@@ -1,19 +1,19 @@
 import React from "react";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
-import { LinksCollection, Link } from "../api/links";
+import { Patient, PatientsCollection } from "/imports/api/patient";
 
 export const Info = () => {
-  const isLoading = useSubscribe("links");
-  const links = useFind(() => LinksCollection.find());
+  const isLoading = useSubscribe("patients");
+  const patients = useFind(() => PatientsCollection.find());
 
   if (isLoading()) {
     return <div>Loading...</div>;
   }
 
-  const makeLink = (link: Link) => {
+  const makePatient = (patient: Patient) => {
     return (
-      <li key={ link._id }>
-        <a href={ link.url } target="_blank">{ link.title }</a>
+      <li key={ patient._id }>
+        <p>{patient.name}</p>
       </li>
     );
   }
@@ -21,7 +21,7 @@ export const Info = () => {
   return (
     <div>
       <h2>Learn Meteor!</h2>
-      <ul>{ links.map(makeLink) }</ul>
+      <ul>{ patients.map(makePatient) }</ul>
     </div>
   );
 };
