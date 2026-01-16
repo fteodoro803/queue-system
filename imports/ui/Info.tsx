@@ -13,7 +13,7 @@ export const Info = () => {
   const makePatient = (patient: Patient) => {
     return (
       <li key={ patient._id }>
-        <p>{patient.name}</p>
+        <p>Name: {patient.name} | Email: {patient.email ?? "null"} | Number: {patient.number ?? "null"}</p>
       </li>
     );
   }
