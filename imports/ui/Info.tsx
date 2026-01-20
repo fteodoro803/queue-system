@@ -1,12 +1,16 @@
 import React from "react";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Patient, PatientsCollection } from "/imports/api/patient";
+import { Appointment, AppointmentsCollection } from "/imports/api/appointment";
 
 export const Info = () => {
-  const isLoading = useSubscribe("patients");
-  const patients = useFind(() => PatientsCollection.find());
+  const isPatientsLoading = useSubscribe("patients");
+  const isAppointmentsLoading = useSubscribe("appointments");
 
-  if (isLoading()) {
+  const patients = useFind(() => PatientsCollection.find());
+  const appointments = useFind(() => AppointmentsCollection.find());
+
+  if (isPatientsLoading() && isAppointmentsLoading) {
     return <div>Loading...</div>;
   }
 
@@ -18,10 +22,20 @@ export const Info = () => {
     );
   }
 
+  const makeAppointment = (appointment: Appointment) => {
+    return (
+        <li key={ appointment._id}>
+          <p>Type: {appointment.type}</p>
+        </li>
+    );
+  }
+
   return (
     <div>
-      <h2>Learn Meteor!</h2>
+      <h2>Patients</h2>
       <ul>{ patients.map(makePatient) }</ul>
+      <h2>Appointments</h2>
+      <ul>{ appointments.map(makeAppointment) }</ul>
     </div>
   );
 };
