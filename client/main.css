@@ -1,3 +1,8 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default;
+}
+
 body {
   padding: 10px;
   font-family: sans-serif;

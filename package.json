@@ -10,15 +10,20 @@
   "dependencies": {
     "@babel/runtime": "^7.23.5",
     "@swc/helpers": "^0.5.17",
+    "@tailwindcss/postcss": "^4.1.18",
     "meteor-node-stubs": "^1.2.12",
+    "postcss": "^8.5.6",
+    "postcss-load-config": "^6.0.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
     "@types/mocha": "^8.2.3",
     "@types/node": "^22.10.6",
     "@types/react": "^18.2.5",
     "@types/react-dom": "^18.2.4",
+    "daisyui": "^5.5.14",
     "typescript": "^5.4.5"
   },
   "meteor": {
