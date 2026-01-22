@@ -8,7 +8,12 @@ export const App = () => (
     <div>
         <h1>Patients</h1>
         <AddPatientForm />
+        <br />
+        <PatientTable />
+
+
         <AddAppointmentForm />
         <Info />
+
     </div>
 );
