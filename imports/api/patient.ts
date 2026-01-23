@@ -5,6 +5,8 @@ export interface Patient {
     name: string;
     email?: string;
     number?: string;
+
+    icon?: string;
     createdAt: Date;
 }
 
