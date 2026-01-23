@@ -1,13 +1,7 @@
-import { Mongo } from "meteor/mongo";
+import {Mongo} from "meteor/mongo";
+import {Profile} from "/imports/api/profile";
 
-export interface Patient {
-    _id?: string;
-    name: string;
-    email?: string;
-    number?: string;
-
-    icon?: string;
-    createdAt: Date;
+export interface Patient extends Profile {
 }
 
 export const PatientsCollection = new Mongo.Collection<Patient>('patients');
