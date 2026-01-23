@@ -12,9 +12,10 @@ export const AddPatientForm = () => {
     if (!name || name.length == 0) return;
 
     await Meteor.callAsync("patients.insert", {
-      name: name.trim(),
-      email: email.length > 0 ? email.trim() : null,
-      number: number.length > 0 ? number.trim() : null,
+      name,
+      email,
+      number,
+      // todo: add icon
     });
 
     // Clear fields
