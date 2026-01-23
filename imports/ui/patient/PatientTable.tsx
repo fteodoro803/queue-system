@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {useFind, useSubscribe} from "meteor/react-meteor-data"
 import {Patient, PatientsCollection} from "/imports/api/patient"
 import {PatientDetailsModal} from "/imports/ui/patient/PatientDetailsModal"
+import {Icon} from "/imports/ui/components/Icon";
 
 export const PatientTable = () => {
   const isPatientsLoading = useSubscribe("patients");
@@ -20,6 +21,7 @@ export const PatientTable = () => {
         {/* head */}
         <thead>
         <tr>
+          <th></th>
           <th>Name</th>
           <th>Email</th>
           <th>Number</th>
@@ -33,18 +35,23 @@ export const PatientTable = () => {
             return (
               <tr key={modalId} className="hover:bg-base-300">
 
+                {/*Icon*/}
+                <th>
+                <Icon profile={p} />
+
+                </th>
+
                 {/*Name*/}
                 <td>{p.name}</td>
 
                 {/*Email*/}
-                <td>{p.email ?? "-"}</td>
+                <td>{(p.email) ? p.email : "-"}</td>
 
                 {/*Number*/}
-                <td>{p.number ?? "-"}</td>
+                <td>{(p.number) ? p.number : "-"}</td>
 
                 {/*Edit Modal*/}
                 <td>
-                  {/* Open the modal using document.getElementById('ID').showModal() method */}
                   <button className="btn btn-circle btn-ghost"
                           onClick={() => {
                             setSelectedPatient(p)
