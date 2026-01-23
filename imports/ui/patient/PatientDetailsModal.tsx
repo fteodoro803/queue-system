@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Meteor} from "meteor/meteor";
 import {Patient} from "/imports/api/patient";
 import {EmailField} from "/imports/ui/components/EmailField";
+import {NumberField} from "/imports/ui/components/NumberField";
 
 export const PatientDetailsModal = ({patient, open, setOpen}: {
   patient: Patient;
@@ -90,13 +91,13 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
 
           {/* Number */}
           <label className="label">Number</label>
-          <input
-            type="text"
-            className="input input-ghost disabled:opacity-100 bg-base-100 text-black"
-            disabled={!isEditing}
-            value={number}
-            onChange={(e) => setNumber(e.target.value)} // update state on typing
+          <NumberField value={number}
+                      onChange={setNumber}
+                      additionalAttributes={"input-ghost disabled:opacity-100 bg-base-100 text-black"}
+                      placeholder={"N/A"}
+                      disabled={!isEditing}
           />
+
 
           {/* System ID */}
           <label className="label">System ID</label>
