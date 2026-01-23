@@ -1,14 +1,17 @@
-import React from "react";
-import {useFind, useSubscribe} from "meteor/react-meteor-data";
-import {PatientsCollection} from "/imports/api/patient";
+import React, {useState} from "react";
+import {useFind, useSubscribe} from "meteor/react-meteor-data"
+import {Patient, PatientsCollection} from "/imports/api/patient"
+import {PatientDetailsModal} from "/imports/ui/patient/PatientDetailsModal"
 
 export const PatientTable = () => {
   const isPatientsLoading = useSubscribe("patients");
   const patients = useFind(() => PatientsCollection.find());
+  const [isPatientDetailsModalOpen, setIsPatientDetailsModalOpen] = useState<boolean>(false);
+  const [selectedPatient, setSelectedPatient] = useState<Patient>(null);
 
   // Loading
   if (isPatientsLoading()) {
-    return <div>Loading...</div>;
+    return <div>Loading Patients...</div>;
   }
 
   return (
@@ -25,25 +28,46 @@ export const PatientTable = () => {
         </thead>
         <tbody>
         {
-          patients.map((p) => (
-            <tr key={p._id} className="hover:bg-base-300">
-              <td>{p.name}</td>
-              <td>{p.email ?? "-"}</td>
-              <td>{p.number ?? "-"}</td>
-              <td>
-                <button className="btn btn-circle btn-ghost">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                       strokeWidth={1.5} stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round"
-                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          ))
+          patients.map((p) => {
+            const modalId: string = `my_modal_${p._id}}`
+            return (
+              <tr key={modalId} className="hover:bg-base-300">
+
+                {/*Name*/}
+                <td>{p.name}</td>
+
+                {/*Email*/}
+                <td>{p.email ?? "-"}</td>
+
+                {/*Number*/}
+                <td>{p.number ?? "-"}</td>
+
+                {/*Edit Modal*/}
+                <td>
+                  {/* Open the modal using document.getElementById('ID').showModal() method */}
+                  <button className="btn btn-circle btn-ghost"
+                          onClick={() => {
+                            setSelectedPatient(p)
+                            setIsPatientDetailsModalOpen(true);
+                          }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" className="size-6">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            )
+          })
         }
         </tbody>
       </table>
+
+      <PatientDetailsModal patient={selectedPatient}
+                           open={isPatientDetailsModalOpen}
+                           setOpen={setIsPatientDetailsModalOpen}/>
+
     </div>
   );
 
