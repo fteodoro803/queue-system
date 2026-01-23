@@ -17,12 +17,18 @@ Meteor.methods({
       createdAt: new Date()
     });
   },
-  "patients.update"({_id, name, email, number}: { name: string, email?: string, number?: string }) {
+  "patients.update"({_id, name, email, number, icon}: {
+    name: string,
+    email?: string,
+    number?: string,
+    icon?: string,
+  }) {
     return PatientsCollection.updateAsync(_id, {
       $set: {
-        name: name,
-        email: email,
-        number: number
+        name: name.trim(),
+        email: email?.trim() || null,
+        number: number?.trim() || null,
+        icon: icon?.trim() || null,
       }
     })
   },

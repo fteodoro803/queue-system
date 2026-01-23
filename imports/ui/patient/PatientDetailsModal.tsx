@@ -17,8 +17,8 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
     if (!patient) return;
 
     setName(patient.name);
-    setEmail(patient.email ?? "---");
-    setNumber(patient.number ?? "---");
+    setEmail(patient.email ?? "");
+    setNumber(patient.number ?? "");
     setIsEditing(false); // reset edit mode when patient changes
   }, [patient]);
 
@@ -31,9 +31,9 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
   const handleSave = async () => {
     await Meteor.callAsync("patients.update", {
       _id: patient._id,
-      name: name.trim(),
-      email: email.trim(),
-      number: number.trim(),
+      name: name,
+      email: email,
+      number: number,
     });
 
     toggleEditing();
@@ -42,8 +42,8 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
   // Cancel edits functionality
   const handleCancel = async () => {
     setName(patient.name);
-    setEmail(patient.email ?? "---");
-    setNumber(patient.number ?? "---")
+    setEmail(patient.email ?? "");
+    setNumber(patient.number ?? "")
 
     toggleEditing();
   };
@@ -96,6 +96,7 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
             <input
               type="email"
               disabled={!isEditing}
+              placeholder={"undefined"}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -141,10 +142,10 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
         {/*Edit Buttons*/}
         {isEditing && <div className=" flex gap-2 justify-end">
           {/*Save Button*/}
-            <button type="button" className="btn" onClick={handleSave}>Save</button>
+            <button type="button" className="btn bg-green-400" onClick={handleSave}>Save</button>
 
           {/*Cancel Button*/}
-            <button type="button" className="btn" onClick={handleCancel}>Cancel</button>
+            <button type="button" className="btn bg-red-400" onClick={handleCancel}>Cancel</button>
         </div>}
 
       </div>
