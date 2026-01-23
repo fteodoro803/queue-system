@@ -2,13 +2,17 @@ import React, {useEffect, useState} from "react";
 import {Meteor} from "meteor/meteor";
 import {Patient} from "/imports/api/patient";
 
-export const PatientDetailsModal = ({ patient, open, setOpen }: { patient: Patient; open: boolean; setOpen: (boolean) => void; } ) => {
+export const PatientDetailsModal = ({patient, open, setOpen}: {
+  patient: Patient;
+  open: boolean;
+  setOpen: (boolean) => void;
+}) => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [number, setNumber] = useState<string>("");
   const [isEditing, setIsEditing] = useState<boolean>(false)
 
-  // Patient details
+  // React to Patient change
   useEffect(() => {
     if (!patient) return;
 
@@ -76,13 +80,27 @@ export const PatientDetailsModal = ({ patient, open, setOpen }: { patient: Patie
 
           {/* Email */}
           <label className="label">Email</label>
-          <input
-            type="text"
-            className="input input-ghost disabled:opacity-100 bg-base-100 text-black"
-            disabled={!isEditing}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)} // update state on typing
-          />
+          <label className="input validator input-ghost disabled:opacity-100 bg-base-100 text-black">
+            <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <g
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                strokeWidth="2.5"
+                fill="none"
+                stroke="currentColor"
+              >
+                <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+              </g>
+            </svg>
+            <input
+              type="email"
+              disabled={!isEditing}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
+          <div className="validator-hint hidden">Enter valid email address</div>
 
           {/* Number */}
           <label className="label">Number</label>
@@ -107,23 +125,23 @@ export const PatientDetailsModal = ({ patient, open, setOpen }: { patient: Patie
 
         {/*Buttons*/}
         {/*Detail Buttons*/}
-        { !isEditing &&
-          <div className=" flex gap-2 justify-end">
-          {/*Edit Button*/}
-          <button type="button" className="btn" onClick={toggleEditing}>Edit</button>
+        {!isEditing &&
+            <div className=" flex gap-2 justify-end">
+              {/*Edit Button*/}
+                <button type="button" className="btn" onClick={toggleEditing}>Edit</button>
 
-          {/*Close Button*/}
-          <button className="btn" onClick={() => {
-            setOpen(false);
-          }}>Close
-          </button>
-        </div>
+              {/*Close Button*/}
+                <button className="btn" onClick={() => {
+                  setOpen(false);
+                }}>Close
+                </button>
+            </div>
         }
 
         {/*Edit Buttons*/}
         {isEditing && <div className=" flex gap-2 justify-end">
           {/*Save Button*/}
-          <button type="button" className="btn" onClick={handleSave}>Save</button>
+            <button type="button" className="btn" onClick={handleSave}>Save</button>
 
           {/*Cancel Button*/}
             <button type="button" className="btn" onClick={handleCancel}>Cancel</button>
