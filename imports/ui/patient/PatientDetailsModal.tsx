@@ -3,6 +3,7 @@ import {Meteor} from "meteor/meteor";
 import {Patient} from "/imports/api/patient";
 import {EmailField} from "/imports/ui/components/EmailField";
 import {NumberField} from "/imports/ui/components/NumberField";
+import {Icon} from "/imports/ui/components/Icon";
 
 export const PatientDetailsModal = ({patient, open, setOpen}: {
   patient: Patient;
@@ -57,16 +58,12 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
   return (
     <div className="modal modal-open" role={"dialog"}>
       <div className="modal-box">
-        {/*Header*/}
 
-        {!isEditing && (
-          <p className="text-2xl font-bold">More Details</p>
-        )}
-        {isEditing && (
-          <p className="text-2xl font-bold">Editing Details</p>
-        )}
+        {/*Avatar*/}
+        <div className="flex justify-center">
+          <Icon profile={patient}/>
+        </div>
 
-        {/*Body*/}
         <fieldset className="fieldset">
 
           {/* Name */}
