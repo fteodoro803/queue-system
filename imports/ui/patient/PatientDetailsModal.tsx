@@ -3,7 +3,7 @@ import {Meteor} from "meteor/meteor";
 import {Patient} from "/imports/api/patient";
 import {EmailField} from "/imports/ui/components/EmailField";
 import {NumberField} from "/imports/ui/components/NumberField";
-import {Icon} from "/imports/ui/components/Icon";
+import {Avatar} from "/imports/ui/components/Avatar";
 
 export const PatientDetailsModal = ({patient, open, setOpen}: {
   patient: Patient;
@@ -61,7 +61,7 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
 
         {/*Avatar*/}
         <div className="flex justify-center">
-          <Icon profile={patient}/>
+          <Avatar profile={patient}/>
         </div>
 
         <fieldset className="fieldset">

@@ -5,22 +5,22 @@ interface IconProps {
   profile: Profile;
 }
 
-export const Icon: React.FC<IconProps> = ({profile}) => {
+export const Avatar: React.FC<IconProps> = ({profile}) => {
   const size: string = "w-14";
   const nameInitial: string = profile.name[0];
 
   return (
-    // Profile's Icon
-    (profile.icon) &&
+    // Profile's Avatar
+    (profile.avatar) &&
     <div className="avatar">
         <div className={`${size} rounded-full`}>
-            <img src={profile.icon} alt="User Avatar"/>
+            <img src={profile.avatar} alt="User Avatar"/>
         </div>
     </div>
 
     ||
 
-    // Fallback Icon
+    // Fallback Avatar
     <div className="avatar avatar-placeholder">
         <div className={`${size} rounded-full bg-neutral text-neutral-content`}>
           <span className="text-xl">{nameInitial}</span>

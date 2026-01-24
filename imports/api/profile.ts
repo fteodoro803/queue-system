@@ -4,6 +4,6 @@ export interface Profile {
   email?: string;
   number?: string;
 
-  icon?: string;
+  avatar?: string;
   createdAt: Date;
 }

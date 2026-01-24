@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {useFind, useSubscribe} from "meteor/react-meteor-data"
 import {Patient, PatientsCollection} from "/imports/api/patient"
 import {PatientDetailsModal} from "/imports/ui/patient/PatientDetailsModal"
-import {Icon} from "/imports/ui/components/Icon";
+import {Avatar} from "/imports/ui/components/Avatar";
 
 export const PatientTable = () => {
   const isPatientsLoading = useSubscribe("patients");
@@ -35,9 +35,9 @@ export const PatientTable = () => {
             return (
               <tr key={modalId} className="hover:bg-base-300">
 
-                {/*Icon*/}
+                {/*Avatar*/}
                 <th>
-                <Icon profile={p} />
+                <Avatar profile={p} />
 
                 </th>
 
