@@ -3,12 +3,12 @@ import {PatientsCollection} from "/imports/api/patient";
 import "../imports/api/patientsMethods";
 import {AppointmentsCollection} from "/imports/api/appointment";
 import "../imports/api/appointmentMethods";
-import {serviceTypesCollection} from "/imports/api/serviceType";
-import "../imports/api/serviceTypeMethods";
+import {servicesCollection} from "/imports/api/service";
+import "../imports/api/serviceMethods";
 
-// Publish Appointment Types
-Meteor.publish("serviceTypes", function () {
-  return serviceTypesCollection.find();
+// Publish Services
+Meteor.publish("services", function () {
+  return servicesCollection.find();
 });
 
 // Publish Appointments

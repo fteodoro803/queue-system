@@ -1,10 +1,10 @@
 import {Meteor} from "meteor/meteor";
-import {serviceTypesCollection} from "/imports/api/serviceType";
+import {servicesCollection} from "/imports/api/service";
 import {isInteger} from "/imports/utils/utils";
 
 Meteor.methods({
   // Adds service type to the database
-  "serviceTypes.insert"({name, duration}: {
+  "services.insert"({name, duration}: {
     name: string;
     duration: string;
   }) {
@@ -12,7 +12,7 @@ Meteor.methods({
       return;
     }
 
-    return serviceTypesCollection.insertAsync({
+    return servicesCollection.insertAsync({
       name: name,
       duration: duration,
       createdAt: new Date(),

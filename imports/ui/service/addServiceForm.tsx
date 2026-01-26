@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Meteor} from "meteor/meteor";
 
-export const CreateServiceTypeForm = () => {
+export const AddServiceForm = () => {
   const [name, setName] = useState("");
   const [duration, setDuration] = useState("");
 
@@ -10,7 +10,7 @@ export const CreateServiceTypeForm = () => {
 
     if (!name || name.length == 0) return;
 
-    await Meteor.callAsync("serviceTypes.insert", {
+    await Meteor.callAsync("services.insert", {
       name,
       duration,
     });
