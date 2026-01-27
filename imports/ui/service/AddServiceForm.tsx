@@ -1,9 +1,13 @@
 import React, {useState} from "react";
 import {Meteor} from "meteor/meteor";
 
+// maybe make this a modal?
+
 export const AddServiceForm = () => {
   const [name, setName] = useState("");
   const [duration, setDuration] = useState("");
+  const [description, setDescription] = useState("");
+  const [cost, setCost] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -12,12 +16,16 @@ export const AddServiceForm = () => {
 
     await Meteor.callAsync("services.insert", {
       name,
+      cost,
       duration,
+      description,
     });
 
     // Clear fields
     setName("");
     setDuration("");
+    setCost("");
+    setDescription("");
   };
 
   return (
@@ -44,6 +52,31 @@ export const AddServiceForm = () => {
           placeholder="10"
           value={duration}
           onChange={(e) => setDuration(e.target.value)}/>
+
+        {/* Cost Field*/}
+        <label className="label">Cost (in Pesos)</label>
+        <label
+          className="input">
+          <input
+            type="number"
+            className="grow"
+            placeholder="500"
+            value={cost}
+            onChange={(e) => setCost(e.target.value)}
+          />
+          <span className="badge badge-neutral badge-xs">Optional</span>
+        </label>
+
+        {/* Description Field */}
+        <label className="label">Description *</label>
+        <input
+          required
+          type="text"
+          className="input"
+          placeholder=""
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}/>
+
 
         {/* Add Button */}
         <button type="submit" className="btn">Add</button>
