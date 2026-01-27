@@ -3,6 +3,7 @@ import {useFind, useSubscribe} from "meteor/react-meteor-data"
 import {Patient, PatientsCollection} from "/imports/api/patient"
 import {PatientDetailsModal} from "/imports/ui/patient/PatientDetailsModal"
 import {Avatar} from "/imports/ui/components/Avatar";
+import {Loading} from "/imports/ui/components/Loading";
 
 export const PatientTable = () => {
   const isPatientsLoading = useSubscribe("patients");
@@ -12,7 +13,9 @@ export const PatientTable = () => {
 
   // Loading
   if (isPatientsLoading()) {
-    return <div>Loading Patients...</div>;
+    return (
+      <Loading />
+    );
   }
 
   return (
