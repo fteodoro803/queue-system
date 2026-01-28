@@ -1,28 +1,19 @@
 import React from 'react';
-import {AddPatientForm} from "/imports/ui/patient/AddPatientForm";
-import {PatientTable} from "/imports/ui/patient/PatientTable";
-import {AddServiceForm} from "/imports/ui/service/AddServiceForm";
-import {AddAppointmentForm} from "/imports/ui/appointment/AddAppointmentForm";
-import {ServiceDetails} from "/imports/ui/service/ServiceDetails";
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import {Home} from "./pages/Home";
+import {Patients} from "./pages/Patients";
+import {Sidebar} from "/imports/ui/navigation/Sidebar";
 
 export const App = () => (
-  <div>
-    <h1>Services</h1>
-    <AddServiceForm/>
-    <br/>
-    <ServiceDetails/>
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Sidebar />}>
+        <Route index element={<Home />} />
+        <Route path="/patient" element={<Patients/>}/>
+          <Route path="/admin" element={<Patients/>}/>
+        <Route path="/service" element={<Patients/>}/>
+      </Route>
 
-    <br/>
-
-    <h1>Appointment</h1>
-    <AddAppointmentForm/>
-
-    <br/>
-
-
-    <h1>Patients</h1>
-    <AddPatientForm/>
-    <PatientTable/>
-
-  </div>
+    </Routes>
+  </BrowserRouter>
 );
