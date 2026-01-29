@@ -1,7 +1,7 @@
 import React, {useState} from "react";
-import {useFind, useSubscribe} from "meteor/react-meteor-data"
-import {Patient, PatientsCollection} from "/imports/api/patient"
-import {PatientDetailsModal} from "/imports/ui/patient/PatientDetailsModal"
+import {useFind, useSubscribe} from "meteor/react-meteor-data";
+import {Patient, PatientsCollection} from "/imports/api/patient";
+import {PatientDetailsModal} from "/imports/ui/patient/PatientDetailsModal";
 import {Avatar} from "/imports/ui/components/Avatar";
 import {Loading} from "/imports/ui/components/Loading";
 
@@ -14,12 +14,12 @@ export const PatientTable = () => {
   // Loading
   if (isPatientsLoading()) {
     return (
-      <Loading />
+      <Loading/>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4">
+    <div className="min-w-2xl max-w-7xl mx-auto px-8 py-8">
       <table className="table">
         {/* head */}
         <thead>
@@ -34,13 +34,13 @@ export const PatientTable = () => {
         <tbody>
         {
           patients.map((p) => {
-            const modalId: string = `my_modal_${p._id}}`
+            const modalId: string = `my_modal_${p._id}}`;
             return (
               <tr key={modalId} className="hover:bg-base-300">
 
                 {/*Avatar*/}
                 <th>
-                <Avatar profile={p} />
+                  <Avatar profile={p}/>
 
                 </th>
 
@@ -57,7 +57,7 @@ export const PatientTable = () => {
                 <td>
                   <button className="btn btn-circle btn-ghost"
                           onClick={() => {
-                            setSelectedPatient(p)
+                            setSelectedPatient(p);
                             setIsPatientDetailsModalOpen(true);
                           }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -68,7 +68,7 @@ export const PatientTable = () => {
                   </button>
                 </td>
               </tr>
-            )
+            );
           })
         }
         </tbody>
