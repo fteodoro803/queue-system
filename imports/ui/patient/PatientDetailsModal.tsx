@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from "react";
-import {Meteor} from "meteor/meteor";
-import {Patient} from "/imports/api/patient";
-import {EmailField} from "/imports/ui/components/EmailField";
-import {NumberField} from "/imports/ui/components/NumberField";
-import {Avatar} from "/imports/ui/components/Avatar";
+import React, { useEffect, useState } from "react";
+import { Meteor } from "meteor/meteor";
+import { Patient } from "/imports/api/patient";
+import { EmailField } from "/imports/ui/components/EmailField";
+import { NumberField } from "/imports/ui/components/NumberField";
+import { Avatar } from "/imports/ui/components/Avatar";
+import { NameField } from "/imports/ui/components/NameField";
 
 export const PatientDetailsModal = ({patient, open, setOpen}: {
   patient: Patient;
@@ -13,7 +14,7 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [number, setNumber] = useState<string>("");
-  const [isEditing, setIsEditing] = useState<boolean>(false)
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   // React to Patient change
   useEffect(() => {
@@ -28,7 +29,7 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
 
   const toggleEditing = () => {
     isEditing ? setIsEditing(false) : setIsEditing(true);
-  }
+  };
 
   // Save edits functionality
   const handleSave = async () => {
@@ -46,7 +47,7 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
   const handleCancel = async () => {
     setName(patient.name);
     setEmail(patient.email ?? "");
-    setNumber(patient.number ?? "")
+    setNumber(patient.number ?? "");
 
     toggleEditing();
   };
@@ -68,13 +69,11 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
 
           {/* Name */}
           <label className="label">Name</label>
-          {/*<input type="text" className="input input-ghost placeholder:text-black" placeholder={name}/>*/}
-          <input
-            type="text"
-            className="input input-ghost disabled:opacity-100 bg-base-100 text-black"
-            disabled={!isEditing}
-            value={name}
-            onChange={(e) => setName(e.target.value)} // update state on typing
+          <NameField value={name}
+                     onChange={setName}
+                     additionalAttributes={"input input-ghost disabled:opacity-100 bg-base-100 text-black"}
+                     placeholder={"N/A"}
+                     disabled={!isEditing}
           />
 
           {/* Email */}
@@ -89,10 +88,10 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
           {/* Number */}
           <label className="label">Number</label>
           <NumberField value={number}
-                      onChange={setNumber}
-                      additionalAttributes={"input-ghost disabled:opacity-100 bg-base-100 text-black"}
-                      placeholder={"N/A"}
-                      disabled={!isEditing}
+                       onChange={setNumber}
+                       additionalAttributes={"input-ghost disabled:opacity-100 bg-base-100 text-black"}
+                       placeholder={"N/A"}
+                       disabled={!isEditing}
           />
 
 
@@ -112,26 +111,26 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
         {!isEditing &&
             <div className=" flex gap-2 justify-end">
               {/*Edit Button*/}
-                <button type="button" className="btn" onClick={toggleEditing}>Edit</button>
+              <button type="button" className="btn" onClick={toggleEditing}>Edit</button>
 
               {/*Close Button*/}
-                <button className="btn" onClick={() => {
-                  setOpen(false);
-                }}>Close
-                </button>
+              <button className="btn" onClick={() => {
+                setOpen(false);
+              }}>Close
+              </button>
             </div>
         }
 
         {/*Edit Buttons*/}
         {isEditing && <div className=" flex gap-2 justify-end">
           {/*Save Button*/}
-            <button type="button" className="btn bg-green-400" onClick={handleSave}>Save</button>
+          <button type="button" className="btn bg-green-400" onClick={handleSave}>Save</button>
 
           {/*Cancel Button*/}
-            <button type="button" className="btn bg-red-400" onClick={handleCancel}>Cancel</button>
+          <button type="button" className="btn bg-red-400" onClick={handleCancel}>Cancel</button>
         </div>}
 
       </div>
     </div>
-  )
-}
+  );
+};

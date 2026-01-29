@@ -1,7 +1,8 @@
-import React, {useState} from "react";
-import {Meteor} from "meteor/meteor";
-import {EmailField} from "/imports/ui/components/EmailField";
-import {NumberField} from "/imports/ui/components/NumberField";
+import React, { useState } from "react";
+import { Meteor } from "meteor/meteor";
+import { EmailField } from "/imports/ui/components/EmailField";
+import { NumberField } from "/imports/ui/components/NumberField";
+import { NameField } from "/imports/ui/components/NameField";
 
 export const AddPatientForm = () => {
   const [name, setName] = useState("");
@@ -33,21 +34,15 @@ export const AddPatientForm = () => {
 
         {/* Name Field */}
         <label className="label">Name *</label>
-        <input
-          required
-          type="text"
-          className="input"
-          placeholder="Little Timmy"
-          value={name}
-          onChange={(e) => setName(e.target.value)}/>
+        <NameField value={name} onChange={setName} placeholder={"Your Name"}/>
 
         {/* Email Field */}
         <label className="label">Email</label>
-        <EmailField value={email} onChange={setEmail} placeholder={"mail@site.com"} />
+        <EmailField value={email} onChange={setEmail} placeholder={"mail@site.com"}/>
 
         {/* Number Field */}
         <label className="label">Number</label>
-        <NumberField value={number} onChange={setNumber} placeholder={"0900 000 0000"} />
+        <NumberField value={number} onChange={setNumber} placeholder={"0900 000 0000"}/>
 
         {/* Add Button */}
         <button type="submit" className="btn">Add</button>
@@ -55,4 +50,4 @@ export const AddPatientForm = () => {
       </fieldset>
     </form>
   );
-}
+};
