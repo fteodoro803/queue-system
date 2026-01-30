@@ -21,9 +21,6 @@ export const EmailField: React.FC<EmailFieldProps> = ({
   return (
     <>
       <label className={`${baseAttributes} ${additionalAttributes}`}>
-        {/*Icon*/}
-        <EnvelopeIcon className="h-5 w-5 text-base-content/50"/>
-
         {/*Input*/}
         <input
           type="email"
@@ -32,6 +29,9 @@ export const EmailField: React.FC<EmailFieldProps> = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
+
+        {/*Icon*/}
+        <EnvelopeIcon className="h-5 w-5 text-base-content/50"/>
       </label>
       <div className="validator-hint hidden">Enter valid email address</div>
     </>

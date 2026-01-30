@@ -21,9 +21,6 @@ export const NameField: React.FC<NameFieldProps> = ({
   return (
     <>
       <label className={`${baseAttributes} ${additionalAttributes}`}>
-        {/*Icon*/}
-        <UserIcon className="h-5 w-5 text-base-content/50"/>
-
         {/*Input*/}
         <input
           required
@@ -34,6 +31,10 @@ export const NameField: React.FC<NameFieldProps> = ({
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
         />
+
+        {/*Icon*/}
+        <UserIcon className="h-5 w-5 text-base-content/50"/>
+
       </label>
     </>
   );
