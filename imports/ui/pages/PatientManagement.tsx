@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { PatientTable } from "/imports/ui/patient/PatientTable";
 import { AddPatientModal } from "/imports/ui/patient/AddPatientModal";
 
-export const Patients = () => {
+export const PatientManagement = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
