@@ -3,12 +3,12 @@ import { PatientsCollection } from "/imports/api/patient";
 import "../imports/api/patientsMethods";
 import { AppointmentsCollection } from "/imports/api/appointment";
 import "../imports/api/appointmentMethods";
-import { servicesCollection } from "/imports/api/service";
+import { ServicesCollection } from "/imports/api/service";
 import "../imports/api/serviceMethods";
 
 // Publish Services
 Meteor.publish("services", function () {
-  return servicesCollection.find();
+  return ServicesCollection.find();
 });
 
 // Publish Appointments

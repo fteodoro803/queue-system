@@ -1,6 +1,6 @@
-import {Meteor} from "meteor/meteor";
-import {servicesCollection} from "/imports/api/service";
-import {isInteger} from "/imports/utils/utils";
+import { Meteor } from "meteor/meteor";
+import { ServicesCollection } from "/imports/api/service";
+import { isInteger } from "/imports/utils/utils";
 
 Meteor.methods({
   // Adds service type to the database
@@ -21,7 +21,7 @@ Meteor.methods({
       return;
     }
 
-    return servicesCollection.insertAsync({
+    return ServicesCollection.insertAsync({
       name: name,
       cost: cost ?? null,
       duration: duration,
