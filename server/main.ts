@@ -1,4 +1,4 @@
-import { Meteor } from 'meteor/meteor';
+import { Meteor } from "meteor/meteor";
 import { PatientsCollection } from "/imports/api/patient";
 import "../imports/api/patientsMethods";
 import { AppointmentsCollection } from "/imports/api/appointment";
@@ -29,5 +29,5 @@ Meteor.publish("patients", function () {
 });
 
 Meteor.startup(async () => {
-  console.log('Server started');
+  console.log("Server started");
 });

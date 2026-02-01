@@ -10,12 +10,12 @@ interface EmailFieldProps {
 }
 
 export const EmailField: React.FC<EmailFieldProps> = ({
-                                                        value,
-                                                        onChange,
-                                                        placeholder = "",
-                                                        disabled = false,
-                                                        additionalAttributes = "",
-                                                      }) => {
+  value,
+  onChange,
+  placeholder = "",
+  disabled = false,
+  additionalAttributes = "",
+}) => {
   const baseAttributes: string = "input validator";
 
   return (
@@ -31,7 +31,7 @@ export const EmailField: React.FC<EmailFieldProps> = ({
         />
 
         {/*Icon*/}
-        <EnvelopeIcon className="h-5 w-5 text-base-content/50"/>
+        <EnvelopeIcon className="h-5 w-5 text-base-content/50" />
       </label>
       <div className="validator-hint hidden">Enter valid email address</div>
     </>

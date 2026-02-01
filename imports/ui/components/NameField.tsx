@@ -10,12 +10,12 @@ interface NameFieldProps {
 }
 
 export const NameField: React.FC<NameFieldProps> = ({
-                                                      value,
-                                                      onChange,
-                                                      placeholder = "",
-                                                      disabled = false,
-                                                      additionalAttributes = "",
-                                                    }) => {
+  value,
+  onChange,
+  placeholder = "",
+  disabled = false,
+  additionalAttributes = "",
+}) => {
   const baseAttributes: string = "input";
 
   return (
@@ -33,8 +33,7 @@ export const NameField: React.FC<NameFieldProps> = ({
         />
 
         {/*Icon*/}
-        <UserIcon className="h-5 w-5 text-base-content/50"/>
-
+        <UserIcon className="h-5 w-5 text-base-content/50" />
       </label>
     </>
   );

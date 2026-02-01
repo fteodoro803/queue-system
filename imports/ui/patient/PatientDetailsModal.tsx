@@ -9,7 +9,7 @@ import { NameField } from "/imports/ui/components/NameField";
 export const PatientDetailsModal = ({patient, open, setOpen}: {
   patient: Patient;
   open: boolean;
-  setOpen: (boolean) => void;
+  setOpen: (value:boolean) => void;
 }) => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
