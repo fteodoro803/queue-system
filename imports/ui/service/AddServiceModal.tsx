@@ -15,12 +15,19 @@ export const AddServiceModal = ({open, setOpen}: AddServiceModalProps) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Convert Cost and Duration to numbers
+    const durationNum: number = parseInt(duration);
+    const costNum: number | null = cost ? parseInt(cost) : null;
+
+    // Early return if name is emtpy, or duration and cost are NaN
     if (!name || name.length == 0) return;
+    if (isNaN(durationNum)) return;
+    if (costNum !== null && isNaN(costNum)) return;
 
     await Meteor.callAsync("services.insert", {
       name,
-      cost,
-      duration,
+      cost: costNum,
+      duration: durationNum,
       description,
     });
 
