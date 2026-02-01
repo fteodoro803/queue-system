@@ -21,6 +21,9 @@ export const NumberField: React.FC<NumberField> = ({
   return (
     <>
       <label className={`${baseAttributes} ${additionalAttributes}`}>
+        {/*Icon*/}
+        <DevicePhoneMobileIcon className="h-5 w-5 text-base-content/50" />
+
         {/*Input*/}
         <input
           type="tel"
@@ -34,9 +37,6 @@ export const NumberField: React.FC<NumberField> = ({
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
         />
-
-        {/*Icon*/}
-        <DevicePhoneMobileIcon className="h-5 w-5 text-base-content/50" />
       </label>
       <p className="validator-hint">Must be 11 digits</p>
     </>
