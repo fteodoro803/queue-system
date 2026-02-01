@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Meteor } from "meteor/meteor";
 
-export const AddServiceModal = ({open, setOpen}: {
+interface AddServiceModalProps {
   open: boolean;
-  setOpen: (boolean) => void;
-}) => {
+  setOpen: (value: boolean) => void;
+}
+
+export const AddServiceModal = ({open, setOpen}: AddServiceModalProps) => {
   const [name, setName] = useState("");
   const [duration, setDuration] = useState("");
   const [description, setDescription] = useState("");

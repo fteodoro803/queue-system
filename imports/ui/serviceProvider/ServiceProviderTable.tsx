@@ -9,7 +9,7 @@ export const ServiceProviderTable = () => {
   const isLoading = useSubscribe("serviceProviders");
   const serviceProviders = useFind(() => ServiceProviderCollection.find());
   const [isProviderDetailsModalOpen, setIsProviderDetailsModalOpen] = useState<boolean>(false);
-  const [selectedProvider, setSelectedProvider] = useState<ServiceProvider>(null);
+  const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
 
   // Loading
   if (isLoading()) {
