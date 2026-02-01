@@ -1,9 +1,8 @@
 export interface Profile {
-  _id?: string;
+  _id: string;
   name: string;
-  email?: string;
-  number?: string;
-
-  avatar?: string;
+  email?: string | null;
+  number?: string | null;
+  avatar?: string | null;
   createdAt: Date;
 }
