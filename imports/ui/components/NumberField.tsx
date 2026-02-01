@@ -10,12 +10,12 @@ interface NumberField {
 }
 
 export const NumberField: React.FC<NumberField> = ({
-                                                     value,
-                                                     onChange,
-                                                     placeholder = "",
-                                                     disabled = false,
-                                                     additionalAttributes = "",
-                                                   }) => {
+  value,
+  onChange,
+  placeholder = "",
+  disabled = false,
+  additionalAttributes = "",
+}) => {
   const baseAttributes: string = "input validator";
 
   return (
@@ -27,8 +27,8 @@ export const NumberField: React.FC<NumberField> = ({
           className="tabular-nums"
           placeholder={placeholder}
           pattern="[0-9]*"
-          minLength="11"
-          maxLength="11"
+          minLength={11}
+          maxLength={11}
           title="Must be 11 digits"
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -36,7 +36,7 @@ export const NumberField: React.FC<NumberField> = ({
         />
 
         {/*Icon*/}
-        <DevicePhoneMobileIcon className="h-5 w-5 text-base-content/50"/>
+        <DevicePhoneMobileIcon className="h-5 w-5 text-base-content/50" />
       </label>
       <p className="validator-hint">Must be 11 digits</p>
     </>
