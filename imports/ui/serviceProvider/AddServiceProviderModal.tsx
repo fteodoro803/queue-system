@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { AddServiceProviderForm } from "/imports/ui/serviceProvider/AddServiceProviderForm";
 
-export const AddServiceProviderModal = ({open, setOpen}: {
+export const AddServiceProviderModal = ({
+  open,
+  setOpen,
+}: {
   open: boolean;
-  setOpen: (boolean) => void;
+  setOpen: (value: boolean) => void;
 }) => {
   const [name, setName] = useState("");
 
@@ -14,19 +17,25 @@ export const AddServiceProviderModal = ({open, setOpen}: {
   return (
     <div className="modal modal-open" role={"dialog"}>
       <div className="modal-box">
-
         {/*Close Button*/}
-        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                onClick={() => setOpen(false)}>✕
+        <button
+          className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          onClick={() => setOpen(false)}
+        >
+          ✕
         </button>
 
-        <AddServiceProviderForm/>
+        <AddServiceProviderForm />
 
         <div className=" flex gap-2 justify-end">
           {/*Close Button*/}
-          <button className="btn" onClick={() => {
-            setOpen(false);
-          }}>Close
+          <button
+            className="btn"
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            Close
           </button>
         </div>
       </div>

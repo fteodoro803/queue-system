@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { AddPatientForm } from "/imports/ui/patient/AddPatientForm";
 
-export const AddPatientModal = ({open, setOpen}: {
+export const AddPatientModal = ({
+  open,
+  setOpen,
+}: {
   open: boolean;
-  setOpen: (boolean) => void;
+  setOpen: (value: boolean) => void;
 }) => {
   const [name, setName] = useState("");
 
@@ -14,14 +17,17 @@ export const AddPatientModal = ({open, setOpen}: {
   return (
     <div className="modal modal-open" role={"dialog"}>
       <div className="modal-box">
-
-        <AddPatientForm/>
+        <AddPatientForm />
 
         <div className=" flex gap-2 justify-end">
-          {/*Close Button*/}
-          <button className="btn" onClick={() => {
-            setOpen(false);
-          }}>Close
+          {/* Close Button */}
+          <button
+            className="btn"
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            Close
           </button>
         </div>
       </div>

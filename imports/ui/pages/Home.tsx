@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
 export const Home = () => {
   return (
@@ -18,7 +18,6 @@ export const Home = () => {
             <button className="btn">Admin View</button>
           </Link>
         </div>
-
       </div>
     </div>
   );

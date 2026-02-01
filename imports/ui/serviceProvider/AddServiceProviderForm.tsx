@@ -9,7 +9,7 @@ export const AddServiceProviderForm = () => {
   const [email, setEmail] = useState("");
   const [number, setNumber] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!name || name.length == 0) return;
@@ -34,19 +34,28 @@ export const AddServiceProviderForm = () => {
 
         {/* Name Field */}
         <label className="label">Name *</label>
-        <NameField value={name} onChange={setName} placeholder={"Your Name"}/>
+        <NameField value={name} onChange={setName} placeholder={"Your Name"} />
 
         {/* Email Field */}
         <label className="label">Email</label>
-        <EmailField value={email} onChange={setEmail} placeholder={"mail@site.com"}/>
+        <EmailField
+          value={email}
+          onChange={setEmail}
+          placeholder={"mail@site.com"}
+        />
 
         {/* Number Field */}
         <label className="label">Number</label>
-        <NumberField value={number} onChange={setNumber} placeholder={"0900 000 0000"}/>
+        <NumberField
+          value={number}
+          onChange={setNumber}
+          placeholder={"0900 000 0000"}
+        />
 
         {/* Add Button */}
-        <button type="submit" className="btn">Add</button>
-
+        <button type="submit" className="btn">
+          Add
+        </button>
       </fieldset>
     </form>
   );
