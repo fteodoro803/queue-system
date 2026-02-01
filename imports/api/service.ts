@@ -1,4 +1,4 @@
-import { Mongo } from "meteor/mongo"
+import { Mongo } from "meteor/mongo";
 
 export interface Service {
   _id?: string;
@@ -8,4 +8,4 @@ export interface Service {
   description: string;
 }
 
-export const servicesCollection = new Mongo.Collection<Service>('services');
+export const ServicesCollection = new Mongo.Collection<Service>('services');

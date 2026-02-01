@@ -4,6 +4,7 @@ import { Home } from "./pages/Home";
 import { PatientManagement } from "./pages/PatientManagement";
 import { Sidebar } from "/imports/ui/navigation/Sidebar";
 import { AdminDashboard } from "/imports/ui/pages/AdminDashboard";
+import { ServiceManagement } from "/imports/ui/pages/ServiceManagement";
 
 export const App = () => (
   <BrowserRouter>
@@ -17,6 +18,7 @@ export const App = () => (
           <Route index element={<AdminDashboard/>}/>
           <Route path="dashboard" element={<AdminDashboard/>}/>
           <Route path="patientManagement" element={<PatientManagement/>}/>
+          <Route path="serviceManagement" element={<ServiceManagement/>}/>
         </Route>
 
         <Route path="service" element={<PatientManagement/>}/>

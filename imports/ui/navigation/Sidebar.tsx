@@ -19,7 +19,7 @@ export const Sidebar = () => {
     return (
       <Outlet/>
     );
-  
+
   return (
     <>
       {/* Floating button - only shows on small screens */}
@@ -56,6 +56,7 @@ export const Sidebar = () => {
             {/*Admin Sidebar*/}
             {isAdmin && (
               <>
+                {/*Dashboard Button*/}
                 <li><Link to="admin/dashboard">
                   <PresentationChartLineIcon className="h-5 w-5 text-black/80"/>
                   <span>Dashboard</span>
@@ -73,10 +74,10 @@ export const Sidebar = () => {
                   <span>Patients</span>
                 </Link></li>
 
-                {/*Service Providers Button*/}
-                <li><Link to="admin/patientManagement">
+                {/*Services Button*/}
+                <li><Link to="admin/serviceManagement">
                   <WrenchScrewdriverIcon className="h-5 w-5 text-black/80"/>
-                  <span>Service Providers</span>
+                  <span>Services</span>
                 </Link></li>
               </>
             )}

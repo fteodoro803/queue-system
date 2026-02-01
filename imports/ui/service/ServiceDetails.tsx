@@ -1,13 +1,13 @@
 import React from "react";
 import { useTracker, useSubscribe } from "meteor/react-meteor-data";
-import {servicesCollection} from "/imports/api/service";
-import {isInteger} from "/imports/utils/utils";
-import {Loading} from "/imports/ui/components/Loading";
+import { ServicesCollection } from "/imports/api/service";
+import { isInteger } from "/imports/utils/utils";
+import { Loading } from "/imports/ui/components/Loading";
 
 export const ServiceDetails = () => {
   // Get list of Services
   const isLoading = useSubscribe("services");
-  const services = useTracker(() => servicesCollection.find({}).fetch());
+  const services = useTracker(() => ServicesCollection.find({}).fetch());
 
   function addButtonValue(cost?: number): string {
     if (!cost) {
@@ -19,7 +19,7 @@ export const ServiceDetails = () => {
 
   if (isLoading()) {
     return (
-      <Loading />
+      <Loading/>
     );
   }
 
@@ -38,4 +38,4 @@ export const ServiceDetails = () => {
       )}
     </div>
   );
-}
+};
