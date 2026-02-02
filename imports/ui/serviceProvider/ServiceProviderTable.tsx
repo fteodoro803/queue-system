@@ -7,6 +7,7 @@ import {
   ServiceProviderCollection,
 } from "/imports/api/serviceProvider";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { ServiceProviderDetailsModal } from "./ServiceProviderDetailsModal";
 
 export const ServiceProviderTable = () => {
   const isLoading = useSubscribe("serviceProviders");
@@ -71,9 +72,14 @@ export const ServiceProviderTable = () => {
         </tbody>
       </table>
 
-      {/*<ServiceProviderDetailsModal patient={selectedProvider}*/}
-      {/*                     open={isProviderDetailsModalOpen}*/}
-      {/*                     setOpen={setIsProviderDetailsModalOpen}/>*/}
+      {/* Modal */}
+      {selectedProvider && (
+        <ServiceProviderDetailsModal
+          serviceProvider={selectedProvider}
+          open={isProviderDetailsModalOpen}
+          setOpen={setIsProviderDetailsModalOpen}
+        />
+      )}
     </div>
   );
 };
