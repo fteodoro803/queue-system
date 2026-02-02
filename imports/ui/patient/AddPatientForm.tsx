@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Meteor } from "meteor/meteor";
 import { EmailField } from "/imports/ui/components/EmailField";
 import { NumberField } from "/imports/ui/components/NumberField";
 import { NameField } from "/imports/ui/components/NameField";
