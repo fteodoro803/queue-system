@@ -23,26 +23,17 @@ Meteor.methods({
   },
 
   // Updates patient information
-  "patients.update"({
-    _id,
-    name,
-    email,
-    number,
-    avatar,
-  }: {
-    _id: string;
-    name: string;
-    email?: string;
-    number?: string;
-    avatar?: string;
-  }) {
-    return PatientsCollection.updateAsync(_id, {
-      $set: {
-        name: name.trim(),
-        email: email?.trim() ?? null,
-        number: number?.trim() ?? null,
-        avatar: avatar?.trim() ?? null,
-      },
+  "patients.update"(id: string, data: PatientData) {
+    const updates: Partial<PatientData> = {};
+
+    // Only update fields that are provided
+    if (data.name !== undefined) updates.name = data.name.trim();
+    if (data.email !== undefined) updates.email = data.email?.trim() ?? null;
+    if (data.number !== undefined) updates.number = data.number?.trim() ?? null;
+    if (data.avatar !== undefined) updates.avatar = data.avatar?.trim() ?? null;
+
+    return PatientsCollection.updateAsync(id, {
+      $set: updates,
     });
   },
 });
@@ -50,4 +41,8 @@ Meteor.methods({
 // Exports for the Meteor methods
 export async function insertPatient(data: PatientData) {
   return Meteor.callAsync("patients.insert", data);
+}
+
+export async function updatePatient(id: string, data: PatientData) {
+  return Meteor.callAsync("patients.update", id, data);
 }

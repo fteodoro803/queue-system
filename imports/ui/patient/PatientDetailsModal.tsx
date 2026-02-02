@@ -5,11 +5,16 @@ import { EmailField } from "/imports/ui/components/EmailField";
 import { NumberField } from "/imports/ui/components/NumberField";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { NameField } from "/imports/ui/components/NameField";
+import { updatePatient } from "/imports/api/patientsMethods";
 
-export const PatientDetailsModal = ({patient, open, setOpen}: {
+export const PatientDetailsModal = ({
+  patient,
+  open,
+  setOpen,
+}: {
   patient: Patient;
   open: boolean;
-  setOpen: (value:boolean) => void;
+  setOpen: (value: boolean) => void;
 }) => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -26,15 +31,13 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
     setIsEditing(false); // reset edit mode when patient changes
   }, [patient]);
 
-
   const toggleEditing = () => {
     isEditing ? setIsEditing(false) : setIsEditing(true);
   };
 
   // Save edits functionality
   const handleSave = async () => {
-    await Meteor.callAsync("patients.update", {
-      _id: patient._id,
+    await updatePatient(patient._id, {
       name: name,
       email: email,
       number: number,
@@ -59,41 +62,47 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
   return (
     <div className="modal modal-open" role={"dialog"}>
       <div className="modal-box">
-
         {/*Avatar*/}
         <div className="flex justify-center">
-          <Avatar profile={patient}/>
+          <Avatar profile={patient} />
         </div>
 
         <fieldset className="fieldset">
-
           {/* Name */}
           <label className="label">Name</label>
-          <NameField value={name}
-                     onChange={setName}
-                     additionalAttributes={"input input-ghost disabled:opacity-100 bg-base-100 text-black"}
-                     placeholder={"N/A"}
-                     disabled={!isEditing}
+          <NameField
+            value={name}
+            onChange={setName}
+            additionalAttributes={
+              "input input-ghost disabled:opacity-100 bg-base-100 text-black"
+            }
+            placeholder={"N/A"}
+            disabled={!isEditing}
           />
 
           {/* Email */}
           <label className="label">Email</label>
-          <EmailField value={email}
-                      onChange={setEmail}
-                      additionalAttributes={"input-ghost disabled:opacity-100 bg-base-100 text-black"}
-                      placeholder={"N/A"}
-                      disabled={!isEditing}
+          <EmailField
+            value={email}
+            onChange={setEmail}
+            additionalAttributes={
+              "input-ghost disabled:opacity-100 bg-base-100 text-black"
+            }
+            placeholder={"N/A"}
+            disabled={!isEditing}
           />
 
           {/* Number */}
           <label className="label">Number</label>
-          <NumberField value={number}
-                       onChange={setNumber}
-                       additionalAttributes={"input-ghost disabled:opacity-100 bg-base-100 text-black"}
-                       placeholder={"N/A"}
-                       disabled={!isEditing}
+          <NumberField
+            value={number}
+            onChange={setNumber}
+            additionalAttributes={
+              "input-ghost disabled:opacity-100 bg-base-100 text-black"
+            }
+            placeholder={"N/A"}
+            disabled={!isEditing}
           />
-
 
           {/* System ID */}
           <label className="label">System ID</label>
@@ -103,33 +112,51 @@ export const PatientDetailsModal = ({patient, open, setOpen}: {
             disabled={true}
             value={patient._id}
           />
-
         </fieldset>
 
         {/*Buttons*/}
         {/*Detail Buttons*/}
-        {!isEditing &&
-            <div className=" flex gap-2 justify-end">
-              {/*Edit Button*/}
-              <button type="button" className="btn" onClick={toggleEditing}>Edit</button>
+        {!isEditing && (
+          <div className=" flex gap-2 justify-end">
+            {/*Edit Button*/}
+            <button type="button" className="btn" onClick={toggleEditing}>
+              Edit
+            </button>
 
-              {/*Close Button*/}
-              <button className="btn" onClick={() => {
+            {/*Close Button*/}
+            <button
+              className="btn"
+              onClick={() => {
                 setOpen(false);
-              }}>Close
-              </button>
-            </div>
-        }
+              }}
+            >
+              Close
+            </button>
+          </div>
+        )}
 
         {/*Edit Buttons*/}
-        {isEditing && <div className=" flex gap-2 justify-end">
-          {/*Save Button*/}
-          <button type="button" className="btn bg-green-400" onClick={handleSave}>Save</button>
+        {isEditing && (
+          <div className=" flex gap-2 justify-end">
+            {/*Save Button*/}
+            <button
+              type="button"
+              className="btn bg-green-400"
+              onClick={handleSave}
+            >
+              Save
+            </button>
 
-          {/*Cancel Button*/}
-          <button type="button" className="btn bg-red-400" onClick={handleCancel}>Cancel</button>
-        </div>}
-
+            {/*Cancel Button*/}
+            <button
+              type="button"
+              className="btn bg-red-400"
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
