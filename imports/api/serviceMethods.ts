@@ -1,26 +1,26 @@
 import { Meteor } from "meteor/meteor";
 import { ServicesCollection } from "/imports/api/service";
-import { isInteger } from "/imports/utils/utils";
+
+export interface ServiceData {
+  name: string;
+  cost?: number | null;
+  duration: number;
+  description: string;
+}
 
 Meteor.methods({
   // Adds service type to the database
-  "services.insert"({
-    name,
-    cost,
-    duration,
-    description,
-  }: {
-    name: string;
-    cost?: number | null;
-    duration: number;
-    description: string;
-  }) {
+  "services.insert"(data: ServiceData) {
     return ServicesCollection.insertAsync({
-      name: name,
-      cost: cost ?? null,
-      duration: duration,
-      description: description,
+      name: data.name,
+      cost: data.cost ?? null,
+      duration: data.duration,
+      description: data.description,
       createdAt: new Date(),
     });
   },
 });
+
+export async function insertService(data: ServiceData) {
+  return await Meteor.callAsync("services.insert", data);
+}
