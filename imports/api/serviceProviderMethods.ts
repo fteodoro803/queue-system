@@ -1,47 +1,49 @@
 import { Meteor } from "meteor/meteor";
 import { ServiceProviderCollection } from "/imports/api/serviceProvider";
 
+// Interfaces
+export interface serviceProviderData {
+  name: string;
+  email?: string;
+  number?: string;
+  avatar?: string;
+}
+
+// Meteor CRUD methods
 Meteor.methods({
   // Adds patient to the database
-  "serviceProvider.insert"({
-    name,
-    email,
-    number,
-    avatar,
-  }: {
-    name: string;
-    email?: string;
-    number?: string;
-    avatar?: string;
-  }) {
+  "serviceProvider.insert"(data: serviceProviderData) {
     return ServiceProviderCollection.insertAsync({
-      name: name.trim(),
-      email: email?.trim() || null,
-      number: number?.trim() || null,
-      avatar: avatar?.trim() || null,
+      name: data.name.trim(),
+      email: data.email?.trim() || null,
+      number: data.number?.trim() || null,
+      avatar: data.avatar?.trim() || null,
       createdAt: new Date(),
     });
   },
-  "serviceProvider.update"({
-    _id,
-    name,
-    email,
-    number,
-    avatar,
-  }: {
-    _id: string;
-    name: string;
-    email?: string;
-    number?: string;
-    avatar?: string;
-  }) {
-    return ServiceProviderCollection.updateAsync(_id, {
-      $set: {
-        name: name.trim(),
-        email: email?.trim() || null,
-        number: number?.trim() || null,
-        avatar: avatar?.trim() || null,
-      },
+  "serviceProvider.update"(id: string, data: serviceProviderData) {
+    const updates: Partial<serviceProviderData> = {};
+
+    // Only update fields that are provided
+    if (data.name !== undefined) updates.name = data.name.trim();
+    if (data.email !== undefined) updates.email = data.email?.trim() ?? null;
+    if (data.number !== undefined) updates.number = data.number?.trim() ?? null;
+    if (data.avatar !== undefined) updates.avatar = data.avatar?.trim() ?? null;
+
+    return ServiceProviderCollection.updateAsync(id, {
+      $set: updates,
     });
   },
 });
+
+// Exports for the Meteor methods
+export async function insertServiceProvider(data: serviceProviderData) {
+  return Meteor.callAsync("serviceProvider.insert", data);
+}
+
+export async function updateServiceProvider(
+  id: string,
+  data: serviceProviderData,
+) {
+  return Meteor.callAsync("serviceProvider.update", id, data);
+}

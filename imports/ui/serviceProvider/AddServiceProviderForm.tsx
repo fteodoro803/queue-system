@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Meteor } from "meteor/meteor";
 import { EmailField } from "/imports/ui/components/EmailField";
 import { NumberField } from "/imports/ui/components/NumberField";
 import { NameField } from "/imports/ui/components/NameField";
+import { insertServiceProvider } from "/imports/api/serviceProviderMethods";
 
 export const AddServiceProviderForm = () => {
   const [name, setName] = useState("");
@@ -14,7 +14,7 @@ export const AddServiceProviderForm = () => {
 
     if (!name || name.length == 0) return;
 
-    await Meteor.callAsync("serviceProvider.insert", {
+    await insertServiceProvider({
       name,
       email,
       number,
