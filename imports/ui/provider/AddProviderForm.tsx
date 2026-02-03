@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { EmailField } from "/imports/ui/components/EmailField";
 import { NumberField } from "/imports/ui/components/NumberField";
 import { NameField } from "/imports/ui/components/NameField";
-import { insertServiceProvider } from "/imports/api/serviceProviderMethods";
+import { insertProvider } from "../../api/providerMethods";
 
-export const AddServiceProviderForm = () => {
+export const AddProviderForm = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [number, setNumber] = useState("");
@@ -14,7 +14,7 @@ export const AddServiceProviderForm = () => {
 
     if (!name || name.length == 0) return;
 
-    await insertServiceProvider({
+    await insertProvider({
       name,
       email,
       number,

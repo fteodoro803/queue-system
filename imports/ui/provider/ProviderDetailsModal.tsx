@@ -3,15 +3,15 @@ import { EmailField } from "/imports/ui/components/EmailField";
 import { NumberField } from "/imports/ui/components/NumberField";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { NameField } from "/imports/ui/components/NameField";
-import { ServiceProvider } from "/imports/api/serviceProvider";
-import { updateServiceProvider } from "/imports/api/serviceProviderMethods";
+import { Provider } from "../../api/provider";
+import { updateProvider } from "../../api/providerMethods";
 
-export const ServiceProviderDetailsModal = ({
-  serviceProvider,
+export const ProviderDetailsModal = ({
+  provider,
   open,
   setOpen,
 }: {
-  serviceProvider: ServiceProvider;
+  provider: Provider;
   open: boolean;
   setOpen: (value: boolean) => void;
 }) => {
@@ -22,13 +22,13 @@ export const ServiceProviderDetailsModal = ({
 
   // React to Patient change
   useEffect(() => {
-    if (!serviceProvider) return;
+    if (!provider) return;
 
-    setName(serviceProvider.name);
-    setEmail(serviceProvider.email ?? "");
-    setNumber(serviceProvider.number ?? "");
+    setName(provider.name);
+    setEmail(provider.email ?? "");
+    setNumber(provider.number ?? "");
     setIsEditing(false); // reset edit mode when patient changes
-  }, [serviceProvider]);
+  }, [provider]);
 
   const toggleEditing = () => {
     isEditing ? setIsEditing(false) : setIsEditing(true);
@@ -36,7 +36,7 @@ export const ServiceProviderDetailsModal = ({
 
   // Save edits functionality
   const handleSave = async () => {
-    await updateServiceProvider(serviceProvider._id, {
+    await updateProvider(provider._id, {
       name: name,
       email: email,
       number: number,
@@ -47,9 +47,9 @@ export const ServiceProviderDetailsModal = ({
 
   // Cancel edits functionality
   const handleCancel = async () => {
-    setName(serviceProvider.name);
-    setEmail(serviceProvider.email ?? "");
-    setNumber(serviceProvider.number ?? "");
+    setName(provider.name);
+    setEmail(provider.email ?? "");
+    setNumber(provider.number ?? "");
 
     toggleEditing();
   };
@@ -63,7 +63,7 @@ export const ServiceProviderDetailsModal = ({
       <div className="modal-box">
         {/*Avatar*/}
         <div className="flex justify-center">
-          <Avatar profile={serviceProvider} />
+          <Avatar profile={provider} />
         </div>
 
         <fieldset className="fieldset">
@@ -109,7 +109,7 @@ export const ServiceProviderDetailsModal = ({
             type="text"
             className="input input-ghost disabled:opacity-100 bg-base-100 text-black"
             disabled={true}
-            value={serviceProvider._id}
+            value={provider._id}
           />
         </fieldset>
 

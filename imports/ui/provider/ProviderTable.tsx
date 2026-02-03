@@ -2,20 +2,18 @@ import React, { useState } from "react";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { Loading } from "/imports/ui/components/Loading";
-import {
-  ServiceProvider,
-  ServiceProviderCollection,
-} from "/imports/api/serviceProvider";
+import { Provider, ProviderCollection } from "../../api/provider";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import { ServiceProviderDetailsModal } from "./ServiceProviderDetailsModal";
+import { ProviderDetailsModal } from "./ProviderDetailsModal";
 
-export const ServiceProviderTable = () => {
-  const isLoading = useSubscribe("serviceProviders");
-  const serviceProviders = useFind(() => ServiceProviderCollection.find());
+export const ProviderTable = () => {
+  const isLoading = useSubscribe("providers");
+  const providers = useFind(() => ProviderCollection.find());
   const [isProviderDetailsModalOpen, setIsProviderDetailsModalOpen] =
     useState<boolean>(false);
-  const [selectedProvider, setSelectedProvider] =
-    useState<ServiceProvider | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<Provider | null>(
+    null,
+  );
 
   // Loading
   if (isLoading()) {
@@ -36,7 +34,7 @@ export const ServiceProviderTable = () => {
           </tr>
         </thead>
         <tbody>
-          {serviceProviders.map((p) => {
+          {providers.map((p) => {
             const modalId: string = `my_modal_${p._id}}`;
             return (
               <tr key={modalId} className="hover:bg-base-300">
@@ -74,8 +72,8 @@ export const ServiceProviderTable = () => {
 
       {/* Modal */}
       {selectedProvider && (
-        <ServiceProviderDetailsModal
-          serviceProvider={selectedProvider}
+        <ProviderDetailsModal
+          provider={selectedProvider}
           open={isProviderDetailsModalOpen}
           setOpen={setIsProviderDetailsModalOpen}
         />

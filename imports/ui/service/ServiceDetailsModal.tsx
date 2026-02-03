@@ -44,7 +44,6 @@ export const ServiceDetailsModal = ({
             placeholder={"N/A"}
             icon={WrenchIcon}
           />
-
           {/* Duration */}
           <label className="label">Duration</label>
           <GenericField
@@ -57,7 +56,6 @@ export const ServiceDetailsModal = ({
             placeholder={"N/A"}
             icon={ClockIcon}
           />
-
           {/* Cost */}
           <label className="label">Cost</label>
           <GenericField
@@ -70,7 +68,6 @@ export const ServiceDetailsModal = ({
             placeholder={"N/A"}
             icon={BanknotesIcon}
           />
-
           {/* Description */}
           <label className="label">Description</label>
           <GenericField
