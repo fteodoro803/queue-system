@@ -70,7 +70,7 @@ export const ProviderTable = () => {
         </tbody>
       </table>
 
-      {/* Modal */}
+      {/* Provider Details Modal */}
       {selectedProvider && (
         <ProviderDetailsModal
           provider={selectedProvider}

@@ -1,10 +1,15 @@
 import { Mongo } from "meteor/mongo";
 import { Profile } from "/imports/api/profile";
 
-export interface Provider extends Profile {
-  services: string[]; // Array of Service IDs
+export interface ProviderService {
+  id: string;
+  name: string; // for display
+  // cost: number;
+  enabled: boolean;
 }
 
-export const ProviderCollection = new Mongo.Collection<Provider>(
-  "provider",
-);
+export interface Provider extends Profile {
+  services: ProviderService[]; // Services offered by the provider
+}
+
+export const ProviderCollection = new Mongo.Collection<Provider>("providers");

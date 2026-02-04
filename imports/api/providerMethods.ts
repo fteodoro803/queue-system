@@ -1,5 +1,5 @@
 import { Meteor } from "meteor/meteor";
-import { ProviderCollection } from "./provider";
+import { ProviderCollection, ProviderService } from "./provider";
 
 // Interfaces
 export interface providerData {
@@ -7,7 +7,7 @@ export interface providerData {
   email?: string;
   number?: string;
   avatar?: string;
-  services?: string[];
+  services?: ProviderService[];
 }
 
 // Meteor CRUD methods
@@ -37,6 +37,41 @@ Meteor.methods({
       $set: updates,
     });
   },
+
+  // Add service to provider's list of services
+  async "provider.updateService"(providerId: string, service: ProviderService) {
+    // 1. Try to update the service
+    let result = await ProviderCollection.updateAsync(
+      // Match by providerId and serviceId
+      {
+        _id: providerId,
+        "services.id": service.id,
+      },
+      // Update the matched service
+      {
+        $set: {
+          "services.$": service,
+        },
+      },
+      // Prevent adding new Provider if match not found
+      { upsert: false },
+    );
+
+    // 2. If no service was updated, add it
+    // Service not updating means it doesn't exist yet
+    if (result === 0) {
+      result = await ProviderCollection.updateAsync(
+        { _id: providerId },
+        {
+          $addToSet: {
+            services: service,
+          },
+        },
+      );
+    }
+
+    return result;
+  },
 });
 
 // Exports for the Meteor methods
@@ -46,4 +81,11 @@ export async function insertProvider(data: providerData) {
 
 export async function updateProvider(id: string, data: providerData) {
   return Meteor.callAsync("provider.update", id, data);
+}
+
+export async function updateProviderService(
+  id: string,
+  service: ProviderService,
+) {
+  return Meteor.callAsync("provider.updateService", id, service);
 }

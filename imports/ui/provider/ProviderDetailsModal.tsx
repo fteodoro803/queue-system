@@ -5,6 +5,9 @@ import { Avatar } from "/imports/ui/components/Avatar";
 import { NameField } from "/imports/ui/components/NameField";
 import { Provider } from "../../api/provider";
 import { updateProvider } from "../../api/providerMethods";
+import { ProviderServices } from "./ProviderServices";
+import { ServiceTable } from "../service/ServiceTable";
+import { GenericField } from "../components/GenericField";
 
 export const ProviderDetailsModal = ({
   provider,
@@ -104,58 +107,27 @@ export const ProviderDetailsModal = ({
           />
 
           {/* System ID */}
-          <label className="label">System ID</label>
-          <input
-            type="text"
-            className="input input-ghost disabled:opacity-100 bg-base-100 text-black"
-            disabled={true}
+          {/* <label className="label">System ID</label>
+          <GenericField
             value={provider._id}
-          />
+            additionalAttributes="input input-ghost disabled:opacity-100 bg-base-100 text-black"
+            disabled={true}
+          /> */}
         </fieldset>
 
-        {/*Buttons*/}
-        {/*Detail Buttons*/}
-        {!isEditing && (
-          <div className=" flex gap-2 justify-end">
-            {/*Edit Button*/}
-            <button type="button" className="btn" onClick={toggleEditing}>
-              Edit
-            </button>
+        <ProviderServices provider={provider} />
 
-            {/*Close Button*/}
-            <button
-              className="btn"
-              onClick={() => {
-                setOpen(false);
-              }}
-            >
-              Close
-            </button>
-          </div>
-        )}
-
-        {/*Edit Buttons*/}
-        {isEditing && (
-          <div className=" flex gap-2 justify-end">
-            {/*Save Button*/}
-            <button
-              type="button"
-              className="btn bg-green-400"
-              onClick={handleSave}
-            >
-              Save
-            </button>
-
-            {/*Cancel Button*/}
-            <button
-              type="button"
-              className="btn bg-red-400"
-              onClick={handleCancel}
-            >
-              Cancel
-            </button>
-          </div>
-        )}
+        {/*Close Button*/}
+        <div className="justify-end flex">
+          <button
+            className="btn"
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   );
