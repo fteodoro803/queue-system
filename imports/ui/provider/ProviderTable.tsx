@@ -15,6 +15,16 @@ export const ProviderTable = () => {
     null,
   );
 
+  // Sync selected provider when providers array updates
+  React.useEffect(() => {
+    if (selectedProvider) {
+      const updated = providers.find((p) => p._id === selectedProvider._id);
+      if (updated) {
+        setSelectedProvider(updated);
+      }
+    }
+  }, [providers]);
+
   // Loading
   if (isLoading()) {
     return <Loading />;

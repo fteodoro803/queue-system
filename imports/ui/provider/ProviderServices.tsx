@@ -10,22 +10,23 @@ export const ProviderServices = ({ provider }: { provider: Provider }) => {
   const isLoadingServices = useSubscribe("services");
   const services = useFind(() => ServicesCollection.find());
 
-  // Saves/Removes service from provider's list of services
-  const handleToggleService = async (
-    checked: React.ChangeEvent<HTMLInputElement>,
-    service: Service,
-  ) => {
-    let providerService: ProviderService = {
-      id: service._id,
-      name: service.name,
-      enabled: checked.target.checked,
-    };
-    updateProviderService(provider._id, providerService);
+  // Check if service is enabled for provider
+  const isServiceEnabled = (serviceId: string): boolean => {
+    return (
+      provider.services?.some((s) => s.id === serviceId && s.enabled) ?? false
+    );
   };
 
-  const [toggledServices, setToggledServices] = React.useState<
-    ProviderService[]
-  >(provider.services);
+  // Toggles (enable/disable) service for provider
+  const handleToggleService = async (service: Service) => {
+    const toggleEnabled: boolean = !isServiceEnabled(service._id);
+    const data: ProviderService = {
+      id: service._id,
+      name: service.name,
+      enabled: toggleEnabled,
+    };
+    await updateProviderService(provider._id, data);
+  };
 
   // Loading
   if (isLoadingProvider() || isLoadingServices()) {
@@ -52,14 +53,15 @@ export const ProviderServices = ({ provider }: { provider: Provider }) => {
                 <td>{service.name}</td>
 
                 {/* Cost */}
-                <td>{service.cost ? service.cost : "-"}</td>
+                <td>{service.cost ?? "-"}</td>
 
                 {/* Toggle Button */}
                 <td>
                   <input
                     type="checkbox"
                     className="toggle toggle-success toggle-xs"
-                    onChange={(e) => handleToggleService(e, service)}
+                    checked={isServiceEnabled(service._id)}
+                    onChange={() => handleToggleService(service)}
                   />
                 </td>
               </tr>
