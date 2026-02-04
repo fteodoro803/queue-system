@@ -39,16 +39,16 @@ export const ProviderServices = ({ provider }: { provider: Provider }) => {
         {/* Head */}
         <thead>
           <tr>
-            <th className="w-3/6">Name</th>
-            <th className="w-2/6">Cost (PHP)</th>
-            <th className="w-1/6">Enabled</th>
+            <th className="w-1/6 text-center">Name</th>
+            <th className="w-1/6 text-center">Cost (PHP)</th>
+            <th className="w-1/6 text-center">Enabled</th>
           </tr>
         </thead>
         <tbody>
           {services.map((service) => {
             const modalId: string = `my_modal_${service._id}}`;
             return (
-              <tr key={modalId} className="hover:bg-base-300">
+              <tr key={modalId} className="hover:bg-base-300 text-center">
                 {/* Name */}
                 <td>{service.name}</td>
 
