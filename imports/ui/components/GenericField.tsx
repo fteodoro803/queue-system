@@ -2,7 +2,7 @@ import React from "react";
 
 interface GenericFieldProps {
   value: string;
-  onChange: (val: string) => void;
+  onChange?: (val: string) => void;
   disabled?: boolean;
   placeholder?: string;
   additionalAttributes?: string;
@@ -37,7 +37,7 @@ export const GenericField: React.FC<GenericFieldProps> = ({
           className="grow"
           placeholder={placeholder}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={onChange ? (e) => onChange(e.target.value) : () => {}}
           disabled={disabled}
         />
       </label>
