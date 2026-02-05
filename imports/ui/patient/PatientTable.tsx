@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Patient, PatientsCollection } from "/imports/api/patient";
 import { PatientDetailsModal } from "/imports/ui/patient/PatientDetailsModal";
@@ -12,6 +12,14 @@ export const PatientTable = () => {
   const [isPatientDetailsModalOpen, setIsPatientDetailsModalOpen] =
     useState<boolean>(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+
+  // Sync selected patient when patients array updates
+  useEffect(() => {
+    if (selectedPatient) {
+      const updated = patients.find((p) => p._id === selectedPatient._id);
+      if (updated) setSelectedPatient(updated);
+    }
+  }, [patients]);
 
   // Loading
   if (isPatientsLoading()) {
