@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Service } from "/imports/api/service";
 import { GenericField } from "../components/GenericField";
 import {
@@ -17,17 +17,25 @@ export const ServiceDetailsModal = ({
   open: boolean;
   setOpen: (value: boolean) => void;
 }) => {
-  const [name, setName] = useState<string>(service.name);
-  const [duration, setDuration] = useState<string>(service.duration.toString());
-  const [cost, setCost] = useState<string>(service.cost?.toString() || "");
-  const [description, setDescription] = useState<string>(service.description);
+  const [name, setName] = useState<string>("");
+  const [duration, setDuration] = useState<string>("");
+  const [cost, setCost] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+
+  // React to Service change
+  useEffect(() => {
+    if (!service) return;
+
+    setName(service.name);
+    setDuration(service.duration.toString());
+    setCost(service.cost?.toString() ?? "");
+    setDescription(service.description);
+  }, [service]);
 
   /* Closed */
   if (!open) return null;
 
-  {
-    /* Open */
-  }
+  /* Open */
   return (
     <div className="modal modal-open" role={"dialog"}>
       <div className="modal-box">
