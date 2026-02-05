@@ -18,7 +18,6 @@ export const PatientDetailsModal = ({
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [number, setNumber] = useState<string>("");
-  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [hasChanges, setHasChanges] = useState<boolean>(false);
 
   // Sync selected patient details with local state
@@ -28,7 +27,6 @@ export const PatientDetailsModal = ({
     setName(patient.name);
     setEmail(patient.email ?? "");
     setNumber(patient.number ?? "");
-    setIsEditing(false); // reset edit mode when patient changes
   }, [patient]);
 
   // Detect changes to enable/disable save button
@@ -41,10 +39,6 @@ export const PatientDetailsModal = ({
     setHasChanges(hasChanges);
   }, [name, email, number, patient]);
 
-  const toggleEditing = () => {
-    isEditing ? setIsEditing(false) : setIsEditing(true);
-  };
-
   // Save edits functionality
   const handleSave = async () => {
     await updatePatient(patient._id, {
@@ -53,7 +47,7 @@ export const PatientDetailsModal = ({
       number: number,
     });
 
-    toggleEditing();
+    setHasChanges(false);
   };
 
   // Cancel edits functionality
@@ -62,7 +56,7 @@ export const PatientDetailsModal = ({
     setEmail(patient.email ?? "");
     setNumber(patient.number ?? "");
 
-    toggleEditing();
+    setHasChanges(false);
   };
 
   // Closed
