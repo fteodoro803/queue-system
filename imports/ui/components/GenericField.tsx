@@ -26,23 +26,31 @@ export const GenericField: React.FC<GenericFieldProps> = ({
 }) => {
   const baseAttributes: string = "input";
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [draftValue, setDraftValue] = useState<string>(value);
 
-  const [originalValue, setOriginalValue] = useState<string>(value);
+  // Sync with parent value changes while not editing
+  React.useEffect(() => {
+    if (!isEditing) {
+      setDraftValue(value);
+    }
+  }, [value, isEditing]);
 
-  // When entering edit mode, capture the current value
+  // Edit Mode - initialise the draft value with the current value
   const handleStartEditing = () => {
-    setOriginalValue(value); // Store snapshot
+    setDraftValue(value);
     setIsEditing(true);
   };
 
-  // Cancel restores the original
+  // Cancel - restores the original value and exits edit mode
   const handleCancel = () => {
-    onChange?.(originalValue); // Restore snapshot
+    // onChange?.(value);
+    setDraftValue(value); // reset draft value to original value
     setIsEditing(false);
   };
 
-  // Save just exits edit mode, keeping the current value
+  // Save - commits the draft value to the parent component and exits edit mode
   const handleSave = () => {
+    onChange?.(draftValue);
     setIsEditing(false);
   };
 
@@ -63,11 +71,10 @@ export const GenericField: React.FC<GenericFieldProps> = ({
             type={type}
             className="grow"
             placeholder={placeholder}
-            value={value}
-            onChange={onChange ? (e) => onChange(e.target.value) : () => {}}
+            value={draftValue}
+            onChange={(e) => setDraftValue(e.target.value)}
             disabled={disabled}
-            // Editable when hovered/selected
-            readOnly={!isEditing}
+            readOnly={!isEditing} // only allows input when in Edit Mode
           />
         </label>
 
