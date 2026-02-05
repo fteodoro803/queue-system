@@ -60,15 +60,15 @@ export const ServiceTable = () => {
           })}
         </tbody>
       </table>
-      
+
       {/* Modal */}
-      {selectedService && (
+      {isServiceDetailsModalOpen && selectedService && (
         <ServiceDetailsModal
           service={selectedService}
           open={isServiceDetailsModalOpen}
           setOpen={setIsServiceDetailsModalOpen}
         />
-      )}{" "}
+      )}
     </div>
   );
 };
