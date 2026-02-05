@@ -5,7 +5,7 @@ import { Avatar } from "/imports/ui/components/Avatar";
 import { NameField } from "/imports/ui/components/NameField";
 import { Provider } from "../../api/provider";
 import { updateProvider } from "../../api/providerMethods";
-import { ProviderServices } from "./ProviderServices";
+import { ProviderServicesTable } from "./ProviderServicesTable";
 import { ServiceTable } from "../service/ServiceTable";
 import { GenericField } from "../components/GenericField";
 
@@ -115,7 +115,7 @@ export const ProviderDetailsModal = ({
           /> */}
         </fieldset>
 
-        <ProviderServices provider={provider} />
+        <ProviderServicesTable provider={provider} />
 
         {/*Close Button*/}
         <div className="justify-end flex">

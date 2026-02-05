@@ -5,7 +5,7 @@ import { Loading } from "../components/Loading";
 import { Service, ServicesCollection } from "/imports/api/service";
 import { updateProviderService } from "/imports/api/providerMethods";
 
-export const ProviderServices = ({ provider }: { provider: Provider }) => {
+export const ProviderServicesTable = ({ provider }: { provider: Provider }) => {
   const isLoadingProvider = useSubscribe("providers");
   const isLoadingServices = useSubscribe("services");
   const services = useFind(() => ServicesCollection.find());
