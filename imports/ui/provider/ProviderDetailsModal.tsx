@@ -6,8 +6,6 @@ import { NameField } from "/imports/ui/components/NameField";
 import { Provider } from "../../api/provider";
 import { updateProvider } from "../../api/providerMethods";
 import { ProviderServicesTable } from "./ProviderServicesTable";
-import { ServiceTable } from "../service/ServiceTable";
-import { GenericField } from "../components/GenericField";
 
 export const ProviderDetailsModal = ({
   provider,

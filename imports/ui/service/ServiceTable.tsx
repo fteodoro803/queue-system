@@ -12,6 +12,16 @@ export const ServiceTable = () => {
     useState<boolean>(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
+  // Sync selected service when services array updates
+  React.useEffect(() => {
+    if (selectedService) {
+      const updated = services.find((s) => s._id === selectedService._id);
+      if (updated) {
+        setSelectedService(updated);
+      }
+    }
+  }, [services]);
+
   // Loading
   if (isLoading()) {
     return <Loading />;
@@ -62,7 +72,7 @@ export const ServiceTable = () => {
       </table>
 
       {/* Modal */}
-      {isServiceDetailsModalOpen && selectedService && (
+      {selectedService && (
         <ServiceDetailsModal
           service={selectedService}
           open={isServiceDetailsModalOpen}
