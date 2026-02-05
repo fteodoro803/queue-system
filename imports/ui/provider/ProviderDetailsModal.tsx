@@ -19,21 +19,16 @@ export const ProviderDetailsModal = ({
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [number, setNumber] = useState<string>("");
-  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [hasChanges, setHasChanges] = useState<boolean>(false);
 
-  // React to Patient change
+  // React to Provider change
   useEffect(() => {
     if (!provider) return;
 
     setName(provider.name);
     setEmail(provider.email ?? "");
     setNumber(provider.number ?? "");
-    setIsEditing(false); // reset edit mode when patient changes
   }, [provider]);
-
-  const toggleEditing = () => {
-    isEditing ? setIsEditing(false) : setIsEditing(true);
-  };
 
   // Save edits functionality
   const handleSave = async () => {
@@ -43,7 +38,7 @@ export const ProviderDetailsModal = ({
       number: number,
     });
 
-    toggleEditing();
+    setHasChanges(false);
   };
 
   // Cancel edits functionality
@@ -52,7 +47,7 @@ export const ProviderDetailsModal = ({
     setEmail(provider.email ?? "");
     setNumber(provider.number ?? "");
 
-    toggleEditing();
+    setHasChanges(false);
   };
 
   // Closed
@@ -77,7 +72,6 @@ export const ProviderDetailsModal = ({
               "input input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
-            disabled={!isEditing}
           />
 
           {/* Email */}
@@ -89,7 +83,6 @@ export const ProviderDetailsModal = ({
               "input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
-            disabled={!isEditing}
           />
 
           {/* Number */}
@@ -101,7 +94,6 @@ export const ProviderDetailsModal = ({
               "input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
-            disabled={!isEditing}
           />
 
           {/* System ID */}

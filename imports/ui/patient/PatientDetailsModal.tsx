@@ -5,6 +5,7 @@ import { NumberField } from "/imports/ui/components/NumberField";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { NameField } from "/imports/ui/components/NameField";
 import { updatePatient } from "/imports/api/patientsMethods";
+import { ModalButtons } from "../components/ModalButtons";
 
 export const PatientDetailsModal = ({
   patient,
@@ -116,42 +117,12 @@ export const PatientDetailsModal = ({
         </fieldset>
 
         {/*Buttons*/}
-        {/*Close Button*/}
-        {!hasChanges && (
-          <div className=" flex gap-2 justify-end">
-            <button
-              className="btn"
-              onClick={() => {
-                setOpen(false);
-              }}
-            >
-              Close
-            </button>
-          </div>
-        )}
-
-        {/*Edit Buttons*/}
-        {hasChanges && (
-          <div className=" flex gap-2 justify-end">
-            {/*Save Button*/}
-            <button
-              type="button"
-              className="btn bg-green-400"
-              onClick={handleSave}
-            >
-              Save
-            </button>
-
-            {/*Cancel Button*/}
-            <button
-              type="button"
-              className="btn bg-red-400"
-              onClick={handleCancel}
-            >
-              Cancel
-            </button>
-          </div>
-        )}
+        <ModalButtons
+          handleCancel={handleCancel}
+          handleSave={handleSave}
+          hasChanges={hasChanges}
+          onClose={() => setOpen(false)}
+        />
       </div>
     </div>
   );
