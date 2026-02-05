@@ -1,12 +1,12 @@
 import React from "react";
 
 export const ModalButtons = ({
-  onClose,
+  setOpen,
   hasChanges,
   handleSave,
   handleCancel,
 }: {
-  onClose: () => void;
+  setOpen: (value: boolean) => void;
   hasChanges?: boolean;
   handleSave?: () => void;
   handleCancel?: () => void;
@@ -16,7 +16,12 @@ export const ModalButtons = ({
       {!hasChanges ? (
         <>
           {/* Close Button */}
-          <button className="btn" onClick={onClose}>
+          <button
+            className="btn"
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
             Close
           </button>
         </>

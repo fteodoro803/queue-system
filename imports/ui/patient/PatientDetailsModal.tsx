@@ -121,7 +121,7 @@ export const PatientDetailsModal = ({
           handleCancel={handleCancel}
           handleSave={handleSave}
           hasChanges={hasChanges}
-          onClose={() => setOpen(false)}
+          setOpen={() => setOpen(false)}
         />
       </div>
     </div>

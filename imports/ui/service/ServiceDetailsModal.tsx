@@ -7,6 +7,7 @@ import {
   ClockIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
+import { ModalButtons } from "../components/ModalButtons";
 
 export const ServiceDetailsModal = ({
   service,
@@ -21,6 +22,7 @@ export const ServiceDetailsModal = ({
   const [duration, setDuration] = useState<string>("");
   const [cost, setCost] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [hasChanges, setHasChanges] = useState<boolean>(false);
 
   // React to Service change
   useEffect(() => {
@@ -31,6 +33,20 @@ export const ServiceDetailsModal = ({
     setCost(service.cost?.toString() ?? "");
     setDescription(service.description);
   }, [service]);
+
+  // Detect changes to enable/disable save button
+  useEffect(() => {
+    if (!service) return;
+    const hasChanges =
+      name !== service.name ||
+      duration !== service.duration.toString() ||
+      cost !== (service.cost?.toString() ?? "") ||
+      description !== service.description;
+
+    setHasChanges(hasChanges);
+  }, [name, duration, cost, description, service]);
+
+  // todo: implement save and cancel functionality
 
   /* Closed */
   if (!open) return null;
@@ -90,17 +106,7 @@ export const ServiceDetailsModal = ({
           />
         </fieldset>
 
-        <div className=" flex gap-2 justify-end">
-          {/*Close Button*/}
-          <button
-            className="btn"
-            onClick={() => {
-              setOpen(false);
-            }}
-          >
-            Close
-          </button>
-        </div>
+        <ModalButtons setOpen={setOpen} hasChanges={hasChanges} />
       </div>
     </div>
   );
