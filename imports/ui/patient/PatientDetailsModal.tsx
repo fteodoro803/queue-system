@@ -19,8 +19,9 @@ export const PatientDetailsModal = ({
   const [email, setEmail] = useState<string>("");
   const [number, setNumber] = useState<string>("");
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [hasChanges, setHasChanges] = useState<boolean>(false);
 
-  // React to Patient change
+  // Sync selected patient details with local state
   useEffect(() => {
     if (!patient) return;
 
@@ -29,6 +30,16 @@ export const PatientDetailsModal = ({
     setNumber(patient.number ?? "");
     setIsEditing(false); // reset edit mode when patient changes
   }, [patient]);
+
+  // Detect changes to enable/disable save button
+  useEffect(() => {
+    if (!patient) return;
+    const hasChanges =
+      name !== patient.name ||
+      email !== (patient.email ?? "") ||
+      number !== (patient.number ?? "");
+    setHasChanges(hasChanges);
+  }, [name, email, number, patient]);
 
   const toggleEditing = () => {
     isEditing ? setIsEditing(false) : setIsEditing(true);
@@ -76,7 +87,6 @@ export const PatientDetailsModal = ({
               "input input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
-            disabled={!isEditing}
           />
 
           {/* Email */}
@@ -88,7 +98,6 @@ export const PatientDetailsModal = ({
               "input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
-            disabled={!isEditing}
           />
 
           {/* Number */}
@@ -100,7 +109,6 @@ export const PatientDetailsModal = ({
               "input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
-            disabled={!isEditing}
           />
 
           {/* System ID */}
@@ -114,15 +122,9 @@ export const PatientDetailsModal = ({
         </fieldset>
 
         {/*Buttons*/}
-        {/*Detail Buttons*/}
-        {!isEditing && (
+        {/*Close Button*/}
+        {!hasChanges && (
           <div className=" flex gap-2 justify-end">
-            {/*Edit Button*/}
-            <button type="button" className="btn" onClick={toggleEditing}>
-              Edit
-            </button>
-
-            {/*Close Button*/}
             <button
               className="btn"
               onClick={() => {
@@ -135,7 +137,7 @@ export const PatientDetailsModal = ({
         )}
 
         {/*Edit Buttons*/}
-        {isEditing && (
+        {hasChanges && (
           <div className=" flex gap-2 justify-end">
             {/*Save Button*/}
             <button
