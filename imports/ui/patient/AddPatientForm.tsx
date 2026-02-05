@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Meteor } from "meteor/meteor";
 import { EmailField } from "/imports/ui/components/EmailField";
 import { NumberField } from "/imports/ui/components/NumberField";
 import { NameField } from "/imports/ui/components/NameField";
+import { insertPatient } from "/imports/api/patientsMethods";
 
 export const AddPatientForm = () => {
   const [name, setName] = useState("");
@@ -14,11 +14,11 @@ export const AddPatientForm = () => {
 
     if (!name || name.length == 0) return;
 
-    await Meteor.callAsync("patients.insert", {
+    // Insert patient to Database
+    await insertPatient({
       name,
       email,
       number,
-      // todo: add icon
     });
 
     // Clear fields

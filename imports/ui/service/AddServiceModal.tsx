@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Meteor } from "meteor/meteor";
+import { insertService } from "/imports/api/serviceMethods";
 
 interface AddServiceModalProps {
   open: boolean;
@@ -24,7 +24,7 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
     if (isNaN(durationNum)) return;
     if (costNum !== null && isNaN(costNum)) return;
 
-    await Meteor.callAsync("services.insert", {
+    await insertService({
       name,
       cost: costNum,
       duration: durationNum,

@@ -5,8 +5,8 @@ import { AppointmentsCollection } from "/imports/api/appointment";
 import "../imports/api/appointmentMethods";
 import { ServicesCollection } from "/imports/api/service";
 import "../imports/api/serviceMethods";
-import { ServiceProviderCollection } from "/imports/api/serviceProvider";
-import "../imports/api/serviceProviderMethods";
+import { ProviderCollection } from "../imports/api/provider";
+import "../imports/api/providerMethods";
 
 // Publish Services
 Meteor.publish("services", function () {
@@ -14,8 +14,8 @@ Meteor.publish("services", function () {
 });
 
 // Publish Service Providers
-Meteor.publish("serviceProviders", function () {
-  return ServiceProviderCollection.find();
+Meteor.publish("providers", function () {
+  return ProviderCollection.find();
 });
 
 // Publish Appointments

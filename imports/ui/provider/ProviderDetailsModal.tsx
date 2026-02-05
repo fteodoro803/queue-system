@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Meteor } from "meteor/meteor";
-import { Patient } from "/imports/api/patient";
 import { EmailField } from "/imports/ui/components/EmailField";
 import { NumberField } from "/imports/ui/components/NumberField";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { NameField } from "/imports/ui/components/NameField";
-import { updatePatient } from "/imports/api/patientsMethods";
+import { Provider } from "../../api/provider";
+import { updateProvider } from "../../api/providerMethods";
+import { ProviderServices } from "./ProviderServices";
+import { ServiceTable } from "../service/ServiceTable";
+import { GenericField } from "../components/GenericField";
 
-export const PatientDetailsModal = ({
-  patient,
+export const ProviderDetailsModal = ({
+  provider,
   open,
   setOpen,
 }: {
-  patient: Patient;
+  provider: Provider;
   open: boolean;
   setOpen: (value: boolean) => void;
 }) => {
@@ -23,13 +25,13 @@ export const PatientDetailsModal = ({
 
   // React to Patient change
   useEffect(() => {
-    if (!patient) return;
+    if (!provider) return;
 
-    setName(patient.name);
-    setEmail(patient.email ?? "");
-    setNumber(patient.number ?? "");
+    setName(provider.name);
+    setEmail(provider.email ?? "");
+    setNumber(provider.number ?? "");
     setIsEditing(false); // reset edit mode when patient changes
-  }, [patient]);
+  }, [provider]);
 
   const toggleEditing = () => {
     isEditing ? setIsEditing(false) : setIsEditing(true);
@@ -37,7 +39,7 @@ export const PatientDetailsModal = ({
 
   // Save edits functionality
   const handleSave = async () => {
-    await updatePatient(patient._id, {
+    await updateProvider(provider._id, {
       name: name,
       email: email,
       number: number,
@@ -48,9 +50,9 @@ export const PatientDetailsModal = ({
 
   // Cancel edits functionality
   const handleCancel = async () => {
-    setName(patient.name);
-    setEmail(patient.email ?? "");
-    setNumber(patient.number ?? "");
+    setName(provider.name);
+    setEmail(provider.email ?? "");
+    setNumber(provider.number ?? "");
 
     toggleEditing();
   };
@@ -64,7 +66,7 @@ export const PatientDetailsModal = ({
       <div className="modal-box">
         {/*Avatar*/}
         <div className="flex justify-center">
-          <Avatar profile={patient} />
+          <Avatar profile={provider} />
         </div>
 
         <fieldset className="fieldset">
@@ -105,58 +107,27 @@ export const PatientDetailsModal = ({
           />
 
           {/* System ID */}
-          <label className="label">System ID</label>
-          <input
-            type="text"
-            className="input input-ghost disabled:opacity-100 bg-base-100 text-black"
+          {/* <label className="label">System ID</label>
+          <GenericField
+            value={provider._id}
+            additionalAttributes="input input-ghost disabled:opacity-100 bg-base-100 text-black"
             disabled={true}
-            value={patient._id}
-          />
+          /> */}
         </fieldset>
 
-        {/*Buttons*/}
-        {/*Detail Buttons*/}
-        {!isEditing && (
-          <div className=" flex gap-2 justify-end">
-            {/*Edit Button*/}
-            <button type="button" className="btn" onClick={toggleEditing}>
-              Edit
-            </button>
+        <ProviderServices provider={provider} />
 
-            {/*Close Button*/}
-            <button
-              className="btn"
-              onClick={() => {
-                setOpen(false);
-              }}
-            >
-              Close
-            </button>
-          </div>
-        )}
-
-        {/*Edit Buttons*/}
-        {isEditing && (
-          <div className=" flex gap-2 justify-end">
-            {/*Save Button*/}
-            <button
-              type="button"
-              className="btn bg-green-400"
-              onClick={handleSave}
-            >
-              Save
-            </button>
-
-            {/*Cancel Button*/}
-            <button
-              type="button"
-              className="btn bg-red-400"
-              onClick={handleCancel}
-            >
-              Cancel
-            </button>
-          </div>
-        )}
+        {/*Close Button*/}
+        <div className="justify-end flex">
+          <button
+            className="btn"
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   );

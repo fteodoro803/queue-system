@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { AddServiceProviderForm } from "/imports/ui/serviceProvider/AddServiceProviderForm";
+import { AddProviderForm } from "./AddProviderForm";
 
-export const AddServiceProviderModal = ({
+export const AddProviderModal = ({
   open,
   setOpen,
 }: {
@@ -25,7 +25,7 @@ export const AddServiceProviderModal = ({
           ✕
         </button>
 
-        <AddServiceProviderForm />
+        <AddProviderForm />
 
         <div className=" flex gap-2 justify-end">
           {/*Close Button*/}

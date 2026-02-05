@@ -3,6 +3,7 @@ import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "/imports/ui/components/Loading";
 import { Service, ServicesCollection } from "/imports/api/service";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { ServiceDetailsModal } from "./ServiceDetailsModal";
 
 export const ServiceTable = () => {
   const isLoading = useSubscribe("services");
@@ -60,9 +61,14 @@ export const ServiceTable = () => {
         </tbody>
       </table>
 
-      {/*<ServiceProviderDetailsModal patient={selectedProvider}*/}
-      {/*                     open={isProviderDetailsModalOpen}*/}
-      {/*                     setOpen={setIsProviderDetailsModalOpen}/>*/}
+      {/* Modal */}
+      {isServiceDetailsModalOpen && selectedService && (
+        <ServiceDetailsModal
+          service={selectedService}
+          open={isServiceDetailsModalOpen}
+          setOpen={setIsServiceDetailsModalOpen}
+        />
+      )}
     </div>
   );
 };

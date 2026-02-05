@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { AddServiceModal } from "/imports/ui/service/AddServiceModal";
-import { AddServiceProviderModal } from "/imports/ui/serviceProvider/AddServiceProviderModal";
-import { ServiceProviderTable } from "/imports/ui/serviceProvider/ServiceProviderTable";
+import { AddProviderModal } from "../provider/AddProviderModal";
+import { ProviderTable } from "../provider/ProviderTable";
 import { ServiceTable } from "/imports/ui/service/ServiceTable";
 
 export const ServiceManagement = () => {
@@ -57,7 +57,7 @@ export const ServiceManagement = () => {
             </button>
           </div>
 
-          <ServiceProviderTable />
+          <ProviderTable />
         </div>
       </div>
 
@@ -67,7 +67,7 @@ export const ServiceManagement = () => {
         open={addServiceModalOpen}
         setOpen={setAddServiceModalOpen}
       />
-      <AddServiceProviderModal
+      <AddProviderModal
         open={addServiceProviderModalOpen}
         setOpen={setAddServiceProviderModalOpen}
       />
