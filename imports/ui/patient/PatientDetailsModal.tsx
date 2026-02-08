@@ -5,6 +5,7 @@ import { NumberField } from "/imports/ui/components/NumberField";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { NameField } from "/imports/ui/components/NameField";
 import { updatePatient } from "/imports/api/patientsMethods";
+import { ModalButtons } from "../components/ModalButtons";
 
 export const PatientDetailsModal = ({
   patient,
@@ -18,21 +19,26 @@ export const PatientDetailsModal = ({
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [number, setNumber] = useState<string>("");
-  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [hasChanges, setHasChanges] = useState<boolean>(false);
 
-  // React to Patient change
+  // Sync selected patient details with local state
   useEffect(() => {
     if (!patient) return;
 
     setName(patient.name);
     setEmail(patient.email ?? "");
     setNumber(patient.number ?? "");
-    setIsEditing(false); // reset edit mode when patient changes
   }, [patient]);
 
-  const toggleEditing = () => {
-    isEditing ? setIsEditing(false) : setIsEditing(true);
-  };
+  // Detect changes to enable/disable save button
+  useEffect(() => {
+    if (!patient) return;
+    const hasChanges =
+      name !== patient.name ||
+      email !== (patient.email ?? "") ||
+      number !== (patient.number ?? "");
+    setHasChanges(hasChanges);
+  }, [name, email, number, patient]);
 
   // Save edits functionality
   const handleSave = async () => {
@@ -42,7 +48,7 @@ export const PatientDetailsModal = ({
       number: number,
     });
 
-    toggleEditing();
+    setHasChanges(false);
   };
 
   // Cancel edits functionality
@@ -51,7 +57,7 @@ export const PatientDetailsModal = ({
     setEmail(patient.email ?? "");
     setNumber(patient.number ?? "");
 
-    toggleEditing();
+    setHasChanges(false);
   };
 
   // Closed
@@ -76,7 +82,6 @@ export const PatientDetailsModal = ({
               "input input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
-            disabled={!isEditing}
           />
 
           {/* Email */}
@@ -88,7 +93,6 @@ export const PatientDetailsModal = ({
               "input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
-            disabled={!isEditing}
           />
 
           {/* Number */}
@@ -100,7 +104,6 @@ export const PatientDetailsModal = ({
               "input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
-            disabled={!isEditing}
           />
 
           {/* System ID */}
@@ -114,48 +117,12 @@ export const PatientDetailsModal = ({
         </fieldset>
 
         {/*Buttons*/}
-        {/*Detail Buttons*/}
-        {!isEditing && (
-          <div className=" flex gap-2 justify-end">
-            {/*Edit Button*/}
-            <button type="button" className="btn" onClick={toggleEditing}>
-              Edit
-            </button>
-
-            {/*Close Button*/}
-            <button
-              className="btn"
-              onClick={() => {
-                setOpen(false);
-              }}
-            >
-              Close
-            </button>
-          </div>
-        )}
-
-        {/*Edit Buttons*/}
-        {isEditing && (
-          <div className=" flex gap-2 justify-end">
-            {/*Save Button*/}
-            <button
-              type="button"
-              className="btn bg-green-400"
-              onClick={handleSave}
-            >
-              Save
-            </button>
-
-            {/*Cancel Button*/}
-            <button
-              type="button"
-              className="btn bg-red-400"
-              onClick={handleCancel}
-            >
-              Cancel
-            </button>
-          </div>
-        )}
+        <ModalButtons
+          handleCancel={handleCancel}
+          handleSave={handleSave}
+          hasChanges={hasChanges}
+          setOpen={() => setOpen(false)}
+        />
       </div>
     </div>
   );

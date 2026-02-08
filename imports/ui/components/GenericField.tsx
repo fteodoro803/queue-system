@@ -79,28 +79,32 @@ export const GenericField: React.FC<GenericFieldProps> = ({
         </label>
 
         {/* Buttons */}
-        {!isEditing && (
+        {/* Visible when not disabled, and changes depending on isEditing */}
+        {!disabled && (
           <div>
-            {/* Edit Button */}
-            <button
-              className="btn opacity-0 group-hover:opacity-100"
-              onClick={handleStartEditing}
-            >
-              <PencilSquareIcon className="h-5 w-5 text-base-content/50" />
-            </button>
-          </div>
-        )}
-        {isEditing && (
-          <div>
-            {/* Cancel Button */}
-            <button className="btn" onClick={handleCancel}>
-              <XMarkIcon className="h-5 w-5 text-base-content/50" />
-            </button>
+            {!isEditing ? (
+              <div>
+                {/* Edit Button */}
+                <button
+                  className="btn opacity-0 group-hover:opacity-100"
+                  onClick={handleStartEditing}
+                >
+                  <PencilSquareIcon className="h-5 w-5 text-base-content/50" />
+                </button>
+              </div>
+            ) : (
+              <div>
+                {/* Cancel Button */}
+                <button className="btn" onClick={handleCancel}>
+                  <XMarkIcon className="h-5 w-5 text-base-content/50" />
+                </button>
 
-            {/* Save Button */}
-            <button className="btn" onClick={handleSave}>
-              <CheckIcon className="h-5 w-5 text-base-content/50" />
-            </button>
+                {/* Save Button */}
+                <button className="btn" onClick={handleSave}>
+                  <CheckIcon className="h-5 w-5 text-base-content/50" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
