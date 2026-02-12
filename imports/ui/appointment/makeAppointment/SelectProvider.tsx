@@ -14,6 +14,8 @@ export const SelectProvider = ({
   service: Service | undefined;
 }) => {
   const isLoading = useSubscribe("providers");
+
+  // Gets Providers, filtering by service and if it's enabled
   const providers = useTracker(() =>
     ProviderCollection.find({
       services: {
@@ -25,11 +27,14 @@ export const SelectProvider = ({
     }).fetch(),
   );
 
+  if (!service)
+    return <p className="text-2xl text-red-500">Select a Service first</p>;
+
   if (isLoading()) {
     return <Loading />;
   }
 
-  // TODO: filter providers by service
+  // TODO: any provider select functionality --> Has to select a provider by here (maybe a locking functinoality for race conditions)
   return (
     <div>
       <ul className="list bg-base-100 rounded-box shadow-md">

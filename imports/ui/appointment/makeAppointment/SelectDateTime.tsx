@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Calendar } from "../../components/Calendar";
 import { Service } from "/imports/api/service";
 
@@ -16,7 +16,7 @@ export const SelectDateTime = ({
 
   return (
     <>
-      <Calendar date={date} setDate={setDate} previousDatesDisabled />
+      <Calendar date={date} setDate={setDate} />
     </>
   );
 };

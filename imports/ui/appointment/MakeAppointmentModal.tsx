@@ -75,12 +75,8 @@ export const MakeAppointmentModal = ({
             <SelectDateTime date={date} setDate={setDate} service={service} />
           )}
           {/* Confirmation */}
-          {page === 4 && service && date && (
-            <Confirmation
-              service={service}
-              provider={provider}
-              dateTime={date}
-            />
+          {page === 4 && (
+            <Confirmation service={service} provider={provider} date={date} />
           )}
 
           {/* <p>Service: {service?.name}</p>
