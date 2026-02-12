@@ -7,6 +7,7 @@ import { SelectProvider } from "./makeAppointment/SelectProvider";
 import { SelectDateTime } from "./makeAppointment/SelectDateTime";
 import { Confirmation } from "./makeAppointment/Confirmation";
 import { MODAL_SIZES } from "/imports/utils/modalSizes";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 export const MakeAppointmentModal = ({
   setOpen,
@@ -36,30 +37,30 @@ export const MakeAppointmentModal = ({
   return (
     <div className="modal modal-open" role={"dialog"}>
       {
-        <div className={`modal-box ${MODAL_SIZES.booking}`}>
+        <div className={`modal-box ${MODAL_SIZES.booking} relative`}>
           {/* Close Button */}
           <button
-            className="btn btn-circle btn-btn-ghost absolute top-2 right-2 gap-2 p-2"
+            className="btn btn-circle btn-ghost absolute top-2 right-2 gap-2 p-2 z-50"
             onClick={() => setOpen(false)}
           >
             X
           </button>
 
           {/* Navigation Buttons */}
-          <div className="flex justify-center">
+          <div className="w-full flex justify-center py-3">
             <div className="join">
               <button
-                className="join-item btn"
+                className="join-item btn btn-ghost btn-circle"
                 onClick={() => changePage("previous")}
               >
-                «
+                <ChevronLeftIcon className="size-6" />
               </button>
-              <button className="join-item btn">Step {page}</button>
+              <Steps step={page} />
               <button
-                className="join-item btn"
+                className="join-item btn btn-ghost btn-circle"
                 onClick={() => changePage("next")}
               >
-                »
+                <ChevronRightIcon className="size-6" />
               </button>
             </div>
           </div>

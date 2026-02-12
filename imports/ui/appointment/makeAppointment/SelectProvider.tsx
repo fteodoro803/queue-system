@@ -2,7 +2,6 @@ import { useSubscribe, useTracker } from "meteor/react-meteor-data";
 import React from "react";
 import { Provider, ProviderCollection } from "/imports/api/provider";
 import { Loading } from "../../components/Loading";
-import { CheckIcon } from "@heroicons/react/24/outline";
 import { Avatar } from "../../components/Avatar";
 import { Service } from "/imports/api/service";
 
