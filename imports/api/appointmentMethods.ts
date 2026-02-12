@@ -1,9 +1,30 @@
 import { Meteor } from "meteor/meteor";
 import { AppointmentsCollection } from "/imports/api/appointment";
+import { Service } from "./service";
+import { Patient } from "./patient";
+import { Provider } from "./provider";
+
+export interface AppointmentData {
+  service: Service;
+  provider: Provider;
+  patient: Patient;
+  date: Date;
+}
 
 Meteor.methods({
   // Adds appointment to the database
-  "appointments.insert"({ type }: { type: string }) {
-    return AppointmentsCollection.insertAsync({ type, createdAt: new Date() });
+  "appointments.insert"(data: AppointmentData) {
+    return AppointmentsCollection.insertAsync({
+      service: data.service,
+      provider: data.provider,
+      patient: data.patient,
+      date: data.date,
+      createdAt: new Date(),
+    });
   },
 });
+
+// Exports for the Meteor methods
+export async function insertAppointment(data: AppointmentData) {
+  return Meteor.callAsync("appointments.insert", data);
+}

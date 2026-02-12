@@ -1,11 +1,14 @@
 import { Mongo } from "meteor/mongo";
 import { Patient } from "/imports/api/patient";
+import { Service } from "./service";
+import { Provider } from "./provider";
 
 export interface Appointment {
   _id?: string;
-  type: string; // todo: change to appointmentTyp
-  time?: Date;
-  patient?: Patient;
+  date: Date;
+  provider: Provider;
+  patient: Patient;
+  service: Service;
   createdAt: Date;
 }
 
