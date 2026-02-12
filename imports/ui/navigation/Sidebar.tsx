@@ -8,6 +8,7 @@ import {
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/solid";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { ThemeController } from "../components/ThemeController";
 
 export const Sidebar = () => {
   const location = useLocation();
@@ -25,7 +26,7 @@ export const Sidebar = () => {
           htmlFor="my-drawer-3"
           className="btn btn-circle btn-xl shadow-lg"
         >
-          <EllipsisVerticalIcon className="h-6 w-6 text-black/80" />
+          <EllipsisVerticalIcon className="h-6 w-6 text-base" />
         </label>
       </div>
 
@@ -47,11 +48,11 @@ export const Sidebar = () => {
             aria-label="close sidebar"
             className="drawer-overlay"
           ></label>
-          <ul className="menu bg-base-200 min-h-full w-80 p-4">
+          <ul className="menu bg-base min-h-full w-80 p-4">
             <Link to="/">
               <li>
                 <a className="flex items-center gap-2">
-                  <HomeIcon className="h-5 w-5 text-black/80" />
+                  <HomeIcon className="h-5 w-5 text-base" />
                   <span>Home</span>
                 </a>
               </li>
@@ -63,7 +64,7 @@ export const Sidebar = () => {
                 {/*Dashboard Button*/}
                 <li>
                   <Link to="admin/dashboard">
-                    <PresentationChartLineIcon className="h-5 w-5 text-black/80" />
+                    <PresentationChartLineIcon className="h-5 w-5 text-base" />
                     <span>Dashboard</span>
                   </Link>
                 </li>
@@ -71,7 +72,7 @@ export const Sidebar = () => {
                 {/*Appointments Button*/}
                 <li>
                   <Link to="admin/appointmentManagement">
-                    <CalendarDaysIcon className="h-5 w-5 text-black/80" />
+                    <CalendarDaysIcon className="h-5 w-5 text-base" />
                     <span>Appointments</span>
                   </Link>
                 </li>
@@ -79,7 +80,7 @@ export const Sidebar = () => {
                 {/*Patients Button*/}
                 <li>
                   <Link to="admin/patientManagement">
-                    <UserGroupIcon className="h-5 w-5 text-black/80" />
+                    <UserGroupIcon className="h-5 w-5 text-base" />
                     <span>Patients</span>
                   </Link>
                 </li>
@@ -87,7 +88,7 @@ export const Sidebar = () => {
                 {/*Services Button*/}
                 <li>
                   <Link to="admin/serviceManagement">
-                    <WrenchScrewdriverIcon className="h-5 w-5 text-black/80" />
+                    <WrenchScrewdriverIcon className="h-5 w-5 text-base" />
                     <span>Services</span>
                   </Link>
                 </li>
@@ -95,6 +96,9 @@ export const Sidebar = () => {
             )}
 
             {/*Patient Sidebars*/}
+
+            {/* Theme Controller */}
+            <ThemeController />
           </ul>
         </div>
       </div>
