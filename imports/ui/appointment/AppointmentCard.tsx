@@ -12,6 +12,10 @@ export const AppointmentCard = ({
 }: {
   appointment: Appointment;
 }) => {
+  const hours = appointment.date.getHours().toString().padStart(2, "0");
+  const minutes = appointment.date.getMinutes().toString().padStart(2, "0");
+  const time: string = `${hours}:${minutes}`;
+
   const iconSize: string = "size-6";
   const textSize: string = "text-sm";
 
@@ -29,17 +33,17 @@ export const AppointmentCard = ({
             {/* Time */}
             <div className="flex items-center gap-1">
               <ClockIcon className={iconSize} />
-              <p className={textSize}>{appointment.date.toTimeString()}</p>
+              <p className={textSize}>{time ?? "N/A"}</p>
             </div>
             {/* Service */}
             <div className="flex items-center gap-1">
               <CogIcon className={iconSize} />
-              <p className={textSize}>{appointment.service.name}</p>
+              <p className={textSize}>{appointment.service.name ?? "N/A"}</p>
             </div>
             {/* Provider */}
             <div className="flex items-center gap-1">
               <UserCircleIcon className={iconSize} />
-              <p className={textSize}>{appointment.provider.name}</p>
+              <p className={textSize}>{appointment.provider.name ?? "N/A"}</p>
             </div>
           </div>
         </div>

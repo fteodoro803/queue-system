@@ -1,45 +1,42 @@
-import React, { useEffect, useState } from "react";
-import { AddAppointmentForm } from "../appointment/AddAppointmentForm";
-import { Calendar } from "../components/Calendar";
-import { selectService } from "../appointment/makeAppointment/SelectService";
-import { Service } from "/imports/api/service";
-import { Steps } from "../components/Steps";
+import React, { useState } from "react";
 import { MakeAppointmentModal } from "../appointment/MakeAppointmentModal";
+import { AppointmentCard } from "../appointment/AppointmentCard";
+import { useFind, useSubscribe } from "meteor/react-meteor-data";
+import { AppointmentsCollection } from "/imports/api/appointment";
+import { Loading } from "../components/Loading";
 
 export const AppointmentManagement = () => {
-  const [service, setService] = useState<Service | undefined>(undefined);
-  const [date, setDate] = useState<Date | undefined>(undefined);
-  const [step, setStep] = useState<number>(1);
+  const isAppointmentsLoaded = useSubscribe("appointments");
+  const appointments = useFind(() => AppointmentsCollection.find());
+
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] =
     useState<boolean>(false);
 
-  useEffect(() => {}, [step]);
-
-  const testDates: Date[] = [
-    new Date("2026-02-10"),
-    new Date("2026-02-16"),
-    new Date("2026-02-20"),
-  ];
+  if (isAppointmentsLoaded()) return <Loading />;
 
   return (
     <>
       <div className="flex justify-between">
         <h1 className="text-3xl font-bold">Appointment Management</h1>
+
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            setIsAppointmentModalOpen(true);
+          }}
+        >
+          + New Appointment
+        </button>
       </div>
-
-
-      <button
-        className="btn"
-        onClick={() => {
-          setIsAppointmentModalOpen(true);
-        }}
-      >
-        Make Appointment
-      </button>
 
       {isAppointmentModalOpen && (
         <MakeAppointmentModal setOpen={setIsAppointmentModalOpen} />
       )}
+
+      <p>Appointments:</p>
+      {appointments.map((a) => {
+        return <AppointmentCard appointment={a} />;
+      })}
     </>
   );
 };
