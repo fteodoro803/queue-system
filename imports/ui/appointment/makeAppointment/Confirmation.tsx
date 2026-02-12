@@ -8,10 +8,12 @@ export const Confirmation = ({
   service,
   provider,
   date,
+  setOpen,
 }: {
   service: Service | undefined;
   provider: Provider | undefined;
   date: Date | undefined;
+  setOpen: (value: boolean) => void;
 }) => {
   const PLACEHOLDER_PATIENT: Patient = {
     _id: "PLACEHOLDER_ID",
@@ -40,6 +42,7 @@ export const Confirmation = ({
         className="btn"
         onClick={() => {
           handleSubmit();
+          setOpen(false);
         }}
       >
         Confirm
