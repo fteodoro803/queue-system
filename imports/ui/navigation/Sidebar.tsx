@@ -6,6 +6,7 @@ import {
   PresentationChartLineIcon,
   CalendarDaysIcon,
   WrenchScrewdriverIcon,
+  BugAntIcon,
 } from "@heroicons/react/24/solid";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { ThemeController } from "../components/ThemeController";
@@ -94,6 +95,14 @@ export const Sidebar = () => {
                 </li>
               </>
             )}
+
+            {/* Test Page Button */}
+            <li>
+              <Link to="admin/test">
+                <BugAntIcon className="h-5 w-5 text-base" />
+                <span>Test Page</span>
+              </Link>
+            </li>
 
             {/*Patient Sidebars*/}
 
