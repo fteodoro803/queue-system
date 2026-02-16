@@ -21,6 +21,13 @@ export const AppointmentCard = ({
   const textSize: string = "text-sm";
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
+  const statusBadgeMap: Record<string, string> = {
+    scheduled: "badge-info",
+    ongoing: "badge-warning",
+    completed: "badge-success",
+    cancelled: "badge-error",
+  };
+
   return (
     <>
       <div
@@ -40,15 +47,24 @@ export const AppointmentCard = ({
               <ClockIcon className={iconSize} />
               <p className={textSize}>{time ?? "N/A"}</p>
             </div>
+
             {/* Service */}
             <div className="flex items-center gap-1">
               <ClipboardDocumentListIcon className={iconSize} />
               <p className={textSize}>{appointment.service.name ?? "N/A"}</p>
             </div>
+
             {/* Provider */}
             <div className="flex items-center gap-1">
               <UserCircleIcon className={iconSize} />
               <p className={textSize}>{appointment.provider.name ?? "N/A"}</p>
+            </div>
+
+            {/* Status */}
+            <div
+              className={`badge badge-soft ${statusBadgeMap[appointment.status]}`}
+            >
+              {appointment.status}
             </div>
           </div>
         </div>
