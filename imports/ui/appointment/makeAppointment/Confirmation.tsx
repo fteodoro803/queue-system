@@ -28,7 +28,7 @@ export const Confirmation = ({
         date,
         provider,
         service,
-        state: "scheduled",
+        status: "scheduled",
       });
     }
   };

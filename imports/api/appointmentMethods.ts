@@ -4,12 +4,14 @@ import { Service } from "./service";
 import { Patient } from "./patient";
 import { Provider } from "./provider";
 
+export const APPOINTMENT_STATES = ["scheduled", "ongoing", "completed"] as const;
+
 export interface AppointmentData {
   service: Service;
   provider: Provider;
   patient: Patient;
   date: Date;
-  state: "scheduled" | "ongoing" | "completed";
+  status: typeof APPOINTMENT_STATES[number];
 }
 
 Meteor.methods({
@@ -20,7 +22,7 @@ Meteor.methods({
       provider: data.provider,
       patient: data.patient,
       date: data.date,
-      state: data.state,
+      status: data.status,
       createdAt: new Date(),
     });
   },
