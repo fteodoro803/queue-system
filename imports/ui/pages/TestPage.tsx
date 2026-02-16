@@ -12,32 +12,49 @@ export const TestPage = () => {
     <>
       <h1 className="text-3xl font-bold">Test Page</h1>
 
-      <h1 className="text-xl font-semibold">Generic Field</h1>
-      <GenericField
-        value={genericFieldValue}
-        onChange={setGenericFieldValue}
-        mode="write"
-      />
-      <GenericField
-        value={genericFieldValue}
-        onChange={setGenericFieldValue}
-        mode="read"
-      />
-      <GenericField
-        value={genericFieldValue}
-        onChange={setGenericFieldValue}
-        mode="editable"
-      />
-      <EmailField
-        value={emailFieldValue}
-        onChange={setEmailFieldValue}
-        mode="write"
-      />
-      <NumberField
-        value={numberFieldValue}
-        onChange={setNumberFieldValue}
-        mode="write"
-      />
+      {/* Theme Section */}
+      <div className="mt-4">
+        <h1 className="text-xl font-semibold">Theme</h1>
+        <div className="flex gap-2">
+          <button className="btn btn-primary text-primary-content">
+            Primary
+          </button>
+          <button className="btn btn-secondary text-secondary-content">
+            Secondary
+          </button>
+          <button className="btn btn-accent text-accent-content">Accent</button>
+        </div>
+      </div>
+
+      {/* Field Section */}
+      <div className="mt-4">
+        <h1 className="text-xl font-semibold">Generic Field</h1>
+        <GenericField
+          value={genericFieldValue}
+          onChange={setGenericFieldValue}
+          mode="write"
+        />
+        <GenericField
+          value={genericFieldValue}
+          onChange={setGenericFieldValue}
+          mode="read"
+        />
+        <GenericField
+          value={genericFieldValue}
+          onChange={setGenericFieldValue}
+          mode="editable"
+        />
+        <EmailField
+          value={emailFieldValue}
+          onChange={setEmailFieldValue}
+          mode="write"
+        />
+        <NumberField
+          value={numberFieldValue}
+          onChange={setNumberFieldValue}
+          mode="write"
+        />
+      </div>
     </>
   );
 };
