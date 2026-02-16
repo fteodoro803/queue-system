@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { AddProviderForm } from "./AddProviderForm";
 
 export const AddProviderModal = ({
@@ -8,7 +8,7 @@ export const AddProviderModal = ({
   open: boolean;
   setOpen: (value: boolean) => void;
 }) => {
-  const [name, setName] = useState("");
+  // const [name, setName] = useState("");
 
   // Closed
   if (!open) return null;
@@ -27,10 +27,10 @@ export const AddProviderModal = ({
 
         <AddProviderForm />
 
-        <div className=" flex gap-2 justify-end">
+        <div className="flex gap-2 justify-end">
           {/*Close Button*/}
           <button
-            className="btn"
+            className="btn btn-primary text-primary-content"
             onClick={() => {
               setOpen(false);
             }}
