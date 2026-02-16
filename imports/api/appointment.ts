@@ -4,7 +4,7 @@ import { Service } from "./service";
 import { Provider } from "./provider";
 
 export interface Appointment {
-  _id?: string;
+  _id: string;
   date: Date;
   provider: Provider;
   patient: Patient;

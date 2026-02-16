@@ -1,6 +1,9 @@
 import React from "react";
 import { Appointment } from "/imports/api/appointment";
-import { APPOINTMENT_STATES } from "/imports/api/appointmentMethods";
+import {
+  APPOINTMENT_STATES,
+  removeAppointment,
+} from "/imports/api/appointmentMethods";
 
 export const AppointmentDetailsModal = ({
   appointment,
@@ -9,6 +12,11 @@ export const AppointmentDetailsModal = ({
   appointment: Appointment;
   isOpen: () => void;
 }) => {
+  const handleDelete = async () => {
+    await removeAppointment(appointment._id);
+    isOpen();
+  };
+
   return (
     <div className="modal modal-open" role={"dialog"}>
       <div className="modal-box">
@@ -36,7 +44,9 @@ export const AppointmentDetailsModal = ({
         </select>
 
         {/* Delete button */}
-        <button className="btn btn-error mt-4">Delete Appointment</button>
+        <button className="btn btn-error mt-4" onClick={handleDelete}>
+          Delete Appointment
+        </button>
 
         {/* Mark as complete button */}
         <button className="btn btn-success mt-2">Mark as Complete</button>
