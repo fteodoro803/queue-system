@@ -12,6 +12,7 @@ interface GenericFieldProps {
   placeholder?: string;
   additionalAttributes?: string;
   type?: string;
+  mode: "write" | "read" | "editable";
   icon?: React.ComponentType<{ className?: string }>;
 }
 
@@ -23,8 +24,11 @@ export const GenericField: React.FC<GenericFieldProps> = ({
   additionalAttributes = "",
   type = "text",
   icon,
+  mode,
 }) => {
   const baseAttributes: string = "input";
+
+  // Edit Mode Values - manages the internal state for editing, separate from the parent value
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [draftValue, setDraftValue] = useState<string>(value);
 
@@ -35,7 +39,7 @@ export const GenericField: React.FC<GenericFieldProps> = ({
     }
   }, [value, isEditing]);
 
-  // Edit Mode - initialise the draft value with the current value
+  // Edit - initialise the draft value with the current value
   const handleStartEditing = () => {
     setDraftValue(value);
     setIsEditing(true);
@@ -71,16 +75,23 @@ export const GenericField: React.FC<GenericFieldProps> = ({
             type={type}
             className="grow"
             placeholder={placeholder}
-            value={draftValue}
-            onChange={(e) => setDraftValue(e.target.value)}
+            value={mode === "editable" ? draftValue : value}
+            onChange={(e) => {
+              if (mode === "editable") {
+                setDraftValue(e.target.value);
+              }
+              if (mode === "write") {
+                onChange?.(e.target.value);
+              }
+            }}
             disabled={disabled}
-            readOnly={!isEditing} // only allows input when in Edit Mode
+            readOnly={mode === "read" || (mode === "editable" && !isEditing)} // only allows input when in Edit Mode
           />
         </label>
 
         {/* Buttons */}
-        {/* Visible when not disabled, and changes depending on isEditing */}
-        {!disabled && (
+        {/* Visible when in editable mode and not disabled */}
+        {mode === "editable" && !disabled && (
           <div>
             {!isEditing ? (
               <div>
