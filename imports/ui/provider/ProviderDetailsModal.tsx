@@ -83,6 +83,7 @@ export const ProviderDetailsModal = ({
               "input input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
+            mode="editable"
           />
 
           {/* Email */}
@@ -94,6 +95,7 @@ export const ProviderDetailsModal = ({
               "input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
+            mode="editable"
           />
 
           {/* Number */}
@@ -105,6 +107,7 @@ export const ProviderDetailsModal = ({
               "input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
+            mode="editable"
           />
 
           {/* System ID */}
