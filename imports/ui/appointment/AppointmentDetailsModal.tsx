@@ -5,7 +5,14 @@ import {
   cancelAppointment,
   startAppointment,
 } from "/imports/api/appointmentMethods";
-import { AcademicCapIcon } from "@heroicons/react/24/outline";
+import {
+  AcademicCapIcon,
+  BellAlertIcon,
+  CalendarDaysIcon,
+  ClockIcon,
+  UserIcon,
+  WrenchScrewdriverIcon,
+} from "@heroicons/react/24/outline";
 import { GenericField } from "../components/GenericField";
 
 export const AppointmentDetailsModal = ({
@@ -42,13 +49,42 @@ export const AppointmentDetailsModal = ({
 
         {/* Details */}
         <p className="font-bold">Appointment Details</p>
-        <p>Patient Name: {appointment.patient.name}</p>
-        <p>Service: {appointment.service.name}</p>
-        <AcademicCapIcon className="size-6" />
-        <p>Provider: {appointment.provider.name}</p>
-        <p>Date: {appointment.date.toLocaleDateString()}</p>
-        <p>Time: {appointment.date.toLocaleTimeString()}</p>
-        <p>Status: {appointment.status}</p>
+        <GenericField
+          value={appointment.patient.name}
+          mode="read"
+          additionalAttributes="input-ghost"
+          icon={UserIcon}
+        />
+        <GenericField
+          value={appointment.service.name}
+          mode="read"
+          additionalAttributes="input-ghost"
+          icon={WrenchScrewdriverIcon}
+        />
+        <GenericField
+          value={appointment.provider.name}
+          mode="read"
+          additionalAttributes="input-ghost"
+          icon={AcademicCapIcon}
+        />
+        <GenericField
+          value={appointment.date.toLocaleDateString()}
+          mode="read"
+          additionalAttributes="input-ghost"
+          icon={CalendarDaysIcon}
+        />
+        <GenericField
+          value={appointment.date.toLocaleTimeString()}
+          mode="read"
+          additionalAttributes="input-ghost"
+          icon={ClockIcon}
+        />
+        <GenericField
+          value={appointment.status}
+          mode="read"
+          additionalAttributes="input-ghost"
+          icon={BellAlertIcon}
+        />
 
         {/* Select State -- disabled for now */}
         {/* <select defaultValue={appointment.status} className="select">

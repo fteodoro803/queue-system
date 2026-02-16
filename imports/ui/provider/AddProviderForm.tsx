@@ -34,7 +34,7 @@ export const AddProviderForm = () => {
 
         {/* Name Field */}
         <label className="label">Name *</label>
-        <NameField value={name} onChange={setName} placeholder={"Your Name"} />
+        <NameField value={name} onChange={setName} placeholder={"Your Name"} mode="write"/>
 
         {/* Email Field */}
         <label className="label">Email</label>
@@ -42,6 +42,7 @@ export const AddProviderForm = () => {
           value={email}
           onChange={setEmail}
           placeholder={"mail@site.com"}
+          mode="write"
         />
 
         {/* Number Field */}
@@ -50,6 +51,7 @@ export const AddProviderForm = () => {
           value={number}
           onChange={setNumber}
           placeholder={"0900 000 0000"}
+          mode="write"
         />
 
         {/* Add Button */}

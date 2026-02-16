@@ -6,6 +6,7 @@ import { Sidebar } from "/imports/ui/navigation/Sidebar";
 import { AdminDashboard } from "/imports/ui/pages/AdminDashboard";
 import { ServiceManagement } from "/imports/ui/pages/ServiceManagement";
 import { AppointmentManagement } from "./pages/AppointmentManagement";
+import { TestPage } from "./pages/TestPage";
 
 export const App = () => (
   <BrowserRouter>
@@ -23,6 +24,7 @@ export const App = () => (
             path="appointmentManagement"
             element={<AppointmentManagement />}
           />
+          <Route path="test" element={<TestPage />} />
         </Route>
 
         {/* Patient Routes */}

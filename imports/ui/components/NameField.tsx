@@ -1,62 +1,17 @@
 import React from "react";
 import { UserIcon } from "@heroicons/react/24/outline";
-import { GenericField } from "./GenericField";
+import { GenericField, GenericFieldProps } from "./GenericField";
 
-interface NameFieldProps {
-  value: string;
-  onChange: (val: string) => void;
-  disabled?: boolean;
-  placeholder?: string;
-  additionalAttributes?: string;
-}
+type NameFieldProps = Omit<GenericFieldProps, "icon">;
 
-// export const NameField: React.FC<NameFieldProps> = ({
-//   value,
-//   onChange,
-//   placeholder = "",
-//   disabled = false,
-//   additionalAttributes = "",
-// }) => {
-//   const baseAttributes: string = "input";
-
-//   return (
-//     <>
-//       <label className={`${baseAttributes} ${additionalAttributes}`}>
-//         {/*Icon*/}
-//         <UserIcon className="h-5 w-5 text-base-content/50" />
-
-//         {/*Input*/}
-//         <input
-//           required
-//           type="text"
-//           className="grow"
-//           placeholder={placeholder}
-//           value={value}
-//           onChange={(e) => onChange(e.target.value)}
-//           disabled={disabled}
-//         />
-//       </label>
-//     </>
-//   );
-// };
-
-export const NameField: React.FC<NameFieldProps> = ({
-  value,
-  onChange,
-  placeholder = "",
-  disabled = false,
-  additionalAttributes = "",
-}) => {
+export const NameField: React.FC<NameFieldProps> = (props) => {
   const baseAttributes: string = "";
 
   return (
     <>
       <GenericField
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        disabled={disabled}
-        additionalAttributes={`${baseAttributes} ${additionalAttributes}`}
+        {...props}
+        additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
         icon={UserIcon}
       />
     </>

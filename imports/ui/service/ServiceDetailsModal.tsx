@@ -64,6 +64,7 @@ export const ServiceDetailsModal = ({
             additionalAttributes={
               "input input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
+            mode="editable"
             type="text"
             placeholder={"N/A"}
             icon={WrenchIcon}
@@ -79,6 +80,7 @@ export const ServiceDetailsModal = ({
             type="number"
             placeholder={"N/A"}
             icon={ClockIcon}
+            mode="editable"
           />
           {/* Cost */}
           <label className="label">Cost</label>
@@ -91,6 +93,7 @@ export const ServiceDetailsModal = ({
             type="number"
             placeholder={"N/A"}
             icon={BanknotesIcon}
+            mode="editable"
           />
           {/* Description */}
           <label className="label">Description</label>
@@ -103,6 +106,7 @@ export const ServiceDetailsModal = ({
             type="text"
             placeholder={"N/A"}
             icon={ChatBubbleBottomCenterIcon}
+            mode="editable"
           />
         </fieldset>
 

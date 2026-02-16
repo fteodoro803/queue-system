@@ -82,6 +82,7 @@ export const PatientDetailsModal = ({
               "input input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
+            mode="editable"
           />
 
           {/* Email */}
@@ -93,6 +94,7 @@ export const PatientDetailsModal = ({
               "input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
+            mode="editable"
           />
 
           {/* Number */}
@@ -104,6 +106,7 @@ export const PatientDetailsModal = ({
               "input-ghost disabled:opacity-100 bg-base-100 text-black"
             }
             placeholder={"N/A"}
+            mode="editable"
           />
 
           {/* System ID */}
