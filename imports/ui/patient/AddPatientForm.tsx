@@ -34,7 +34,12 @@ export const AddPatientForm = () => {
 
         {/* Name Field */}
         <label className="label">Name *</label>
-        <NameField value={name} onChange={setName} placeholder={"Your Name"} mode="write" />
+        <NameField
+          value={name}
+          onChange={setName}
+          placeholder={"Your Name"}
+          mode="write"
+        />
 
         {/* Email Field */}
         <label className="label">Email</label>
@@ -55,7 +60,7 @@ export const AddPatientForm = () => {
         />
 
         {/* Add Button */}
-        <button type="submit" className="btn">
+        <button type="submit" className="btn btn-primary text-primary-content">
           Add
         </button>
       </fieldset>
