@@ -1,9 +1,9 @@
 import React from "react";
 import { DateIcon } from "../components/DateIcon";
 import {
+  AcademicCapIcon,
   ClipboardDocumentListIcon,
   ClockIcon,
-  UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import { Appointment } from "/imports/api/appointment";
 import { AppointmentDetailsModal } from "./AppointmentDetailsModal";
@@ -56,7 +56,7 @@ export const AppointmentCard = ({
 
             {/* Provider */}
             <div className="flex items-center gap-1">
-              <UserCircleIcon className={iconSize} />
+              <AcademicCapIcon className={iconSize} />
               <p className={textSize}>{appointment.provider.name ?? "N/A"}</p>
             </div>
 
