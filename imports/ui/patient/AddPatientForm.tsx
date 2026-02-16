@@ -60,7 +60,7 @@ export const AddPatientForm = () => {
         />
 
         {/* Add Button */}
-        <button type="submit" className="btn btn-primary text-primary-content">
+        <button type="submit" className="btn btn-primary">
           Add
         </button>
       </fieldset>

@@ -22,7 +22,7 @@ export const AddPatientModal = ({
         <div className=" flex gap-2 justify-end">
           {/* Close Button */}
           <button
-            className="btn btn-primary text-primary-content"
+            className="btn btn-primary"
             onClick={() => {
               setOpen(false);
             }}

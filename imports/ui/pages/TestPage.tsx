@@ -16,13 +16,9 @@ export const TestPage = () => {
       <div className="mt-4">
         <h1 className="text-xl font-semibold">Theme</h1>
         <div className="flex gap-2">
-          <button className="btn btn-primary text-primary-content">
-            Primary
-          </button>
-          <button className="btn btn-secondary text-secondary-content">
-            Secondary
-          </button>
-          <button className="btn btn-accent text-accent-content">Accent</button>
+          <button className="btn btn-primary">Primary</button>
+          <button className="btn btn-secondary">Secondary</button>
+          <button className="btn btn-accent">Accent</button>
         </div>
       </div>
 
