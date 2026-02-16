@@ -5,7 +5,7 @@ import {
 } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 
-interface GenericFieldProps {
+export interface GenericFieldProps {
   value: string;
   onChange?: (val: string) => void;
   disabled?: boolean;
