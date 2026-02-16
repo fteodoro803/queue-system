@@ -9,6 +9,7 @@ export interface Appointment {
   provider: Provider;
   patient: Patient;
   service: Service;
+  state: string;
   createdAt: Date;
 }
 

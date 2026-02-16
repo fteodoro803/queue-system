@@ -9,6 +9,7 @@ export interface AppointmentData {
   provider: Provider;
   patient: Patient;
   date: Date;
+  state: "scheduled" | "waiting" | "ongoing" | "completed";
 }
 
 Meteor.methods({
@@ -19,6 +20,7 @@ Meteor.methods({
       provider: data.provider,
       patient: data.patient,
       date: data.date,
+      state: data.state,
       createdAt: new Date(),
     });
   },
