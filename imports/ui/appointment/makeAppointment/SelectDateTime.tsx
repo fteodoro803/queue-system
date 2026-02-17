@@ -11,7 +11,7 @@ export const SelectDateTime = ({
   service: Service | undefined;
 }) => {
   const [currDate, setCurrDate] = useState<Date | undefined>(undefined);
-  const [currTime, setCurrTime] = useState<Date | undefined>(undefined);
+  // const [currTime, setCurrTime] = useState<Date | undefined>(undefined);
 
   const placeholderTimes = [
     "00:00",
@@ -53,7 +53,7 @@ export const SelectDateTime = ({
       <div className="flex flex-col space-y-2 overflow-y-auto">
         {placeholderTimes.map((t) => {
           return (
-            <div
+            <div key={`time_${t}`}
               className="card sm:w-40 md:w-70 h-20 bg-base-100 card-xs shadow-sm gap-1 hover:bg-base-300"
               onClick={() => {
                 const date = currDate;

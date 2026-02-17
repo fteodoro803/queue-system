@@ -40,7 +40,7 @@ export const Confirmation = ({
       <p>Provider: {provider?.name ?? "Any"}</p>
       <p>Date and Time: {date?.toLocaleString() ?? "None"}</p>
       <button
-        className="btn"
+        className="btn btn-primary"
         onClick={() => {
           handleSubmit();
           setOpen(false);
