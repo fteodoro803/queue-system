@@ -11,7 +11,8 @@ export const Steps = ({ step }: StepsProps) => {
       <li className={`step ${step >= 1 ? "step-primary" : ""}`}>Service</li>
       <li className={`step ${step >= 2 ? "step-primary" : ""}`}>Provider</li>
       <li className={`step ${step >= 3 ? "step-primary" : ""}`}>Date</li>
-      <li className={`step ${step >= 4 ? "step-primary" : ""}`}>Confirm</li>
+      <li className={`step ${step >= 4 ? "step-primary" : ""}`}>Patient</li>
+      <li className={`step ${step >= 5 ? "step-primary" : ""}`}>Confirm</li>
     </ul>
   );
 };

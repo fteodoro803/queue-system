@@ -8,6 +8,8 @@ import { SelectDateTime } from "./makeAppointment/SelectDateTime";
 import { Confirmation } from "./makeAppointment/Confirmation";
 import { MODAL_SIZES } from "/imports/utils/modalSizes";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { SelectPatient } from "./makeAppointment/SelectPatient";
+import { Patient } from "/imports/api/patient";
 
 export const MakeAppointmentModal = ({
   setOpen,
@@ -18,13 +20,14 @@ export const MakeAppointmentModal = ({
   const [provider, setProvider] = useState<Provider | undefined>(undefined);
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [page, setPage] = useState<number>(0);
+  const [patient, setPatient] = useState<Patient | undefined>(undefined);
 
   useEffect(() => {
     changePage("next");
-  }, [service, provider, date]);
+  }, [service, provider, date, patient]);
 
   function changePage(change: "next" | "previous") {
-    const maxPages: number = 4;
+    const maxPages: number = 5;
     if (change === "next" && page < maxPages) {
       setPage(page + 1);
     }
@@ -73,12 +76,15 @@ export const MakeAppointmentModal = ({
           )}
           {/* Select Date and Time */}
           {page === 3 && <SelectDateTime setDate={setDate} service={service} />}
+          {/* Select Patient */}
+          {page === 4 && <SelectPatient setPatient={setPatient} />}
           {/* Confirmation */}
-          {page === 4 && (
+          {page === 5 && (
             <Confirmation
               service={service}
               provider={provider}
               date={date}
+              patient={patient}
               setOpen={setOpen}
             />
           )}

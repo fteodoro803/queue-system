@@ -5,26 +5,22 @@ import { insertAppointment } from "/imports/api/appointmentMethods";
 import { Patient } from "/imports/api/patient";
 
 export const Confirmation = ({
+  patient,
   service,
   provider,
   date,
   setOpen,
 }: {
+  patient: Patient | undefined;
   service: Service | undefined;
   provider: Provider | undefined;
   date: Date | undefined;
   setOpen: (value: boolean) => void;
 }) => {
-  const PLACEHOLDER_PATIENT: Patient = {
-    _id: "PLACEHOLDER_ID",
-    name: "PLACEHOLDER_NAME",
-    createdAt: new Date(),
-  };
-
   const handleSubmit = async () => {
-    if (service && date && provider && PLACEHOLDER_PATIENT) {
+    if (service && date && provider && patient) {
       await insertAppointment({
-        patient: PLACEHOLDER_PATIENT,
+        patient,
         date,
         provider,
         service,
@@ -36,6 +32,7 @@ export const Confirmation = ({
   return (
     <>
       <p>Confirmation:</p>
+      <p>Patient: {patient?.name ?? "None"}</p>
       <p>Service: {service?.name ?? "None"}</p>
       <p>Provider: {provider?.name ?? "Any"}</p>
       <p>Date and Time: {date?.toLocaleString() ?? "None"}</p>
