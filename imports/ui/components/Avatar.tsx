@@ -21,7 +21,7 @@ export const Avatar: React.FC<IconProps> = ({ profile }) => {
     )) || (
       // Fallback Avatar
       <div className="avatar avatar-placeholder">
-        <div className={`${size} rounded-full bg-neutral text-neutral-content`}>
+        <div className={`${size} rounded-full bg-primary-content text-primary`}>
           <span className="text-xl">{nameInitial}</span>
         </div>
       </div>
