@@ -92,36 +92,64 @@ export const TestPage = () => {
       {/* Field */}
       <div className="mt-4">
         <p className="text-xl font-semibold">Fields</p>
-        <p className="text-sm">Generic Field: mode=write</p>
-        <GenericField
-          value={genericFieldValue}
-          onChange={setGenericFieldValue}
-          mode="write"
-        />
-        <p className="text-sm">Generic Field: mode=read</p>
-        <GenericField
-          value={genericFieldValue}
-          onChange={setGenericFieldValue}
-          mode="read"
-        />
-        <p className="text-sm">Generic Field: mode=editable</p>
-        <GenericField
-          value={genericFieldValue}
-          onChange={setGenericFieldValue}
-          mode="editable"
-        />
-        <p className="text-sm">Email Field</p>
-        <EmailField
-          value={emailFieldValue}
-          onChange={setEmailFieldValue}
-          mode="write"
-        />
-        <p className="text-sm">Number Field</p>
-        <NumberField
-          value={numberFieldValue}
-          onChange={setNumberFieldValue}
-          mode="write"
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <p className="text-sm">Generic Field: mode=write</p>
+            <GenericField
+              value={genericFieldValue}
+              onChange={setGenericFieldValue}
+              mode="write"
+              placeholder="placeholder"
+            />
+          </div>
+
+          <div>
+            <p className="text-sm">Generic Field: mode=read</p>
+            <GenericField
+              value={genericFieldValue}
+              onChange={setGenericFieldValue}
+              mode="read"
+              placeholder="placeholder"
+            />
+          </div>
+          <div>
+            <p className="text-sm">Generic Field: mode=editable</p>
+            <GenericField
+              value={genericFieldValue}
+              onChange={setGenericFieldValue}
+              mode="editable"
+              placeholder="placeholder"
+            />
+          </div>
+          <div>
+            <p className="text-sm">Generic Field: ghost</p>
+            <GenericField
+              value={genericFieldValue}
+              onChange={setGenericFieldValue}
+              mode="write"
+              additionalAttributes="input-ghost"
+              placeholder="placeholder"
+            />
+          </div>
+          <div>
+            <p className="text-sm">Email Field</p>
+            <EmailField
+              value={emailFieldValue}
+              onChange={setEmailFieldValue}
+              mode="write"
+              placeholder="placeholder@email.com"
+            />
+          </div>
+          <div>
+            <p className="text-sm">Number Field</p>
+            <NumberField
+              value={numberFieldValue}
+              onChange={setNumberFieldValue}
+              mode="write"
+              placeholder="12345"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Calendar */}
