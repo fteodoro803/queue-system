@@ -8,16 +8,14 @@ import {
   WrenchScrewdriverIcon,
   BugAntIcon,
 } from "@heroicons/react/24/solid";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { ThemeController } from "../components/ThemeController";
+import { NavLinkItem } from "./NavLinkItem";
 
 export const Sidebar = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const isAdmin = location.pathname.startsWith("/admin");
-  // Determine active path for highlighting
-  const activePath = location.pathname;
-  const highlight = "bg-primary text-primary-content rounded";
 
   // Home Screen - don't show dashboard
   if (isHome) return <Outlet />;
@@ -53,77 +51,47 @@ export const Sidebar = () => {
             className="drawer-overlay"
           ></label>
           <ul className="menu bg-base min-h-full w-80 p-4">
-            <Link to="/">
-              <li className={activePath === "/" ? highlight : ""}>
-                <a className="flex items-center gap-2">
-                  <HomeIcon className="h-5 w-5 text-base" />
-                  <span>Home</span>
-                </a>
-              </li>
-            </Link>
+            <NavLinkItem link="/" label="Home" icon={HomeIcon} />
 
             {/*Admin Sidebar*/}
             {isAdmin && (
               <>
                 {/*Dashboard Button*/}
-                <li
-                  className={
-                    activePath === "/admin/dashboard" ? highlight : ""
-                  }
-                >
-                  <Link to="admin/dashboard">
-                    <PresentationChartLineIcon className="h-5 w-5 text-base" />
-                    <span>Dashboard</span>
-                  </Link>
-                </li>
+                <NavLinkItem
+                  link="/admin/dashboard"
+                  label="Dashboard"
+                  icon={PresentationChartLineIcon}
+                />
 
                 {/*Appointments Button*/}
-                <li
-                  className={
-                    activePath === "/admin/appointmentManagement"
-                      ? highlight
-                      : ""
-                  }
-                >
-                  <Link to="admin/appointmentManagement">
-                    <CalendarDaysIcon className="h-5 w-5 text-base" />
-                    <span>Appointments</span>
-                  </Link>
-                </li>
+                <NavLinkItem
+                  link="/admin/appointmentManagement"
+                  label="Appointments"
+                  icon={CalendarDaysIcon}
+                />
 
                 {/*Patients Button*/}
-                <li
-                  className={
-                    activePath === "/admin/patientManagement" ? highlight : ""
-                  }
-                >
-                  <Link to="admin/patientManagement">
-                    <UserGroupIcon className="h-5 w-5 text-base" />
-                    <span>Patients</span>
-                  </Link>
-                </li>
+                <NavLinkItem
+                  link="/admin/patientManagement"
+                  label="Patients"
+                  icon={UserGroupIcon}
+                />
 
                 {/*Services Button*/}
-                <li
-                  className={
-                    activePath === "/admin/serviceManagement" ? highlight : ""
-                  }
-                >
-                  <Link to="admin/serviceManagement">
-                    <WrenchScrewdriverIcon className="h-5 w-5 text-base" />
-                    <span>Services</span>
-                  </Link>
-                </li>
+                <NavLinkItem
+                  link="/admin/serviceManagement"
+                  label="Services"
+                  icon={WrenchScrewdriverIcon}
+                />
+
+                {/* Test Page Button */}
+                <NavLinkItem
+                  link="/admin/test"
+                  label="Test Page"
+                  icon={BugAntIcon}
+                />
               </>
             )}
-
-            {/* Test Page Button */}
-            <li className={activePath === "/admin/test" ? highlight : ""}>
-              <Link to="admin/test">
-                <BugAntIcon className="h-5 w-5 text-base" />
-                <span>Test Page</span>
-              </Link>
-            </li>
 
             {/*Patient Sidebars*/}
 
