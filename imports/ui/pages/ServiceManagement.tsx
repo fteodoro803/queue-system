@@ -31,7 +31,7 @@ export const ServiceManagement = () => {
               className="btn btn-primary"
               onClick={() => setAddServiceModalOpen(true)}
             >
-              Add Service
+              + New Service
             </button>
           </div>
           <ServiceTable />
@@ -53,7 +53,7 @@ export const ServiceManagement = () => {
               className="btn btn-primary"
               onClick={() => setAddServiceProviderModalOpen(true)}
             >
-              Add Provider
+              + New Provider
             </button>
           </div>
 
