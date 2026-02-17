@@ -17,24 +17,24 @@ import { GenericField } from "../components/GenericField";
 
 export const AppointmentDetailsModal = ({
   appointment,
-  isOpen,
+  setOpen,
 }: {
   appointment: Appointment;
-  isOpen: () => void;
+  setOpen: (value: boolean) => void;
 }) => {
   const handleCancel = async () => {
     await cancelAppointment(appointment._id);
-    isOpen();
+    setOpen(false);
   };
 
   const handleStart = async () => {
     await startAppointment(appointment._id);
-    isOpen();
+    setOpen(false);
   };
 
   const handleComplete = async () => {
     await completeAppointment(appointment._id);
-    isOpen();
+    setOpen(false);
   };
 
   return (
@@ -42,7 +42,7 @@ export const AppointmentDetailsModal = ({
       <div className="modal-box flex flex-col gap-2">
         <button
           className="btn btn-sm btn-circle absolute right-2 top-2"
-          onClick={isOpen}
+          onClick={() => setOpen(false)}
         >
           ✕
         </button>
@@ -110,6 +110,9 @@ export const AppointmentDetailsModal = ({
           Mark as Complete
         </button>
       </div>
+
+      {/* Closes modal when clicking outside */}
+      <div className="modal-backdrop" onClick={() => setOpen(false)} />
     </div>
   );
 };

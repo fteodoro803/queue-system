@@ -127,6 +127,15 @@ export const PatientDetailsModal = ({
           setOpen={() => setOpen(false)}
         />
       </div>
+
+      {/* Cancel edits and close modal when clicking outside */}
+      <div
+        className="modal-backdrop"
+        onClick={() => {
+          handleCancel();
+          setOpen(false);
+        }}
+      />
     </div>
   );
 };
