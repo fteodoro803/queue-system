@@ -105,7 +105,7 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
             />
 
             {/* Add Button */}
-            <button type="submit" className="btn">
+            <button type="submit" className="btn btn-primary">
               Add
             </button>
           </fieldset>

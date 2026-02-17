@@ -10,7 +10,10 @@ export const PatientManagement = () => {
       {/*<div className="flex items-center justify-between px-50">*/}
       <div className="flex justify-between">
         <h1 className="text-3xl font-bold">Patient Management</h1>
-        <button className="btn btn-primary" onClick={() => setModalOpen(true)}>
+        <button
+          className="btn btn-primary"
+          onClick={() => setModalOpen(true)}
+        >
           Add Patient
         </button>
       </div>

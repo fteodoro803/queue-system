@@ -80,7 +80,7 @@ export const ProviderDetailsModal = ({
             value={name}
             onChange={setName}
             additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100 text-black"
+              "input input-ghost disabled:opacity-100 bg-base-100"
             }
             placeholder={"N/A"}
             mode="editable"
@@ -92,7 +92,7 @@ export const ProviderDetailsModal = ({
             value={email}
             onChange={setEmail}
             additionalAttributes={
-              "input-ghost disabled:opacity-100 bg-base-100 text-black"
+              "input-ghost disabled:opacity-100 bg-base-100"
             }
             placeholder={"N/A"}
             mode="editable"
@@ -104,7 +104,7 @@ export const ProviderDetailsModal = ({
             value={number}
             onChange={setNumber}
             additionalAttributes={
-              "input-ghost disabled:opacity-100 bg-base-100 text-black"
+              "input-ghost disabled:opacity-100 bg-base-100"
             }
             placeholder={"N/A"}
             mode="editable"
@@ -114,8 +114,9 @@ export const ProviderDetailsModal = ({
           {/* <label className="label">System ID</label>
           <GenericField
             value={provider._id}
-            additionalAttributes="input input-ghost disabled:opacity-100 bg-base-100 text-black"
+            additionalAttributes="input input-ghost disabled:opacity-100 bg-base-100"
             disabled={true}
+            mode="read"
           /> */}
         </fieldset>
 

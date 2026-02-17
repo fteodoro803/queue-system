@@ -35,7 +35,7 @@ export const AppointmentManagement = () => {
 
       <p>Appointments:</p>
       {appointments.map((a) => {
-        return <AppointmentCard appointment={a} />;
+        return <AppointmentCard key={a._id} appointment={a} />;
       })}
     </>
   );

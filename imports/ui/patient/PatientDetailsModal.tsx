@@ -79,7 +79,7 @@ export const PatientDetailsModal = ({
             value={name}
             onChange={setName}
             additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100 text-black"
+              "input input-ghost disabled:opacity-100 bg-base-100"
             }
             placeholder={"N/A"}
             mode="editable"
@@ -91,7 +91,7 @@ export const PatientDetailsModal = ({
             value={email}
             onChange={setEmail}
             additionalAttributes={
-              "input-ghost disabled:opacity-100 bg-base-100 text-black"
+              "input-ghost disabled:opacity-100 bg-base-100"
             }
             placeholder={"N/A"}
             mode="editable"
@@ -103,7 +103,7 @@ export const PatientDetailsModal = ({
             value={number}
             onChange={setNumber}
             additionalAttributes={
-              "input-ghost disabled:opacity-100 bg-base-100 text-black"
+              "input-ghost disabled:opacity-100 bg-base-100"
             }
             placeholder={"N/A"}
             mode="editable"
@@ -113,7 +113,7 @@ export const PatientDetailsModal = ({
           <label className="label">System ID</label>
           <input
             type="text"
-            className="input input-ghost disabled:opacity-100 bg-base-100 text-black"
+            className="input input-ghost disabled:opacity-100 bg-base-100"
             disabled={true}
             value={patient._id}
           />

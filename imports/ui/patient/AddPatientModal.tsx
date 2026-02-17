@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { AddPatientForm } from "/imports/ui/patient/AddPatientForm";
 
 export const AddPatientModal = ({
@@ -8,7 +8,7 @@ export const AddPatientModal = ({
   open: boolean;
   setOpen: (value: boolean) => void;
 }) => {
-  const [name, setName] = useState("");
+  // const [name, setName] = useState("");
 
   // Closed
   if (!open) return null;
@@ -22,7 +22,7 @@ export const AddPatientModal = ({
         <div className=" flex gap-2 justify-end">
           {/* Close Button */}
           <button
-            className="btn"
+            className="btn btn-primary"
             onClick={() => {
               setOpen(false);
             }}

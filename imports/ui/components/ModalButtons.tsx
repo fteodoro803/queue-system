@@ -30,7 +30,7 @@ export const ModalButtons = ({
           {/* Save Button */}
           <button
             type="button"
-            className="btn bg-green-400"
+            className="btn btn-success"
             onClick={handleSave}
           >
             Save
@@ -39,7 +39,7 @@ export const ModalButtons = ({
           {/* Cancel Button */}
           <button
             type="button"
-            className="btn bg-red-400"
+            className="btn btn-error"
             onClick={handleCancel}
           >
             Cancel

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DayPicker, getDefaultClassNames, Matcher } from "react-day-picker";
+import { DayPicker, Matcher } from "react-day-picker";
 import "react-day-picker/src/style.css";
 
 // TODO: add tagalog localisation
@@ -18,7 +18,6 @@ export const Calendar = ({
   disabledDates,
   previousDatesDisabled,
 }: CalendarProps) => {
-  const defaultClassNames = getDefaultClassNames();
   // const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [month, setMonth] = useState<Date>(startMonth ?? new Date());
 
@@ -45,12 +44,17 @@ export const Calendar = ({
       ISOWeek={true} // week starts on Monday
       fixedWeeks={true} // consistent window size
       footer={
-        <button className="btn" onClick={() => setMonth(new Date())}>
+        <button
+          className="btn btn-primary"
+          onClick={() => setMonth(new Date())}
+        >
           Today
         </button>
       }
       classNames={{
-        selected: `${defaultClassNames.selected}`,
+        today: `text`, // make text normal-coloured instead of highlighted
+        selected: `bg-accent border-accent text-accent-content rounded-lg`, // Highlight the selected day
+        chevron: `fill-primary`,
       }}
     />
   );

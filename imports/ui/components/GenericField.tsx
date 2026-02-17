@@ -106,12 +106,12 @@ export const GenericField: React.FC<GenericFieldProps> = ({
             ) : (
               <div>
                 {/* Cancel Button */}
-                <button className="btn" onClick={handleCancel}>
+                <button className="btn btn-error" onClick={handleCancel}>
                   <XMarkIcon className="h-5 w-5 text-base-content/50" />
                 </button>
 
                 {/* Save Button */}
-                <button className="btn" onClick={handleSave}>
+                <button className="btn btn-success" onClick={handleSave}>
                   <CheckIcon className="h-5 w-5 text-base-content/50" />
                 </button>
               </div>

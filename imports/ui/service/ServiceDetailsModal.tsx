@@ -62,7 +62,7 @@ export const ServiceDetailsModal = ({
             value={name}
             onChange={setName}
             additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100 text-black"
+              "input input-ghost disabled:opacity-100 bg-base-100"
             }
             mode="editable"
             type="text"
@@ -75,7 +75,7 @@ export const ServiceDetailsModal = ({
             value={duration}
             onChange={setDuration}
             additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100 text-black"
+              "input input-ghost disabled:opacity-100 bg-base-100"
             }
             type="number"
             placeholder={"N/A"}
@@ -88,7 +88,7 @@ export const ServiceDetailsModal = ({
             value={cost}
             onChange={setCost}
             additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100 text-black"
+              "input input-ghost disabled:opacity-100 bg-base-100"
             }
             type="number"
             placeholder={"N/A"}
@@ -101,7 +101,7 @@ export const ServiceDetailsModal = ({
             value={description}
             onChange={setDescription}
             additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100 text-black"
+              "input input-ghost disabled:opacity-100 bg-base-100"
             }
             type="text"
             placeholder={"N/A"}
