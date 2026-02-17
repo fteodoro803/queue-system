@@ -39,6 +39,9 @@ export const AddProviderModal = ({
           </button>
         </div>
       </div>
+
+      {/* Closes modal when clicking outside */}
+      <div className="modal-backdrop" onClick={() => setOpen(false)} />
     </div>
   );
 };

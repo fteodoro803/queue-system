@@ -131,6 +131,15 @@ export const ProviderDetailsModal = ({
           handleCancel={handleCancel}
         />
       </div>
+
+      {/* Closes modal when clicking outside */}
+      <div
+        className="modal-backdrop"
+        onClick={() => {
+          handleCancel();
+          setOpen(false);
+        }}
+      />
     </div>
   );
 };

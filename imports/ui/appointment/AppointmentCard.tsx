@@ -74,7 +74,7 @@ export const AppointmentCard = ({
       {isModalOpen && (
         <AppointmentDetailsModal
           appointment={appointment}
-          isOpen={() => setIsModalOpen(false)}
+          setOpen={setIsModalOpen}
         />
       )}
     </>

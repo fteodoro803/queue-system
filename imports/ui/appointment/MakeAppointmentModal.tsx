@@ -94,6 +94,9 @@ export const MakeAppointmentModal = ({
         <p>Date: {date?.getDate()}</p> */}
         </div>
       }
+
+      {/* Closes modal when clicking outside */}
+      <div className="modal-backdrop" onClick={() => setOpen(false)} />
     </div>
   );
 };
