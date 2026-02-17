@@ -39,7 +39,7 @@ export const AppointmentCard = ({
         </figure>
         <div className="card-body">
           {/* Patient Name */}
-          <h2 className="card-title">Patient Name</h2>
+          <h2 className="card-title">{appointment.patient.name ?? "N/A"}</h2>
           {/* More appointment details */}
           <div className="flex gap-7">
             {/* Time */}
