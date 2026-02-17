@@ -85,6 +85,7 @@ export const TestPage = () => {
           <button className="btn btn-primary">Primary</button>
           <button className="btn btn-secondary">Secondary</button>
           <button className="btn btn-accent">Accent</button>
+          <button className="btn">Standard</button>
         </div>
       </div>
 
