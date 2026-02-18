@@ -6,7 +6,7 @@ import { Provider } from "./provider";
 
 export const APPOINTMENT_STATES = [
   "scheduled",
-  "ongoing",
+  "in-progress",
   "completed",
   "cancelled",
 ] as const;
@@ -44,10 +44,10 @@ Meteor.methods({
     });
   },
 
-  // Marks appointment as ongoing
+  // Marks appointment as in-progress
   "appointments.start"(id: string) {
     return AppointmentsCollection.updateAsync(id, {
-      $set: { status: "ongoing" },
+      $set: { status: "in-progress" },
     });
   },
 
