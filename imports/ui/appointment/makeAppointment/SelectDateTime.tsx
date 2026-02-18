@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Calendar } from "../../components/Calendar";
 import { Service } from "/imports/api/service";
-import { convertStrToHrs } from "/imports/utils/utils";
+import {
+  convertStrToHrs,
+  createTimeSlots,
+  timeStrToLocaleTime,
+} from "/imports/utils/utils";
 
 export const SelectDateTime = ({
   setDate,
@@ -10,65 +14,50 @@ export const SelectDateTime = ({
   setDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
   service: Service | undefined;
 }) => {
-  const [currDate, setCurrDate] = useState<Date | undefined>(undefined);
-  // const [currTime, setCurrTime] = useState<Date | undefined>(undefined);
+  const [startTime, endTime]: [number, number] = [9, 17]; // 9am to 5pm
+  const placeholderTimes = createTimeSlots(startTime, endTime, 30); // every 30 mins
+  const [currDate, setCurrDate] = useState<Date>();
 
-  const placeholderTimes = [
-    "00:00",
-    "00:30",
-    "01:00",
-    "01:30",
-    "02:00",
-    "02:30",
-    "03:00",
-    "03:30",
-    "04:00",
-    "04:30",
-    "05:00",
-    "05:30",
-    "06:00",
-    "06:30",
-    "07:00",
-    "07:30",
-    "08:00",
-    "08:30",
-    "09:00",
-    "09:30",
-    "10:00",
-    "10:30",
-    "11:00",
-    "11:30",
-    "12:00",
-  ];
+  const setAppointmentTime = (timeStr: string) => {
+    if (!currDate) return;
+
+    const convertedTime = convertStrToHrs(timeStr);
+    const newDate = new Date(currDate);
+    newDate?.setHours(convertedTime[0], convertedTime[1], convertedTime[2]);
+    setCurrDate(newDate);
+  };
+
+  const confirmAppointmentTime = () => {
+    setDate(currDate);
+  };
 
   if (!service)
-    return <p className="text-2xl text-red-500">Select a Service first</p>;
+    return <p className="text-2xl text-warning">Select a Service first</p>;
 
   return (
     <div className="flex gap-2">
       {/* Calendar */}
-      <Calendar date={currDate} setDate={setCurrDate} previousDatesDisabled />
+      <Calendar date={currDate} setDate={setCurrDate} />
 
       {/* Appointment Times */}
-      <div className="flex flex-col space-y-2 overflow-y-auto">
-        {placeholderTimes.map((t) => {
-          return (
-            <div key={`time_${t}`}
-              className="card sm:w-40 md:w-70 h-20 bg-base-100 card-xs shadow-sm gap-1 hover:bg-base-300"
-              onClick={() => {
-                const date = currDate;
-                const convertedTime = convertStrToHrs(t);
-                date?.setHours(convertedTime[0], convertedTime[1]);
-                setDate(date);
-              }}
-            >
-              <div className="card-body">
-                <h2 className="card-title">{t}</h2>
-                <p>Time</p>
-              </div>
-            </div>
-          );
-        })}
+      <div className="">
+        <select
+          defaultValue={"No Time Selected"}
+          className="select"
+          onChange={(e) => setAppointmentTime(e.target.value)}
+        >
+          <option disabled={true}>No Time Selected</option>
+          {placeholderTimes.map((t) => (
+            <option key={`time_option_${t}`} value={t}>
+              {timeStrToLocaleTime(t)}
+            </option>
+          ))}
+        </select>
+
+        {/* Confirm Button */}
+        <button className="btn btn-primary" onClick={confirmAppointmentTime}>
+          Confirm
+        </button>
       </div>
     </div>
   );

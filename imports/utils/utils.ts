@@ -18,3 +18,28 @@ export function getEndOfDay(date: Date): Date {
   endOfDay.setHours(23, 59, 59, 999);
   return endOfDay;
 }
+
+export function createTimeSlots(
+  minHour: number,
+  maxHour: number,
+  interval: number,
+): string[] {
+  const timeSlots: string[] = [];
+  for (let hour = minHour; hour < maxHour; hour++) {
+    for (let minute = 0; minute < 60; minute += interval) {
+      const timeStr = `${hour.toString().padStart(2, "0")}:${minute
+        .toString()
+        .padStart(2, "0")}`;
+      timeSlots.push(timeStr);
+    }
+  }
+  return timeSlots;
+}
+
+// Converts "HH:MM" to locale time string like "02:30 PM"
+export function timeStrToLocaleTime(timeStr: string): string {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  const date = new Date();
+  date.setHours(hours, minutes);
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}

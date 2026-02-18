@@ -4,7 +4,7 @@ import "react-day-picker/src/style.css";
 
 // TODO: add tagalog localisation
 interface CalendarProps {
-  date: Date | undefined;
+  date?: Date;
   setDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
   startMonth?: Date;
   disabledDates?: Matcher[];
@@ -43,14 +43,7 @@ export const Calendar = ({
       disabled={combinedDisabledDates}
       ISOWeek={true} // week starts on Monday
       fixedWeeks={true} // consistent window size
-      footer={
-        <button
-          className="btn btn-primary"
-          onClick={() => setMonth(new Date())}
-        >
-          Today
-        </button>
-      }
+      footer={<p>Selected: {date ? `${date.toLocaleString()}` : "None"}</p>}
       classNames={{
         today: `text`, // make text normal-coloured instead of highlighted
         selected: `bg-accent border-accent text-accent-content rounded-lg`, // Highlight the selected day
