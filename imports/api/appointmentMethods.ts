@@ -6,7 +6,7 @@ import { Provider } from "./provider";
 
 export const APPOINTMENT_STATES = [
   "scheduled",
-  "ongoing",
+  "in-progress",
   "completed",
   "cancelled",
 ] as const;
@@ -44,10 +44,10 @@ Meteor.methods({
     });
   },
 
-  // Marks appointment as ongoing
+  // Marks appointment as in-progress
   "appointments.start"(id: string) {
     return AppointmentsCollection.updateAsync(id, {
-      $set: { status: "ongoing" },
+      $set: { status: "in-progress" },
     });
   },
 
@@ -55,6 +55,13 @@ Meteor.methods({
   "appointments.cancel"(id: string) {
     return AppointmentsCollection.updateAsync(id, {
       $set: { status: "cancelled" },
+    });
+  },
+
+  // Marks appointment as scheduled
+  "appointments.scheduled"(id: string) {
+    return AppointmentsCollection.updateAsync(id, {
+      $set: { status: "scheduled" },
     });
   },
 });
@@ -68,14 +75,18 @@ export async function removeAppointment(id: string) {
   return Meteor.callAsync("appointments.remove", id);
 }
 
-export async function completeAppointment(id: string) {
+export async function markAsCompleted(id: string) {
   return Meteor.callAsync("appointments.complete", id);
 }
 
-export async function startAppointment(id: string) {
+export async function markAsStarted(id: string) {
   return Meteor.callAsync("appointments.start", id);
 }
 
-export async function cancelAppointment(id: string) {
+export async function markAsCancelled(id: string) {
   return Meteor.callAsync("appointments.cancel", id);
+}
+
+export async function markAsScheduled(id: string) {
+  return Meteor.callAsync("appointments.scheduled", id);
 }

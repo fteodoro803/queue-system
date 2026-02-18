@@ -1,9 +1,10 @@
 import React from "react";
 import { Appointment } from "/imports/api/appointment";
 import {
-  completeAppointment,
-  cancelAppointment,
-  startAppointment,
+  markAsCompleted,
+  markAsCancelled,
+  markAsStarted,
+  markAsScheduled,
 } from "/imports/api/appointmentMethods";
 import {
   AcademicCapIcon,
@@ -23,23 +24,28 @@ export const AppointmentDetailsModal = ({
   setOpen: (value: boolean) => void;
 }) => {
   const handleCancel = async () => {
-    await cancelAppointment(appointment._id);
+    await markAsCancelled(appointment._id);
     setOpen(false);
   };
 
   const handleStart = async () => {
-    await startAppointment(appointment._id);
+    await markAsStarted(appointment._id);
     setOpen(false);
   };
 
   const handleComplete = async () => {
-    await completeAppointment(appointment._id);
+    await markAsCompleted(appointment._id);
+    setOpen(false);
+  };
+
+  const handleSchedule = async () => {
+    await markAsScheduled(appointment._id);
     setOpen(false);
   };
 
   return (
     <div className="modal modal-open" role={"dialog"}>
-      <div className="modal-box flex flex-col gap-2">
+      <div className="modal-box flex flex-col gap-1">
         <button
           className="btn btn-sm btn-circle absolute right-2 top-2"
           onClick={() => setOpen(false)}
@@ -94,6 +100,11 @@ export const AppointmentDetailsModal = ({
             </option>
           ))}
         </select> */}
+
+        {/* Scheduled button (test) */}
+        <button className="btn" onClick={handleSchedule}>
+          Mark as Scheduled (test)
+        </button>
 
         {/* Cancel button */}
         <button className="btn btn-error mt-2" onClick={handleCancel}>

@@ -2,7 +2,44 @@ export function isInteger(str: string): boolean {
   return /^\d+$/.test(str);
 }
 
-export function convertStrToHrs(timeStr: string): [number, number] {
+export function convertStrToHrs(timeStr: string): [number, number, number] {
   const [hours, minutes] = timeStr.split(":").map(Number);
-  return [hours, minutes];
+  return [hours, minutes, 0];
+}
+
+export function getStartOfDay(date: Date): Date {
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  return startOfDay;
+}
+
+export function getEndOfDay(date: Date): Date {
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+  return endOfDay;
+}
+
+export function createTimeSlots(
+  minHour: number,
+  maxHour: number,
+  interval: number,
+): string[] {
+  const timeSlots: string[] = [];
+  for (let hour = minHour; hour < maxHour; hour++) {
+    for (let minute = 0; minute < 60; minute += interval) {
+      const timeStr = `${hour.toString().padStart(2, "0")}:${minute
+        .toString()
+        .padStart(2, "0")}`;
+      timeSlots.push(timeStr);
+    }
+  }
+  return timeSlots;
+}
+
+// Converts "HH:MM" to locale time string like "02:30 PM"
+export function timeStrToLocaleTime(timeStr: string): string {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  const date = new Date();
+  date.setHours(hours, minutes);
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
