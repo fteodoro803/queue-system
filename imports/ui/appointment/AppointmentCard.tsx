@@ -13,9 +13,12 @@ export const AppointmentCard = ({
 }: {
   appointment: Appointment;
 }) => {
-  const hours = appointment.date.getHours().toString().padStart(2, "0");
+  const hours = (appointment.date.getHours() % 12 || 12)
+    .toString()
+    .padStart(2, "0");
   const minutes = appointment.date.getMinutes().toString().padStart(2, "0");
-  const time: string = `${hours}:${minutes}`;
+  const amPm = appointment.date.getHours() >= 12 ? "PM" : "AM";
+  const time: string = `${hours}:${minutes} ${amPm}`;
 
   const iconSize: string = "size-6";
   const textSize: string = "text-sm";

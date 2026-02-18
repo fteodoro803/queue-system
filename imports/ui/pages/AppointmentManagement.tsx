@@ -5,9 +5,10 @@ import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { AppointmentsCollection } from "/imports/api/appointment";
 import { Loading } from "../components/Loading";
 import { Clock } from "../components/Clock";
+import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
 
 export const AppointmentManagement = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const isAppointmentsLoading = useSubscribe("appointments");
   const appointments = useFind(() =>
     AppointmentsCollection.find(
@@ -17,10 +18,20 @@ export const AppointmentManagement = () => {
       },
     ),
   );
-  const scheduledAppointments = appointments.filter(
-    (a) => a.date >= currentTime,
+  const pastAppointments = appointments.filter((a) => a.date < currentDateTime);
+
+  const todayAppointments = useFind(() =>
+    AppointmentsCollection.find(
+      {
+        // find appointments where date is between start and end of current day
+        date: {
+          $gte: getStartOfDay(currentDateTime),
+          $lte: getEndOfDay(currentDateTime),
+        },
+      },
+      { sort: { date: 1 } },
+    ),
   );
-  const pastAppointments = appointments.filter((a) => a.date < currentTime);
 
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] =
     useState<boolean>(false);
@@ -46,18 +57,24 @@ export const AppointmentManagement = () => {
       {/* Current Time */}
       <div className="flex items-center gap-1">
         <p>Current Time:</p>
-        <Clock setTime={setCurrentTime} />
+        <Clock setTime={setCurrentDateTime} />
       </div>
 
-      {/* Upcoming Appointments */}
-      <p>Upcoming Appointments:</p>
-      {scheduledAppointments.map((a) => (
+      {/* Today's Appointments */}
+      <p>Todays Appointments:</p>
+      {todayAppointments.map((a) => (
         <AppointmentCard key={a._id} appointment={a} />
       ))}
 
       {/* Past Appointments */}
       <p>Past Appointments:</p>
       {pastAppointments.map((a) => (
+        <AppointmentCard key={a._id} appointment={a} />
+      ))}
+
+      {/* All Appointments */}
+      <p>All Appointments:</p>
+      {appointments.map((a) => (
         <AppointmentCard key={a._id} appointment={a} />
       ))}
 
