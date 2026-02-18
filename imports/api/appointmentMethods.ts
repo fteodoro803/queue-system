@@ -57,6 +57,13 @@ Meteor.methods({
       $set: { status: "cancelled" },
     });
   },
+
+  // Marks appointment as scheduled
+  "appointments.scheduled"(id: string) {
+    return AppointmentsCollection.updateAsync(id, {
+      $set: { status: "scheduled" },
+    });
+  },
 });
 
 // Exports for the Meteor methods
@@ -68,14 +75,18 @@ export async function removeAppointment(id: string) {
   return Meteor.callAsync("appointments.remove", id);
 }
 
-export async function completeAppointment(id: string) {
+export async function markAsCompleted(id: string) {
   return Meteor.callAsync("appointments.complete", id);
 }
 
-export async function startAppointment(id: string) {
+export async function markAsStarted(id: string) {
   return Meteor.callAsync("appointments.start", id);
 }
 
-export async function cancelAppointment(id: string) {
+export async function markAsCancelled(id: string) {
   return Meteor.callAsync("appointments.cancel", id);
+}
+
+export async function markAsScheduled(id: string) {
+  return Meteor.callAsync("appointments.scheduled", id);
 }
