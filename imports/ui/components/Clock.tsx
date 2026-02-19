@@ -25,7 +25,7 @@ export const Clock = ({
   className?: string;
 }) => {
   const [currentTime, setCurrentTime] = useState(TEST_TIME ?? new Date());
-  const updateTime = 1000; // Update every 1 second (in ms)
+  const updateTime = 30000; // Update every 30 seconds (in ms)
 
   // Continuously update the current time at the specified interval
   useEffect(() => {
