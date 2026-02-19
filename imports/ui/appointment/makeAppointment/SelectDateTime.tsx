@@ -37,7 +37,7 @@ export const SelectDateTime = ({
   return (
     <div className="flex gap-2">
       {/* Calendar */}
-      <Calendar date={currDate} setDate={setCurrDate} />
+      <Calendar date={currDate} setDate={setCurrDate} previousDatesDisabled />
 
       {/* Appointment Times */}
       <div className="">

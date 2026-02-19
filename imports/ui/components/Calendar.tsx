@@ -15,15 +15,14 @@ interface CalendarProps {
 export const Calendar = ({
   date,
   setDate,
-  startMonth = TEST_DATE ?? undefined, // default to current month if not provided, use TEST_TIME for testing purposes
+  startMonth = TEST_DATE ?? undefined, // default to current month if not provided, use TEST_DATE for testing purposes
   disabledDates,
   previousDatesDisabled,
 }: CalendarProps) => {
-  // const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [month, setMonth] = useState<Date>(startMonth ?? new Date());
 
   // Date Options
-  const previousDates = { before: new Date() };
+  const previousDates = { before: month };
   const combinedDisabledDates: Matcher[] = [
     disabledDates ?? [],
     previousDatesDisabled && previousDates,
