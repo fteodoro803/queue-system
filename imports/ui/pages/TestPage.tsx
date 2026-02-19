@@ -11,6 +11,8 @@ import { AppointmentCard } from "../appointment/AppointmentCard";
 import { Appointment } from "/imports/api/appointment";
 import { Provider, ProviderService } from "/imports/api/provider";
 import { Service } from "/imports/api/service";
+import { DashboardCard } from "../components/DashboardCard";
+import { HomeIcon } from "@heroicons/react/24/outline";
 
 export const TestPage = () => {
   const [genericFieldValue, setGenericFieldValue] = useState<string>("");
@@ -180,6 +182,17 @@ export const TestPage = () => {
       <div className="mt-4">
         <p className="text-xl font-semibold">Appointment Card</p>
         <AppointmentCard appointment={appointment} />
+      </div>
+
+      {/* Dashboard Card */}
+      <div className="mt-4">
+        <p className="text-xl font-semibold">Dashboard Card</p>
+        <DashboardCard
+          header="Header"
+          body="Body"
+          footer="Footer"
+          icon={HomeIcon}
+        />
       </div>
     </>
   );

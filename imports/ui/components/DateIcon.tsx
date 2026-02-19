@@ -11,7 +11,7 @@ export const DateIcon = ({ date, size = 70 }: DateIconProps) => {
 
   return (
     <div
-      className="flex flex-col items-center justify-center rounded-2xl bg-primary-content text-primary"
+      className="flex flex-col items-center justify-center rounded-2xl bg-primary/10 text-primary"
       style={{ width: size, height: size }}
     >
       <span className="text-sm font-semibold">{month.toUpperCase()}</span>
