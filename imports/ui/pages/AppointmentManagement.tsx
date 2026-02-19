@@ -8,15 +8,18 @@ import { Clock } from "../components/Clock";
 import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
 import { DashboardCard } from "../components/DashboardCard";
 import { CalendarIcon, ClockIcon } from "@heroicons/react/24/outline";
-import { TEST_TIME } from "../../dev/settings";
+import { TEST_DATE } from "../../dev/settings";
 
 export const AppointmentManagement = () => {
   // Time State
   const [currentDateTime, setCurrentDateTime] = useState(
-    TEST_TIME ?? new Date(),
+    TEST_DATE ?? new Date(),
   );
 
   const isAppointmentsLoading = useSubscribe("appointments");
+  const appointments = useFind(() =>
+    AppointmentsCollection.find({}, { sort: { date: 1 } }),
+  );
   const appointmentsToday = useFind(() =>
     AppointmentsCollection.find(
       {
@@ -98,6 +101,14 @@ export const AppointmentManagement = () => {
           .map((a) => (
             <AppointmentCard key={a._id} appointment={a} />
           ))}
+      </div>
+
+      {/* All Appointments */}
+      <div className="py-4">
+        <h1 className="text-l font-semibold">All Appointments:</h1>
+        {appointments.map((a) => (
+          <AppointmentCard key={a._id} appointment={a} />
+        ))}
       </div>
 
       {/* Appointment Modal */}
