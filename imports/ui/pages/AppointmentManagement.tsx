@@ -8,11 +8,15 @@ import { Clock } from "../components/Clock";
 import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
 import { DashboardCard } from "../components/DashboardCard";
 import { CalendarIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { TEST_TIME } from "../../dev/settings";
 
 export const AppointmentManagement = () => {
-  const [currentDateTime, setCurrentDateTime] = useState(new Date());
-  const isAppointmentsLoading = useSubscribe("appointments");
+  // Time State
+  const [currentDateTime, setCurrentDateTime] = useState(
+    TEST_TIME ?? new Date(),
+  );
 
+  const isAppointmentsLoading = useSubscribe("appointments");
   const appointmentsToday = useFind(() =>
     AppointmentsCollection.find(
       {

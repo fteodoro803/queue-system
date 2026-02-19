@@ -2,9 +2,11 @@ export function isInteger(str: string): boolean {
   return /^\d+$/.test(str);
 }
 
+// Converts "HH:MM" to [hour, minute, second]
+// Useful for creating Date objects with specific times
 export function convertStrToHrs(timeStr: string): [number, number, number] {
-  const [hours, minutes] = timeStr.split(":").map(Number);
-  return [hours, minutes, 0];
+  const [hour = "0", minute = "0", second = "0"] = timeStr.split(":");
+  return [parseInt(hour, 10), parseInt(minute, 10), parseInt(second, 10)];
 }
 
 export function getStartOfDay(date: Date): Date {

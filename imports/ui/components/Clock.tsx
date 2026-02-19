@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { TEST_TIME } from "/imports/dev/settings";
 
 /**
  * Clock component that displays the current time and optionally syncs with parent state.
@@ -23,11 +24,14 @@ export const Clock = ({
   setTime?: (time: Date) => void;
   className?: string;
 }) => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const updateTime = 10000; // Update every 10 seconds (in ms)
+  const [currentTime, setCurrentTime] = useState(TEST_TIME ?? new Date());
+  const updateTime = 1000; // Update every 1 second (in ms)
 
   // Continuously update the current time at the specified interval
   useEffect(() => {
+    // Don't start interval if using test time
+    if (TEST_TIME) return;
+
     const interval = setInterval(() => {
       const now = new Date();
 
@@ -44,6 +48,7 @@ export const Clock = ({
         {currentTime.toLocaleTimeString("en-US", {
           hour: "2-digit",
           minute: "2-digit",
+          // second: "2-digit",
         })}
       </p>
     </div>
