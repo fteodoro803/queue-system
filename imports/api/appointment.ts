@@ -6,6 +6,7 @@ import { Provider } from "./provider";
 export interface Appointment {
   _id: string;
   date: Date;
+  endDate: Date;
   provider: Provider;
   patient: Patient;
   service: Service;

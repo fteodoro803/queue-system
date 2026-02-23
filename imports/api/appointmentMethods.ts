@@ -27,6 +27,7 @@ Meteor.methods({
       provider: data.provider,
       patient: data.patient,
       date: data.date,
+      endDate: new Date(data.date.getTime() + data.service.duration * 60000), // calculate end date based on service duration
       status: data.status,
       createdAt: new Date(),
     });
