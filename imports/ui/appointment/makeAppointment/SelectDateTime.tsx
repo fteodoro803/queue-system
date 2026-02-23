@@ -6,6 +6,7 @@ import {
   createTimeSlots,
   timeStrToLocaleTime,
 } from "/imports/utils/utils";
+import { getEarliestAppointment } from "/imports/api/appointmentMethods";
 
 export const SelectDateTime = ({
   setDate,
@@ -14,6 +15,7 @@ export const SelectDateTime = ({
   setDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
   service: Service | undefined;
 }) => {
+  // TODO: replace placeholder times with actual available times based on provider's schedule and existing appointments
   const [startTime, endTime]: [number, number] = [9, 17]; // 9am to 5pm
   const placeholderTimes = createTimeSlots(startTime, endTime, 30); // every 30 mins
   const [currDate, setCurrDate] = useState<Date>();
@@ -25,6 +27,17 @@ export const SelectDateTime = ({
     const newDate = new Date(currDate);
     newDate?.setHours(convertedTime[0], convertedTime[1], convertedTime[2]);
     setCurrDate(newDate);
+  };
+
+  // Selects the earliest available date and time
+  const findEarliestAppointment = async (
+    serviceId: string,
+  ): Promise<Date | undefined> => {
+    // TODO: get the first available time slot from the service providers
+    // for now, just compare the current time, and the current appointments
+    // 1. Get earliest available time
+    const earliestDate = await getEarliestAppointment(serviceId);
+    return earliestDate;
   };
 
   const confirmAppointmentTime = () => {
@@ -53,6 +66,24 @@ export const SelectDateTime = ({
             </option>
           ))}
         </select>
+
+        {/* Earliest Available Time Button */}
+        <p className="text-sm text-gray-500">
+          Earliest Available: {currDate ? currDate.toLocaleString() : "N/A"}
+        </p>
+        <button
+          className="btn"
+          onClick={async () => {
+            try {
+              const earliest = await findEarliestAppointment(service._id);
+              if (earliest) setCurrDate(earliest);
+            } catch (e) {
+              console.error("Failed to get earliest appointment:", e);
+            }
+          }}
+        >
+          Set Earliest Available
+        </button>
 
         {/* Confirm Button */}
         <button className="btn btn-primary" onClick={confirmAppointmentTime}>

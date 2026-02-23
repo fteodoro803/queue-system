@@ -1,8 +1,10 @@
 import { Meteor } from "meteor/meteor";
 import { AppointmentsCollection } from "/imports/api/appointment";
-import { Service } from "./service";
+import { Service, ServicesCollection } from "./service";
 import { Patient } from "./patient";
 import { Provider } from "./provider";
+import { convertStrToHrs, hasOverlap } from "../utils/utils";
+import { TEST_DATE, WORKING_HOURS } from "../dev/settings";
 
 export const APPOINTMENT_STATES = [
   "scheduled",
@@ -23,8 +25,11 @@ Meteor.methods({
   // Adds appointment to the database
   "appointments.insert"(data: AppointmentData) {
     return AppointmentsCollection.insertAsync({
+      serviceId: data.service._id,
       service: data.service,
+      providerId: data.provider._id,
       provider: data.provider,
+      patientId: data.patient._id,
       patient: data.patient,
       date: data.date,
       endDate: new Date(data.date.getTime() + data.service.duration * 60000), // calculate end date based on service duration
@@ -65,6 +70,85 @@ Meteor.methods({
       $set: { status: "scheduled" },
     });
   },
+
+  // Get earliest appointment time for a given service, and optionally a provider
+  // TODO: do proper tests on this. I know this works within a day, but need to verify it works across days, and with edge cases (e.g. appointments that end at closing time)
+  async "appointments.getEarliest"(
+    serviceId: string,
+  ): Promise<Date | undefined> {
+    const service = await ServicesCollection.findOneAsync(serviceId);
+    if (!service) return undefined;
+
+    const searchFrom = TEST_DATE ?? new Date();
+    const searchUntil = new Date(searchFrom);
+    searchUntil.setMonth(searchUntil.getMonth() + 3);
+
+    // Start searching from the beginning of the current day
+    const currentDay = new Date(searchFrom);
+    currentDay.setHours(...convertStrToHrs(WORKING_HOURS.startTime));
+
+    while (currentDay < searchUntil) {
+      // Skip weekends
+      const dayOfWeek = currentDay.getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        currentDay.setDate(currentDay.getDate() + 1);
+        currentDay.setHours(...convertStrToHrs(WORKING_HOURS.startTime));
+        continue;
+      }
+
+      const dayStart = new Date(currentDay);
+      const dayEnd = new Date(currentDay);
+      dayEnd.setHours(...convertStrToHrs(WORKING_HOURS.endTime));
+
+      const appointments = await AppointmentsCollection.find(
+        {
+          serviceId,
+          date: { $gte: dayStart, $lte: dayEnd },
+          status: { $in: ["scheduled", "in-progress"] },
+        },
+        { sort: { date: 1 } },
+      ).fetch();
+
+      let windowStart = new Date(dayStart);
+      let windowEnd = new Date(dayStart.getTime() + service.duration * 60000);
+
+      let slotFound = true; // assume a slot exists until proven otherwise
+
+      for (const appointment of appointments) {
+        // Window has slid past end of day — no slot today
+        if (windowEnd > dayEnd) {
+          slotFound = false;
+          break;
+        }
+
+        if (
+          hasOverlap(
+            { date: windowStart, endDate: windowEnd },
+            { date: appointment.date, endDate: appointment.endDate },
+          )
+        ) {
+          // Slide window to after this appointment
+          windowStart = new Date(appointment.endDate);
+          windowEnd = new Date(
+            windowStart.getTime() + service.duration * 60000,
+          );
+        } else {
+          // Gap found — slot is available
+          return windowStart;
+        }
+      }
+
+      // Check the slot after all appointments (or if there were none)
+      if (slotFound && windowEnd <= dayEnd) return windowStart;
+
+      // No slot today — advance to next day
+      currentDay.setDate(currentDay.getDate() + 1);
+      currentDay.setHours(...convertStrToHrs(WORKING_HOURS.startTime));
+    }
+
+    // No slot found in entire search range
+    return undefined;
+  },
 });
 
 // Exports for the Meteor methods
@@ -90,4 +174,10 @@ export async function markAsCancelled(id: string) {
 
 export async function markAsScheduled(id: string) {
   return Meteor.callAsync("appointments.scheduled", id);
+}
+
+export async function getEarliestAppointment(
+  serviceId: string,
+): Promise<Date | undefined> {
+  return Meteor.callAsync("appointments.getEarliest", serviceId);
 }

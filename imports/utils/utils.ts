@@ -9,12 +9,14 @@ export function convertStrToHrs(timeStr: string): [number, number, number] {
   return [parseInt(hour, 10), parseInt(minute, 10), parseInt(second, 10)];
 }
 
+// TODO: use the startOfDay in settings instead
 export function getStartOfDay(date: Date): Date {
   const startOfDay = new Date(date);
   startOfDay.setHours(0, 0, 0, 0);
   return startOfDay;
 }
 
+// TODO: use the endOfDay in settings instead
 export function getEndOfDay(date: Date): Date {
   const endOfDay = new Date(date);
   endOfDay.setHours(23, 59, 59, 999);
@@ -44,4 +46,13 @@ export function timeStrToLocaleTime(timeStr: string): string {
   const date = new Date();
   date.setHours(hours, minutes);
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+// Check if appointments overlap
+// TODO: add consideration for breaks, and provider availability
+export function hasOverlap(
+  a1: { date: Date; endDate: Date },
+  a2: { date: Date; endDate: Date },
+): boolean {
+  return !(a1.date >= a2.endDate || a1.endDate <= a2.date);
 }
