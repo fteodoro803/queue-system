@@ -21,6 +21,14 @@ export interface AppointmentData {
   status: (typeof APPOINTMENT_STATES)[number];
 }
 
+interface AppointmentQuery {
+  serviceId: string;
+  date: { $gte: Date; $lte: Date };
+  status: { $in: string[] };
+  providerId?: string;
+}
+
+// Client-Called methods
 Meteor.methods({
   // Adds appointment to the database
   "appointments.insert"(data: AppointmentData) {
@@ -75,6 +83,7 @@ Meteor.methods({
   // TODO: do proper tests on this. I know this works within a day, but need to verify it works across days, and with edge cases (e.g. appointments that end at closing time)
   async "appointments.getEarliest"(
     serviceId: string,
+    providerId?: string,
   ): Promise<Date | undefined> {
     const service = await ServicesCollection.findOneAsync(serviceId);
     if (!service) return undefined;
@@ -83,12 +92,13 @@ Meteor.methods({
     const searchUntil = new Date(searchFrom);
     searchUntil.setMonth(searchUntil.getMonth() + 3);
 
-    // Start searching from the beginning of the current day
+    // 1. Start searching from the beginning of the current day
     const currentDay = new Date(searchFrom);
     currentDay.setHours(...convertStrToHrs(WORKING_HOURS.startTime));
 
     while (currentDay < searchUntil) {
       // Skip weekends
+      // TODO: add modifiers to skip specific days (e.g. provider vacations, holidays, etc.)
       const dayOfWeek = currentDay.getDay();
       if (dayOfWeek === 0 || dayOfWeek === 6) {
         currentDay.setDate(currentDay.getDate() + 1);
@@ -100,20 +110,28 @@ Meteor.methods({
       const dayEnd = new Date(currentDay);
       dayEnd.setHours(...convertStrToHrs(WORKING_HOURS.endTime));
 
-      const appointments = await AppointmentsCollection.find(
-        {
-          serviceId,
-          date: { $gte: dayStart, $lte: dayEnd },
-          status: { $in: ["scheduled", "in-progress"] },
-        },
-        { sort: { date: 1 } },
-      ).fetch();
+      // 2. Search for appointments for this service (and provider, if specified) on this day, sorted by date
+      const query: AppointmentQuery = {
+        serviceId,
+        date: { $gte: dayStart, $lte: dayEnd },
+        status: { $in: ["scheduled", "in-progress"] },
+      };
 
+      if (providerId) {
+        query.providerId = providerId;
+      }
+
+      const appointments = await AppointmentsCollection.find(query, {
+        sort: { date: 1 },
+      }).fetch();
+
+      // 3. Sliding window to find the earliest gap between appointments that can fit the service duration
       let windowStart = new Date(dayStart);
       let windowEnd = new Date(dayStart.getTime() + service.duration * 60000);
-
       let slotFound = true; // assume a slot exists until proven otherwise
 
+      // Uses appointment's duration rather than service' duration because if a service's duration changes, it shouldn't affect already scheduled appointments
+      // TODO: do tests for this edge case
       for (const appointment of appointments) {
         // Window has slid past end of day — no slot today
         if (windowEnd > dayEnd) {
@@ -178,6 +196,7 @@ export async function markAsScheduled(id: string) {
 
 export async function getEarliestAppointment(
   serviceId: string,
+  providerId?: string,
 ): Promise<Date | undefined> {
-  return Meteor.callAsync("appointments.getEarliest", serviceId);
+  return Meteor.callAsync("appointments.getEarliest", serviceId, providerId);
 }

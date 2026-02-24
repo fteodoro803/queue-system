@@ -32,11 +32,9 @@ export const SelectDateTime = ({
   // Selects the earliest available date and time
   const findEarliestAppointment = async (
     serviceId: string,
+    providerId?: string,
   ): Promise<Date | undefined> => {
-    // TODO: get the first available time slot from the service providers
-    // for now, just compare the current time, and the current appointments
-    // 1. Get earliest available time
-    const earliestDate = await getEarliestAppointment(serviceId);
+    const earliestDate = await getEarliestAppointment(serviceId, providerId);
     return earliestDate;
   };
 
