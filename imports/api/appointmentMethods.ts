@@ -76,11 +76,10 @@ Meteor.methods({
   async "appointments.getEarliest"(
     serviceId: string,
     providerId?: string,
-    monthsAhead?: number,
   ): Promise<Date | undefined> {
     const service = await ServicesCollection.findOneAsync(serviceId);
     if (!service) return undefined;
-    return findEarliestSlot(service, providerId, monthsAhead);
+    return findEarliestSlot(service, providerId);
   },
 });
 
@@ -112,12 +111,6 @@ export async function markAsScheduled(id: string) {
 export async function getEarliestAppointment(
   serviceId: string,
   providerId?: string,
-  monthsAhead?: number,
 ): Promise<Date | undefined> {
-  return Meteor.callAsync(
-    "appointments.getEarliest",
-    serviceId,
-    providerId,
-    monthsAhead,
-  );
+  return Meteor.callAsync("appointments.getEarliest", serviceId, providerId);
 }

@@ -73,10 +73,10 @@ export function findEarliestSlotInDay(
 export async function findEarliestSlot(
   service: Service,
   providerId?: string,
-  monthsAhead: number = 3,
 ): Promise<Date | undefined> {
   const searchFrom = TEST_DATE ?? new Date();
   const searchUntil = new Date(searchFrom);
+  const monthsAhead = 3;
   searchUntil.setMonth(searchUntil.getMonth() + monthsAhead);
 
   const currentDay = new Date(searchFrom);
