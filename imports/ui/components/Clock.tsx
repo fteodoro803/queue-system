@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TEST_DATE } from "/imports/dev/settings";
+import { formatDateToLocale } from "/imports/utils/utils";
 
 /**
  * Clock component that displays the current time and optionally syncs with parent state.
@@ -44,13 +45,7 @@ export const Clock = ({
 
   return (
     <div className={className}>
-      <p className="">
-        {currentTime.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          // second: "2-digit",
-        })}
-      </p>
+      <p className="">{formatDateToLocale(currentTime)}</p>
     </div>
   );
 };

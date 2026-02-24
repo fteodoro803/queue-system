@@ -1,6 +1,9 @@
+// ----- Checks -----
 export function isInteger(str: string): boolean {
   return /^\d+$/.test(str);
 }
+
+// ----- Time Utilities -----
 
 // Converts "HH:MM" to [hour, minute, second]
 // Useful for creating Date objects with specific times
@@ -48,8 +51,18 @@ export function timeStrToLocaleTime(timeStr: string): string {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
+// Time format (like "02:30 PM")
+export function formatDateToLocale(date: Date): string {
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
 // Check if appointments overlap
 // TODO: add consideration for breaks, and provider availability
+// TODO: move this to appointment utils
 export function hasOverlap(
   a1: { date: Date; endDate: Date },
   a2: { date: Date; endDate: Date },

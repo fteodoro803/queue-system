@@ -7,19 +7,13 @@ import {
 } from "@heroicons/react/24/outline";
 import { Appointment } from "/imports/api/appointment";
 import { AppointmentDetailsModal } from "./AppointmentDetailsModal";
+import { formatDateToLocale } from "/imports/utils/utils";
 
 export const AppointmentCard = ({
   appointment,
 }: {
   appointment: Appointment;
 }) => {
-  const hours = (appointment.date.getHours() % 12 || 12)
-    .toString()
-    .padStart(2, "0");
-  const minutes = appointment.date.getMinutes().toString().padStart(2, "0");
-  const amPm = appointment.date.getHours() >= 12 ? "PM" : "AM";
-  const time: string = `${hours}:${minutes} ${amPm}`;
-
   const iconSize: string = "size-6";
   const textSize: string = "text-sm";
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -48,7 +42,7 @@ export const AppointmentCard = ({
             {/* Time */}
             <div className="flex items-center gap-1">
               <ClockIcon className={iconSize} />
-              <p className={textSize}>{time ?? "N/A"}</p>
+              <p className={textSize}>{formatDateToLocale(appointment.date)}</p>
             </div>
 
             {/* Service */}
