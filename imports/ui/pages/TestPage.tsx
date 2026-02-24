@@ -68,10 +68,14 @@ export const TestPage = () => {
 
   const appointment: Appointment = {
     _id: "67890",
+    patientId: patient._id,
     patient: patient,
+    providerId: provider._id,
     provider: provider,
+    serviceId: service1._id,
     service: service1,
     date: date ?? new Date(),
+    endDate: new Date((date ?? new Date()).getTime() + service1.duration * 60000),
     status: "scheduled",
     createdAt: date ?? new Date(),
   };

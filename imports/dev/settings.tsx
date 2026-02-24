@@ -11,7 +11,7 @@ export const TEST_DATE = USE_TEST_DATE
   : null;
 
 // Start and End of Working Day
-const [startTime, endTime]: [string, string] = ["09:00", "10:00"];
+const [startTime, endTime]: [string, string] = ["09:00", "12:00"];
 export const WORKING_HOURS = {
   startTime,
   endTime,

@@ -73,9 +73,10 @@ Meteor.methods({
 
   // Get earliest appointment time for a given service, and optionally a provider
   // TODO: do proper tests on this. I know this works within a day, but need to verify it works across days, and with edge cases (e.g. appointments that end at closing time)
+  // TODO: should i change the arguments to just types Service and Provider?
   async "appointments.getEarliest"(
     serviceId: string,
-    providerId?: string,
+    providerId: string,
   ): Promise<Date | undefined> {
     const service = await ServicesCollection.findOneAsync(serviceId);
     if (!service) return undefined;
@@ -110,7 +111,7 @@ export async function markAsScheduled(id: string) {
 
 export async function getEarliestAppointment(
   serviceId: string,
-  providerId?: string,
+  providerId: string,
 ): Promise<Date | undefined> {
   return Meteor.callAsync("appointments.getEarliest", serviceId, providerId);
 }

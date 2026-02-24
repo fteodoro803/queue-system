@@ -4,10 +4,9 @@ import { TEST_DATE, WORKING_HOURS } from "../dev/settings";
 import { convertStrToHrs, hasOverlap } from "./utils";
 
 interface AppointmentQuery {
-  serviceId: string;
+  providerId: string;
   date: { $gte: Date; $lte: Date };
   status: { $in: string[] };
-  providerId?: string;
 }
 
 /**
@@ -61,7 +60,7 @@ export function findEarliestSlotInDay(
  * Searches from today up to a specified number of months ahead, skipping weekends.
  *
  * @param service - The service to find a slot for
- * @param providerId - Optional. If provided, only searches appointments for this provider
+ * @param providerId - The ID of the provider to search appointments for
  * @param monthsAhead - Optional. The number of months ahead to search for available slots (default is 3)
  * @returns The earliest available Date, or undefined if no slot is found
  *
@@ -72,7 +71,7 @@ export function findEarliestSlotInDay(
  */
 export async function findEarliestSlot(
   service: Service,
-  providerId?: string,
+  providerId: string,
 ): Promise<Date | undefined> {
   const searchFrom = TEST_DATE ?? new Date();
   const searchUntil = new Date(searchFrom);
@@ -99,15 +98,10 @@ export async function findEarliestSlot(
 
     // 2. Fetch appointments for the day
     const query: AppointmentQuery = {
-      serviceId: service._id,
+      providerId: providerId,
       date: { $gte: dayStart, $lte: dayEnd },
       status: { $in: ["scheduled", "in-progress"] },
     };
-
-    // Add provider filter if specified (for provider-specific services)
-    if (providerId) {
-      query.providerId = providerId;
-    }
 
     // 3. Check if there are open slots between appointments for that day
     const appointments = await AppointmentsCollection.find(query, {

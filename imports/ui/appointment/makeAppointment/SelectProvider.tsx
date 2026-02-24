@@ -46,7 +46,6 @@ export const SelectProvider = ({
     }
   }, [service, providerIds]);
 
-
   if (!service)
     return <p className="text-2xl text-red-500">Select a Service first</p>;
 
@@ -93,7 +92,6 @@ export const SelectProvider = ({
                 {earliestProviderRecord[p._id] != undefined
                   ? `${earliestProviderRecord[p._id]?.toLocaleDateString()} at ${earliestProviderRecord[p._id]?.toLocaleTimeString()}`
                   : "N/A"}
-                {p.email}
               </div>
             </div>
           </li>
