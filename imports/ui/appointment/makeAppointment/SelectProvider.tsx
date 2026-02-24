@@ -1,9 +1,10 @@
 import { useSubscribe, useTracker } from "meteor/react-meteor-data";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Provider, ProviderCollection } from "/imports/api/provider";
 import { Loading } from "../../components/Loading";
 import { Avatar } from "../../components/Avatar";
 import { Service } from "/imports/api/service";
+import { getEarliestAppointment } from "/imports/api/appointmentMethods";
 
 export const SelectProvider = ({
   setProvider,
@@ -25,6 +26,26 @@ export const SelectProvider = ({
       },
     }).fetch(),
   );
+  // Stable string to use as useEffect dependency
+  const providerIds: string = providers.map((p) => p._id).join(",");
+
+  // Get earliest Provider-specific availabilities for the service
+  const [earliestProviderRecord, setEarliestProviderRecord] = useState<
+    Record<string, Date | undefined>
+  >({});
+  useEffect(() => {
+    if (!service || providers.length === 0) return;
+
+    for (const provider of providers) {
+      getEarliestAppointment(service._id, provider._id).then((date) => {
+        setEarliestProviderRecord((prev) => ({
+          ...prev,
+          [provider._id]: date,
+        }));
+      });
+    }
+  }, [service, providerIds]);
+
 
   if (!service)
     return <p className="text-2xl text-red-500">Select a Service first</p>;
@@ -33,7 +54,6 @@ export const SelectProvider = ({
     return <Loading />;
   }
 
-  // TODO: any provider select functionality --> Has to select a provider by here (maybe a locking functinoality for race conditions)
   return (
     <div>
       <ul className="list bg-base-100 rounded-box shadow-md">
@@ -70,7 +90,9 @@ export const SelectProvider = ({
             <div>
               <div>{p.name}</div>
               <div className="text-xs uppercase font-semibold opacity-60">
-                {/* TODO: change this to next availability */}
+                {earliestProviderRecord[p._id] != undefined
+                  ? `${earliestProviderRecord[p._id]?.toLocaleDateString()} at ${earliestProviderRecord[p._id]?.toLocaleTimeString()}`
+                  : "N/A"}
                 {p.email}
               </div>
             </div>
