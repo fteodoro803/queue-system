@@ -75,7 +75,13 @@ export const MakeAppointmentModal = ({
             <SelectProvider setProvider={setProvider} service={service} />
           )}
           {/* Select Date and Time */}
-          {page === 3 && <SelectDateTime setDate={setDate} service={service} />}
+          {page === 3 && (
+            <SelectDateTime
+              setDate={setDate}
+              service={service}
+              provider={provider}
+            />
+          )}
           {/* Select Patient */}
           {page === 4 && <SelectPatient setPatient={setPatient} />}
           {/* Confirmation */}

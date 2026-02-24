@@ -1,8 +1,9 @@
 import { Meteor } from "meteor/meteor";
 import { AppointmentsCollection } from "/imports/api/appointment";
-import { Service } from "./service";
+import { Service, ServicesCollection } from "./service";
 import { Patient } from "./patient";
 import { Provider } from "./provider";
+import { findEarliestSlot } from "../utils/appointmentUtils";
 
 export const APPOINTMENT_STATES = [
   "scheduled",
@@ -19,14 +20,19 @@ export interface AppointmentData {
   status: (typeof APPOINTMENT_STATES)[number];
 }
 
+// Client-Called methods
 Meteor.methods({
   // Adds appointment to the database
   "appointments.insert"(data: AppointmentData) {
     return AppointmentsCollection.insertAsync({
+      serviceId: data.service._id,
       service: data.service,
+      providerId: data.provider._id,
       provider: data.provider,
+      patientId: data.patient._id,
       patient: data.patient,
       date: data.date,
+      endDate: new Date(data.date.getTime() + data.service.duration * 60000), // calculate end date based on service duration
       status: data.status,
       createdAt: new Date(),
     });
@@ -64,6 +70,18 @@ Meteor.methods({
       $set: { status: "scheduled" },
     });
   },
+
+  // Get earliest appointment time for a given service, and optionally a provider
+  // TODO: do proper tests on this. I know this works within a day, but need to verify it works across days, and with edge cases (e.g. appointments that end at closing time)
+  // TODO: should i change the arguments to just types Service and Provider?
+  async "appointments.getEarliest"(
+    serviceId: string,
+    providerId: string,
+  ): Promise<Date | undefined> {
+    const service = await ServicesCollection.findOneAsync(serviceId);
+    if (!service) return undefined;
+    return findEarliestSlot(service, providerId);
+  },
 });
 
 // Exports for the Meteor methods
@@ -89,4 +107,11 @@ export async function markAsCancelled(id: string) {
 
 export async function markAsScheduled(id: string) {
   return Meteor.callAsync("appointments.scheduled", id);
+}
+
+export async function getEarliestAppointment(
+  serviceId: string,
+  providerId: string,
+): Promise<Date | undefined> {
+  return Meteor.callAsync("appointments.getEarliest", serviceId, providerId);
 }

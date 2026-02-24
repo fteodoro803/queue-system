@@ -6,14 +6,19 @@ import {
   createTimeSlots,
   timeStrToLocaleTime,
 } from "/imports/utils/utils";
+import { getEarliestAppointment } from "/imports/api/appointmentMethods";
+import { Provider } from "/imports/api/provider";
 
 export const SelectDateTime = ({
   setDate,
   service,
+  provider,
 }: {
   setDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
   service: Service | undefined;
+  provider: Provider | undefined;
 }) => {
+  // TODO: replace placeholder times with actual available times based on provider's schedule and existing appointments
   const [startTime, endTime]: [number, number] = [9, 17]; // 9am to 5pm
   const placeholderTimes = createTimeSlots(startTime, endTime, 30); // every 30 mins
   const [currDate, setCurrDate] = useState<Date>();
@@ -27,17 +32,26 @@ export const SelectDateTime = ({
     setCurrDate(newDate);
   };
 
+  // Selects the earliest available date and time
+  const findEarliestAppointment = async (
+    serviceId: string,
+    providerId: string,
+  ): Promise<Date | undefined> => {
+    const earliestDate = await getEarliestAppointment(serviceId, providerId);
+    return earliestDate;
+  };
+
   const confirmAppointmentTime = () => {
     setDate(currDate);
   };
 
-  if (!service)
-    return <p className="text-2xl text-warning">Select a Service first</p>;
+  if (!service || !provider)
+    return <p className="text-2xl text-warning">Select a Service and Provider first</p>;
 
   return (
     <div className="flex gap-2">
       {/* Calendar */}
-      <Calendar date={currDate} setDate={setCurrDate} />
+      <Calendar date={currDate} setDate={setCurrDate} previousDatesDisabled />
 
       {/* Appointment Times */}
       <div className="">
@@ -53,6 +67,24 @@ export const SelectDateTime = ({
             </option>
           ))}
         </select>
+
+        {/* Earliest Available Time Button */}
+        <p className="text-sm text-gray-500">
+          Earliest Available: {currDate ? currDate.toLocaleString() : "N/A"}
+        </p>
+        <button
+          className="btn"
+          onClick={async () => {
+            try {
+              const earliest = await findEarliestAppointment(service._id, provider._id);
+              if (earliest) setCurrDate(earliest);
+            } catch (e) {
+              console.error("Failed to get earliest appointment:", e);
+            }
+          }}
+        >
+          Set Earliest Available
+        </button>
 
         {/* Confirm Button */}
         <button className="btn btn-primary" onClick={confirmAppointmentTime}>
