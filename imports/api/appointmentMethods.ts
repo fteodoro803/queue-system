@@ -3,8 +3,7 @@ import { AppointmentsCollection } from "/imports/api/appointment";
 import { Service, ServicesCollection } from "./service";
 import { Patient } from "./patient";
 import { Provider } from "./provider";
-import { convertStrToHrs, hasOverlap } from "../utils/utils";
-import { TEST_DATE, WORKING_HOURS } from "../dev/settings";
+import { findEarliestSlot } from "../utils/appointmentUtils";
 
 export const APPOINTMENT_STATES = [
   "scheduled",
@@ -19,13 +18,6 @@ export interface AppointmentData {
   patient: Patient;
   date: Date;
   status: (typeof APPOINTMENT_STATES)[number];
-}
-
-interface AppointmentQuery {
-  serviceId: string;
-  date: { $gte: Date; $lte: Date };
-  status: { $in: string[] };
-  providerId?: string;
 }
 
 // Client-Called methods
@@ -84,88 +76,11 @@ Meteor.methods({
   async "appointments.getEarliest"(
     serviceId: string,
     providerId?: string,
+    monthsAhead?: number,
   ): Promise<Date | undefined> {
     const service = await ServicesCollection.findOneAsync(serviceId);
     if (!service) return undefined;
-
-    const searchFrom = TEST_DATE ?? new Date();
-    const searchUntil = new Date(searchFrom);
-    searchUntil.setMonth(searchUntil.getMonth() + 3);
-
-    // 1. Start searching from the beginning of the current day
-    const currentDay = new Date(searchFrom);
-    currentDay.setHours(...convertStrToHrs(WORKING_HOURS.startTime));
-
-    while (currentDay < searchUntil) {
-      // Skip weekends
-      // TODO: add modifiers to skip specific days (e.g. provider vacations, holidays, etc.)
-      const dayOfWeek = currentDay.getDay();
-      if (dayOfWeek === 0 || dayOfWeek === 6) {
-        currentDay.setDate(currentDay.getDate() + 1);
-        currentDay.setHours(...convertStrToHrs(WORKING_HOURS.startTime));
-        continue;
-      }
-
-      const dayStart = new Date(currentDay);
-      const dayEnd = new Date(currentDay);
-      dayEnd.setHours(...convertStrToHrs(WORKING_HOURS.endTime));
-
-      // 2. Search for appointments for this service (and provider, if specified) on this day, sorted by date
-      const query: AppointmentQuery = {
-        serviceId,
-        date: { $gte: dayStart, $lte: dayEnd },
-        status: { $in: ["scheduled", "in-progress"] },
-      };
-
-      if (providerId) {
-        query.providerId = providerId;
-      }
-
-      const appointments = await AppointmentsCollection.find(query, {
-        sort: { date: 1 },
-      }).fetch();
-
-      // 3. Sliding window to find the earliest gap between appointments that can fit the service duration
-      let windowStart = new Date(dayStart);
-      let windowEnd = new Date(dayStart.getTime() + service.duration * 60000);
-      let slotFound = true; // assume a slot exists until proven otherwise
-
-      // Uses appointment's duration rather than service' duration because if a service's duration changes, it shouldn't affect already scheduled appointments
-      // TODO: do tests for this edge case
-      for (const appointment of appointments) {
-        // Window has slid past end of day — no slot today
-        if (windowEnd > dayEnd) {
-          slotFound = false;
-          break;
-        }
-
-        if (
-          hasOverlap(
-            { date: windowStart, endDate: windowEnd },
-            { date: appointment.date, endDate: appointment.endDate },
-          )
-        ) {
-          // Slide window to after this appointment
-          windowStart = new Date(appointment.endDate);
-          windowEnd = new Date(
-            windowStart.getTime() + service.duration * 60000,
-          );
-        } else {
-          // Gap found — slot is available
-          return windowStart;
-        }
-      }
-
-      // Check the slot after all appointments (or if there were none)
-      if (slotFound && windowEnd <= dayEnd) return windowStart;
-
-      // No slot today — advance to next day
-      currentDay.setDate(currentDay.getDate() + 1);
-      currentDay.setHours(...convertStrToHrs(WORKING_HOURS.startTime));
-    }
-
-    // No slot found in entire search range
-    return undefined;
+    return findEarliestSlot(service, providerId, monthsAhead);
   },
 });
 
@@ -197,6 +112,12 @@ export async function markAsScheduled(id: string) {
 export async function getEarliestAppointment(
   serviceId: string,
   providerId?: string,
+  monthsAhead?: number,
 ): Promise<Date | undefined> {
-  return Meteor.callAsync("appointments.getEarliest", serviceId, providerId);
+  return Meteor.callAsync(
+    "appointments.getEarliest",
+    serviceId,
+    providerId,
+    monthsAhead,
+  );
 }
