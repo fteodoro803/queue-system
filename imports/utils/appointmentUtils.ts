@@ -1,12 +1,25 @@
 import { Appointment, AppointmentsCollection } from "../api/appointment";
 import { Service } from "../api/service";
 import { TEST_DATE, WORKING_HOURS } from "../dev/settings";
-import { convertStrToHrs, hasOverlap } from "./utils";
+import { convertStrToHrs } from "./utils";
 
 interface AppointmentQuery {
   providerId: string;
   date: { $gte: Date; $lte: Date };
   status: { $in: string[] };
+}
+
+/**
+ * 
+ * @param a1 - Appointment 1
+ * @param a2 - Appointment 2
+ * @returns True if the appointments overlap, false otherwise
+ */
+export function hasOverlap(
+  a1: { date: Date; endDate: Date },
+  a2: { date: Date; endDate: Date },
+): boolean {
+  return !(a1.date >= a2.endDate || a1.endDate <= a2.date);
 }
 
 /**
@@ -124,4 +137,6 @@ export async function findEarliestSlot(
 
   // No slot found in entire search range
   return undefined;
-}
+} // Check if appointments overlap
+// TODO: add consideration for breaks, and provider availability
+// TODO: move this to appointment utils

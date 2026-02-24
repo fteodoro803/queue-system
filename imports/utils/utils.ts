@@ -59,13 +59,3 @@ export function formatDateToLocale(date: Date): string {
     hour12: true,
   });
 }
-
-// Check if appointments overlap
-// TODO: add consideration for breaks, and provider availability
-// TODO: move this to appointment utils
-export function hasOverlap(
-  a1: { date: Date; endDate: Date },
-  a2: { date: Date; endDate: Date },
-): boolean {
-  return !(a1.date >= a2.endDate || a1.endDate <= a2.date);
-}
