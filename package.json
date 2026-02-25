@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "start": "meteor run",
-    "test": "meteor test --driver-package meteortesting:mocha --port 3100",
+    "test": "meteor test --once --driver-package meteortesting:mocha --port 3100",
+    "test-live": "meteor test --driver-package meteortesting:mocha --port 3100",
     "test-app": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha --port 3100",
     "visualize": "meteor --production --extra-packages bundle-visualizer",
     "lint": "eslint imports"
