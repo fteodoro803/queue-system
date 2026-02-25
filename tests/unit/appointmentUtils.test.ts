@@ -20,7 +20,7 @@ function makeAppointment(
 }
 
 // HasOverlap Tests
-describe("AppointmentUtils - hasOverlap()", () => {
+describe("[UNIT] AppointmentUtils - hasOverlap()", () => {
   it("returns true for overlapping appointments", () => {
     const a1 = makeAppointment(9, 0, 9, 30); // 9:00 - 9:30
     const a2 = makeAppointment(9, 15, 9, 45); // 9:15 - 9:45
@@ -35,7 +35,7 @@ describe("AppointmentUtils - hasOverlap()", () => {
 });
 
 // FindEarliestSlotInDay Tests
-describe("AppointmentUtils - findEarliestSlotInDay()", () => {
+describe("[UNIT] AppointmentUtils - findEarliestSlotInDay()", () => {
   // Reusable test data
   const dayStart = new Date(2026, 1, 1, 9, 0); // 9:00am
   const dayEnd = new Date(2026, 1, 1, 17, 0); // 5:00pm
