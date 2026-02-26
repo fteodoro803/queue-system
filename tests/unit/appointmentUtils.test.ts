@@ -14,8 +14,8 @@ function makeAppointment(
   endMin: number,
 ): Appointment {
   return {
-    date: new Date(2026, 1, 1, startHour, startMin),
-    endDate: new Date(2026, 1, 1, endHour, endMin),
+    scheduled_start: new Date(2026, 1, 1, startHour, startMin),
+    scheduled_end: new Date(2026, 1, 1, endHour, endMin),
   } as Appointment;
 }
 
@@ -24,13 +24,23 @@ describe("[UNIT] AppointmentUtils - hasOverlap()", () => {
   it("returns true for overlapping appointments", () => {
     const a1 = makeAppointment(9, 0, 9, 30); // 9:00 - 9:30
     const a2 = makeAppointment(9, 15, 9, 45); // 9:15 - 9:45
-    expect(hasOverlap(a1, a2)).to.equal(true);
+    expect(
+      hasOverlap(
+        { start: a1.scheduled_start, end: a1.scheduled_end },
+        { start: a2.scheduled_start, end: a2.scheduled_end },
+      ),
+    ).to.equal(true);
   });
 
   it("returns false for non-overlapping appointments", () => {
     const a1 = makeAppointment(9, 0, 9, 30); // 9:00 - 9:30
     const a2 = makeAppointment(9, 30, 10, 0); // 9:30 - 10:00
-    expect(hasOverlap(a1, a2)).to.equal(false);
+    expect(
+      hasOverlap(
+        { start: a1.scheduled_start, end: a1.scheduled_end },
+        { start: a2.scheduled_start, end: a2.scheduled_end },
+      ),
+    ).to.equal(false);
   });
 });
 

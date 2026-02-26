@@ -74,13 +74,13 @@ export const AppointmentDetailsModal = ({
           icon={AcademicCapIcon}
         />
         <GenericField
-          value={appointment.date.toLocaleDateString()}
+          value={appointment.scheduled_start.toLocaleDateString()}
           mode="read"
           additionalAttributes="input-ghost"
           icon={CalendarDaysIcon}
         />
         <GenericField
-          value={appointment.date.toLocaleTimeString()}
+          value={appointment.scheduled_start.toLocaleTimeString()}
           mode="read"
           additionalAttributes="input-ghost"
           icon={ClockIcon}

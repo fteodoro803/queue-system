@@ -24,7 +24,7 @@ export const AppointmentManagement = () => {
     AppointmentsCollection.find(
       {
         // find appointments where date is between start and end of current day
-        date: {
+        scheduled_start: {
           $gte: getStartOfDay(currentDateTime),
           $lte: getEndOfDay(currentDateTime),
         },

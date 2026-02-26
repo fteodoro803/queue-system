@@ -32,7 +32,7 @@ export const AppointmentCard = ({
         onClick={() => setIsModalOpen(true)}
       >
         <figure className="p-3">
-          <DateIcon date={appointment.date} size={70} />
+          <DateIcon date={appointment.scheduled_start} size={70} />
         </figure>
         <div className="card-body">
           {/* Patient Name */}
@@ -42,7 +42,9 @@ export const AppointmentCard = ({
             {/* Time */}
             <div className="flex items-center gap-1">
               <ClockIcon className={iconSize} />
-              <p className={textSize}>{formatDateToLocale(appointment.date)}</p>
+              <p className={textSize}>
+                {formatDateToLocale(appointment.scheduled_start)}
+              </p>
             </div>
 
             {/* Service */}

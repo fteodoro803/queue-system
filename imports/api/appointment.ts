@@ -5,14 +5,16 @@ import { Provider } from "./provider";
 
 export interface Appointment {
   _id: string;
-  date: Date;
-  endDate: Date;
   providerId: string;
   provider: Provider;
   patientId: string;
   patient: Patient;
   serviceId: string;
   service: Service;
+  scheduled_start: Date;
+  scheduled_end: Date;
+  real_start?: Date;
+  real_end?: Date;
   status: string;
   createdAt: Date;
 }
