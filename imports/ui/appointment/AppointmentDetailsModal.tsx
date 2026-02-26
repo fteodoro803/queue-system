@@ -80,7 +80,7 @@ export const AppointmentDetailsModal = ({
           icon={CalendarDaysIcon}
         />
         <GenericField
-          value={appointment.scheduled_start.toLocaleTimeString()}
+          value={`${appointment.scheduled_start.toLocaleTimeString()} || ${appointment.actual_start ? `${appointment.actual_start.toLocaleTimeString()}` : "N/A"} - ${appointment.actual_end ? `${appointment.actual_end.toLocaleTimeString()}` : "N/A"}`}
           mode="read"
           additionalAttributes="input-ghost"
           icon={ClockIcon}

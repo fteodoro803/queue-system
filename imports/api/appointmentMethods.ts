@@ -47,17 +47,17 @@ Meteor.methods({
     return AppointmentsCollection.removeAsync(id);
   },
 
-  // Marks appointment as complete
-  "appointments.complete"(id: string) {
+  // Marks appointment as in-progress and update timestamp
+  "appointments.start"(id: string) {
     return AppointmentsCollection.updateAsync(id, {
-      $set: { status: "completed" },
+      $set: { status: "in-progress", actual_start: new Date() },
     });
   },
 
-  // Marks appointment as in-progress
-  "appointments.start"(id: string) {
+  // Marks appointment as complete and update timestamp
+  "appointments.complete"(id: string) {
     return AppointmentsCollection.updateAsync(id, {
-      $set: { status: "in-progress" },
+      $set: { status: "completed", actual_end: new Date() },
     });
   },
 

@@ -13,8 +13,8 @@ export interface Appointment {
   service: Service;
   scheduled_start: Date;
   scheduled_end: Date;
-  real_start?: Date;
-  real_end?: Date;
+  actual_start?: Date;
+  actual_end?: Date;
   status: string;
   createdAt: Date;
 }
