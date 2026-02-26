@@ -59,3 +59,10 @@ export function formatDateToLocale(date: Date): string {
     hour12: true,
   });
 }
+
+// Converts a date to a specified number of months later
+export function addMonths(date: Date, months: number): Date {
+  const newDate = new Date(date);
+  newDate.setMonth(newDate.getMonth() + months);
+  return newDate;
+}
