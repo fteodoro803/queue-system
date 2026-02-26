@@ -1,6 +1,6 @@
 import { Appointment, AppointmentsCollection } from "../api/appointment";
 import { Service } from "../api/service";
-import { TEST_DATE, WORKING_HOURS } from "../dev/settings";
+import { WORKING_HOURS } from "../dev/settings";
 import { convertStrToHrs } from "./utils";
 
 interface AppointmentQuery {
@@ -74,25 +74,24 @@ export function findEarliestSlotInDay(
  *
  * @param service - The service to find a slot for
  * @param providerId - The ID of the provider to search appointments for
+ * @param from - The date to start searching from (inclusive)
+ * @param until - The date to end the search at (exclusive)
  *
  * @example
- * const slot = await findEarliestSlot(dentalService, "providerABC");
+ * const slot = await findEarliestSlot(dentalService, "providerABC", new Date(), new Date());
  */
 // TODO: add consideration for breaks, and provider availability
 export async function findEarliestSlot(
   service: Service,
   providerId: string,
+  from: Date,
+  until: Date,
 ): Promise<Date | undefined> {
-  const searchFrom = TEST_DATE ?? new Date();
-  const searchUntil = new Date(searchFrom);
-  const monthsAhead = 3;
-  searchUntil.setMonth(searchUntil.getMonth() + monthsAhead);
-
-  const currentDay = new Date(searchFrom);
+  const currentDay = new Date(from);
   currentDay.setHours(...convertStrToHrs(WORKING_HOURS.startTime));
 
-  // 1. Search from current date until searchUntil date
-  while (currentDay < searchUntil) {
+  // 1. Search from current date to until date
+  while (currentDay < until) {
     // Skip weekends
     // TODO: add modifiers to skip specific days (e.g. provider vacations, holidays)
     const dayOfWeek = currentDay.getDay();
