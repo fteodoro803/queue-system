@@ -55,7 +55,8 @@ export const AppointmentManagement = () => {
       </div>
 
       {/* Dashboard Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-6"> */}
+      <div className="flex flex-wrap gap-4 justify-start mt-6">
         {/* Calendar Dashboard Card */}
         <div className="my-4">
           <DashboardCard

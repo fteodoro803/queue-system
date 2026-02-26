@@ -4,6 +4,8 @@ import { Service, ServicesCollection } from "./service";
 import { Patient } from "./patient";
 import { Provider } from "./provider";
 import { findEarliestSlot } from "../utils/appointmentUtils";
+import { TEST_DATE } from "../dev/settings";
+import { addMonths } from "../utils/utils";
 
 export const APPOINTMENT_STATES = [
   "scheduled",
@@ -79,8 +81,11 @@ Meteor.methods({
     providerId: string,
   ): Promise<Date | undefined> {
     const service = await ServicesCollection.findOneAsync(serviceId);
+    const from = TEST_DATE ?? new Date();
+    const until = addMonths(from, 3); // search up to 3 months in advance
+
     if (!service) return undefined;
-    return findEarliestSlot(service, providerId);
+    return findEarliestSlot(service, providerId, from, until);
   },
 });
 

@@ -1,6 +1,6 @@
 import { Appointment, AppointmentsCollection } from "../api/appointment";
 import { Service } from "../api/service";
-import { TEST_DATE, WORKING_HOURS } from "../dev/settings";
+import { WORKING_HOURS } from "../dev/settings";
 import { convertStrToHrs } from "./utils";
 
 interface AppointmentQuery {
@@ -10,7 +10,7 @@ interface AppointmentQuery {
 }
 
 /**
- * 
+ *
  * @param a1 - Appointment 1
  * @param a2 - Appointment 2
  * @returns True if the appointments overlap, false otherwise
@@ -69,33 +69,29 @@ export function findEarliestSlotInDay(
 }
 
 /**
- * Finds the earliest available appointment slot for a given service.
+ * Finds the earliest available appointment slot for a provider's given service.
  * Searches from today up to a specified number of months ahead, skipping weekends.
  *
  * @param service - The service to find a slot for
  * @param providerId - The ID of the provider to search appointments for
- * @param monthsAhead - Optional. The number of months ahead to search for available slots (default is 3)
- * @returns The earliest available Date, or undefined if no slot is found
+ * @param from - The date to start searching from (inclusive)
+ * @param until - The date to end the search at (exclusive)
  *
  * @example
- * const slot = await findEarliestSlot(dentalService);
- * const slot = await findEarliestSlot(dentalService, "providerABC");
- * const slot = await findEarliestSlot(dentalService, undefined, 6); // search 6 months ahead
+ * const slot = await findEarliestSlot(dentalService, "providerABC", new Date(), new Date());
  */
+// TODO: add consideration for breaks, and provider availability (i think can be done with a list of unavailable days)
 export async function findEarliestSlot(
   service: Service,
   providerId: string,
+  from: Date,
+  until: Date,
 ): Promise<Date | undefined> {
-  const searchFrom = TEST_DATE ?? new Date();
-  const searchUntil = new Date(searchFrom);
-  const monthsAhead = 3;
-  searchUntil.setMonth(searchUntil.getMonth() + monthsAhead);
-
-  const currentDay = new Date(searchFrom);
+  const currentDay = new Date(from);
   currentDay.setHours(...convertStrToHrs(WORKING_HOURS.startTime));
 
-  // 1. Search from current date until searchUntil date
-  while (currentDay < searchUntil) {
+  // 1. Search from current date to until date
+  while (currentDay < until) {
     // Skip weekends
     // TODO: add modifiers to skip specific days (e.g. provider vacations, holidays)
     const dayOfWeek = currentDay.getDay();
@@ -137,6 +133,4 @@ export async function findEarliestSlot(
 
   // No slot found in entire search range
   return undefined;
-} // Check if appointments overlap
-// TODO: add consideration for breaks, and provider availability
-// TODO: move this to appointment utils
+}
