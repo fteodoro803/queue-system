@@ -1,6 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import assert from "assert";
 import "./unit/appointmentUtils.test";
+import "./integration/appointmentUtils.test";
 
 describe("queue-system", function () {
   it("package.json has correct name", async function () {

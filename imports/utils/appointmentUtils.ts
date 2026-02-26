@@ -80,7 +80,7 @@ export function findEarliestSlotInDay(
  * @example
  * const slot = await findEarliestSlot(dentalService, "providerABC", new Date(), new Date());
  */
-// TODO: add consideration for breaks, and provider availability
+// TODO: add consideration for breaks, and provider availability (i think can be done with a list of unavailable days)
 export async function findEarliestSlot(
   service: Service,
   providerId: string,
