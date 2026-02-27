@@ -15,7 +15,7 @@ export const NumberField: React.FC<NumberFieldProps> = (props) => {
         icon={DevicePhoneMobileIcon}
         type="tel"
       />
-      <div className="validator-hint">Must be 11 digits</div>
+      <div className="validator-hint hidden">Must be 11 digits</div>
     </>
   );
 };
