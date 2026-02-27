@@ -6,6 +6,7 @@ import { Provider } from "./provider";
 import { findEarliestSlot } from "../utils/appointmentUtils";
 import { TEST_DATE } from "../dev/settings";
 import { addMonths } from "../utils/utils";
+import { updateServiceAnalytics } from "./serviceMethods";
 
 export const APPOINTMENT_STATES = [
   "scheduled",
@@ -49,15 +50,25 @@ Meteor.methods({
 
   // Marks appointment as in-progress and update timestamp
   "appointments.start"(id: string) {
+    const startTime = TEST_DATE ?? new Date();
     return AppointmentsCollection.updateAsync(id, {
-      $set: { status: "in-progress", actual_start: new Date() },
+      $set: { status: "in-progress", actual_start: startTime },
     });
   },
 
-  // Marks appointment as complete and update timestamp
-  "appointments.complete"(id: string) {
+  // Marks appointment as complete and update timestamp and analytics
+  async "appointments.complete"(id: string) {
+    // 1. Get the appointment to calculate the actual duration
+    const appointment = await AppointmentsCollection.findOneAsync(id);
+    if (!appointment || !appointment.actual_start) return;
+
+    const startTime: Date = appointment.actual_start;
+    const endTime: Date = TEST_DATE ?? new Date();
+    const duration: number = (endTime.getTime() - startTime.getTime()) / 60000; // duration in minutes
+    await updateServiceAnalytics(appointment.serviceId, duration);
+
     return AppointmentsCollection.updateAsync(id, {
-      $set: { status: "completed", actual_end: new Date() },
+      $set: { status: "completed", actual_end: endTime },
     });
   },
 

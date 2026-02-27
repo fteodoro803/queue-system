@@ -6,6 +6,11 @@ export interface Service {
   cost?: number | null;
   duration: number; // duration in minutes
   description: string;
+
+  // Analytics fields
+  count?: number;
+  totalDuration?: number; // total duration in minutes
+  avgDuration?: number; // average duration in minutes
   createdAt: Date;
 }
 
