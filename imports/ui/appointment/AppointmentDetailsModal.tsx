@@ -45,7 +45,7 @@ export const AppointmentDetailsModal = ({
 
   return (
     <div className="modal modal-open" role={"dialog"}>
-      <div className="modal-box flex flex-col gap-1">
+      <div className="modal-box flex flex-col">
         <button
           className="btn btn-sm btn-circle absolute right-2 top-2"
           onClick={() => setOpen(false)}
