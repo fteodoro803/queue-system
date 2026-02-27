@@ -61,7 +61,7 @@ export const GenericField: React.FC<GenericFieldProps> = ({
   return (
     <>
       {/* Field */}
-      <div className="flex items-center gap-2 mb-1 group">
+      <div className="flex items-center gap-2 group">
         <label className={`${baseAttributes} ${additionalAttributes}`}>
           {/*Icon*/}
           {icon &&
