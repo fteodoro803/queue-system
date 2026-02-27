@@ -5,21 +5,21 @@ import { convertStrToHrs } from "./utils";
 
 interface AppointmentQuery {
   providerId: string;
-  date: { $gte: Date; $lte: Date };
+  scheduled_start: { $gte: Date; $lte: Date };
   status: { $in: string[] };
 }
 
 /**
  *
- * @param a1 - Appointment 1
- * @param a2 - Appointment 2
- * @returns True if the appointments overlap, false otherwise
+ * @param s1 - Time Slot 1
+ * @param s2 - Time Slot 2
+ * @returns True if the time slots overlap, false otherwise
  */
 export function hasOverlap(
-  a1: { date: Date; endDate: Date },
-  a2: { date: Date; endDate: Date },
+  s1: { start: Date; end: Date },
+  s2: { start: Date; end: Date },
 ): boolean {
-  return !(a1.date >= a2.endDate || a1.endDate <= a2.date);
+  return !(s1.start >= s2.end || s1.end <= s2.start);
 }
 
 /**
@@ -50,12 +50,15 @@ export function findEarliestSlotInDay(
 
     if (
       hasOverlap(
-        { date: windowStart, endDate: windowEnd },
-        { date: appointment.date, endDate: appointment.endDate },
+        { start: windowStart, end: windowEnd },
+        {
+          start: appointment.scheduled_start,
+          end: appointment.scheduled_end,
+        },
       )
     ) {
       // Slide window to after this appointment
-      windowStart = new Date(appointment.endDate);
+      windowStart = new Date(appointment.scheduled_end);
       windowEnd = new Date(windowStart.getTime() + duration * 60000);
     } else {
       // Gap found — slot is available
@@ -108,13 +111,14 @@ export async function findEarliestSlot(
     // 2. Fetch appointments for the day
     const query: AppointmentQuery = {
       providerId: providerId,
-      date: { $gte: dayStart, $lte: dayEnd },
+      scheduled_start: { $gte: dayStart, $lte: dayEnd },
       status: { $in: ["scheduled", "in-progress"] },
     };
 
     // 3. Check if there are open slots between appointments for that day
+    // sort appointments
     const appointments = await AppointmentsCollection.find(query, {
-      sort: { date: 1 },
+      sort: { scheduled_start: 1 },
     }).fetch();
 
     const slot = findEarliestSlotInDay(

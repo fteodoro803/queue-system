@@ -6,6 +6,7 @@ import { Provider } from "./provider";
 import { findEarliestSlot } from "../utils/appointmentUtils";
 import { TEST_DATE } from "../dev/settings";
 import { addMonths } from "../utils/utils";
+import { updateServiceAnalytics } from "./serviceMethods";
 
 export const APPOINTMENT_STATES = [
   "scheduled",
@@ -33,8 +34,10 @@ Meteor.methods({
       provider: data.provider,
       patientId: data.patient._id,
       patient: data.patient,
-      date: data.date,
-      endDate: new Date(data.date.getTime() + data.service.duration * 60000), // calculate end date based on service duration
+      scheduled_start: data.date,
+      scheduled_end: new Date(
+        data.date.getTime() + data.service.duration * 60000,
+      ), // calculate end date based on service duration
       status: data.status,
       createdAt: new Date(),
     });
@@ -45,17 +48,27 @@ Meteor.methods({
     return AppointmentsCollection.removeAsync(id);
   },
 
-  // Marks appointment as complete
-  "appointments.complete"(id: string) {
+  // Marks appointment as in-progress and update timestamp
+  "appointments.start"(id: string) {
+    const startTime = TEST_DATE ?? new Date();
     return AppointmentsCollection.updateAsync(id, {
-      $set: { status: "completed" },
+      $set: { status: "in-progress", actual_start: startTime },
     });
   },
 
-  // Marks appointment as in-progress
-  "appointments.start"(id: string) {
+  // Marks appointment as complete and update timestamp and analytics
+  async "appointments.complete"(id: string) {
+    // 1. Get the appointment to calculate the actual duration
+    const appointment = await AppointmentsCollection.findOneAsync(id);
+    if (!appointment || !appointment.actual_start) return;
+
+    const startTime: Date = appointment.actual_start;
+    const endTime: Date = TEST_DATE ?? new Date();
+    const duration: number = (endTime.getTime() - startTime.getTime()) / 60000; // duration in minutes
+    await updateServiceAnalytics(appointment.serviceId, duration);
+
     return AppointmentsCollection.updateAsync(id, {
-      $set: { status: "in-progress" },
+      $set: { status: "completed", actual_end: endTime },
     });
   },
 

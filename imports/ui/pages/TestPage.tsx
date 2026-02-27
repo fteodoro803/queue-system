@@ -74,8 +74,10 @@ export const TestPage = () => {
     provider: provider,
     serviceId: service1._id,
     service: service1,
-    date: date ?? new Date(),
-    endDate: new Date((date ?? new Date()).getTime() + service1.duration * 60000),
+    scheduled_start: date ?? new Date(),
+    scheduled_end: new Date(
+      (date ?? new Date()).getTime() + service1.duration * 60000,
+    ),
     status: "scheduled",
     createdAt: date ?? new Date(),
   };
