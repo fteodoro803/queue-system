@@ -84,32 +84,60 @@ export const AppointmentManagement = () => {
         </div>
       </div>
 
-      {/* Today's Appointments */}
-      <div className="py-4">
-        <h1 className="text-l font-semibold">Upcoming Appointments:</h1>
-        {appointmentsToday
-          .filter((a) => a.status === "scheduled" || a.status === "in-progress")
-          .map((a) => (
-            <AppointmentCard key={a._id} appointment={a} />
-          ))}
-      </div>
+      {/* Tab Groups */}
+      {/* name of each tab group should be unique */}
+      <div className="tabs tabs-border justify-center">
+        <input
+          type="radio"
+          name="my_tabs_2"
+          className="tab"
+          aria-label="Upcoming"
+          defaultChecked
+        />
+        <div className="tab-content border-base-300 bg-base-100 p-10">
+          {/* Today's Appointments */}
+          <div className="py-4">
+            {/* <h1 className="text-l font-semibold">Upcoming Appointments:</h1> */}
+            {appointmentsToday
+              .filter(
+                (a) => a.status === "scheduled" || a.status === "in-progress",
+              )
+              .map((a) => (
+                <AppointmentCard key={a._id} appointment={a} />
+              ))}
+          </div>
+        </div>
 
-      {/* Finished Appointments */}
-      <div className="py-4">
-        <h1 className="text-l font-semibold">Finished Appointments:</h1>
-        {appointmentsToday
-          .filter((a) => a.status === "completed" || a.status === "cancelled")
-          .map((a) => (
-            <AppointmentCard key={a._id} appointment={a} />
-          ))}
-      </div>
+        <input
+          type="radio"
+          name="my_tabs_2"
+          className="tab"
+          aria-label="Finished"
+        />
+        <div className="tab-content border-base-300 bg-base-100 p-10">
+          {/* Finished Appointments */}
+          <div className="py-4">
+            {/* <h1 className="text-l font-semibold">Finished Appointments:</h1> */}
+            {appointmentsToday
+              .filter(
+                (a) => a.status === "completed" || a.status === "cancelled",
+              )
+              .map((a) => (
+                <AppointmentCard key={a._id} appointment={a} />
+              ))}
+          </div>
+        </div>
 
-      {/* All Appointments */}
-      <div className="py-4">
-        <h1 className="text-l font-semibold">All Appointments:</h1>
-        {appointments.map((a) => (
-          <AppointmentCard key={a._id} appointment={a} />
-        ))}
+        <input type="radio" name="my_tabs_2" className="tab" aria-label="All" />
+        <div className="tab-content border-base-300 bg-base-100 p-10">
+          {/* All Appointments */}
+          <div className="py-4">
+            {/* <h1 className="text-l font-semibold">All Appointments:</h1> */}
+            {appointments.map((a) => (
+              <AppointmentCard key={a._id} appointment={a} />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Appointment Modal */}
