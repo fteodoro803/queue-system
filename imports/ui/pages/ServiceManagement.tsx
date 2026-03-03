@@ -3,6 +3,7 @@ import { AddServiceModal } from "/imports/ui/service/AddServiceModal";
 import { AddProviderModal } from "../provider/AddProviderModal";
 import { ProviderTable } from "../provider/ProviderTable";
 import { ServiceTable } from "/imports/ui/service/ServiceTable";
+import { clearServiceAnalytics } from "/imports/api/serviceMethods";
 
 export const ServiceManagement = () => {
   const [addServiceProviderModalOpen, setAddServiceProviderModalOpen] =
@@ -22,17 +23,26 @@ export const ServiceManagement = () => {
           name="my_tabs_3"
           className="tab"
           aria-label="Services"
+          defaultChecked
         />
         <div className="tab-content bg-base-100 border-base-300 p-6">
           {/*Services Table*/}
           <div className="flex justify-between">
             <h1 className="text-2xl font-bold">Services</h1>
-            <button
-              className="btn btn-primary"
-              onClick={() => setAddServiceModalOpen(true)}
-            >
-              + New Service
-            </button>
+            <div className="flex gap-1">
+              <button
+                className="btn btn-primary"
+                onClick={() => clearServiceAnalytics()}
+              >
+                - Clear Analytics
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={() => setAddServiceModalOpen(true)}
+              >
+                + New Service
+              </button>
+            </div>
           </div>
           <ServiceTable />
         </div>
@@ -43,7 +53,6 @@ export const ServiceManagement = () => {
           name="my_tabs_3"
           className="tab"
           aria-label="Providers"
-          defaultChecked
         />
         <div className="tab-content bg-base-100 border-base-300 p-6">
           {/* Service Providers */}

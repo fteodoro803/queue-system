@@ -19,6 +19,15 @@ Meteor.methods({
       createdAt: new Date(),
     });
   },
+
+  // Clear analytics data for all services
+  "services.clearAnalytics"() {
+    return ServicesCollection.updateAsync(
+      {},
+      { $set: { count: 0, totalDuration: 0, avgDuration: 0 } },
+      { multi: true },
+    );
+  },
 });
 
 export async function insertService(data: ServiceData) {
@@ -40,4 +49,8 @@ export async function updateServiceAnalytics(
     $inc: { count: 1, totalDuration: duration },
     $set: { avgDuration: newAverage },
   });
+}
+
+export async function clearServiceAnalytics() {
+  return await Meteor.callAsync("services.clearAnalytics");
 }
