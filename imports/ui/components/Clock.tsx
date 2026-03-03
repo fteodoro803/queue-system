@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { TEST_DATE, TEST_SETTINGS } from "/imports/dev/settings";
+import {
+  TEST_DATE,
+  TEST_SETTINGS,
+  TIME_MULTIPLIER,
+} from "/imports/dev/settings";
 import { formatDateToLocale } from "/imports/utils/utils";
 
 /**
@@ -33,7 +37,7 @@ export const Clock = ({
     if (TEST_SETTINGS.FREEZE_TIME) return;
 
     const interval = setInterval(() => {
-      const elapsed = Date.now() - startedAt.current;
+      const elapsed = (Date.now() - startedAt.current) * TIME_MULTIPLIER;
       const now = TEST_DATE
         ? new Date(TEST_DATE.getTime() + elapsed)
         : new Date();
