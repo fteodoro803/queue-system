@@ -7,32 +7,35 @@ import { AdminDashboard } from "/imports/ui/pages/AdminDashboard";
 import { ServiceManagement } from "/imports/ui/pages/ServiceManagement";
 import { AppointmentManagement } from "./pages/AppointmentManagement";
 import { TestPage } from "./pages/TestPage";
+import { DateTimeProvider } from "../contexts/DateTimeContext";
 
 export const App = () => (
-  <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<Sidebar />}>
-        <Route index element={<Home />} />
+  <DateTimeProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Sidebar />}>
+          <Route index element={<Home />} />
 
-        {/* Admin Routes */}
-        <Route path="admin">
-          <Route index element={<AdminDashboard />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="patientManagement" element={<PatientManagement />} />
-          <Route path="serviceManagement" element={<ServiceManagement />} />
-          <Route
-            path="appointmentManagement"
-            element={<AppointmentManagement />}
-          />
-          <Route path="test" element={<TestPage />} />
+          {/* Admin Routes */}
+          <Route path="admin">
+            <Route index element={<AdminDashboard />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="patientManagement" element={<PatientManagement />} />
+            <Route path="serviceManagement" element={<ServiceManagement />} />
+            <Route
+              path="appointmentManagement"
+              element={<AppointmentManagement />}
+            />
+            <Route path="test" element={<TestPage />} />
+          </Route>
+
+          {/* Patient Routes */}
+          <Route path="patient" element={<PatientManagement />} />
+
+          {/* Service Provider Routes */}
+          <Route path="service" element={<PatientManagement />} />
         </Route>
-
-        {/* Patient Routes */}
-        <Route path="patient" element={<PatientManagement />} />
-
-        {/* Service Provider Routes */}
-        <Route path="service" element={<PatientManagement />} />
-      </Route>
-    </Routes>
-  </BrowserRouter>
+      </Routes>
+    </BrowserRouter>
+  </DateTimeProvider>
 );

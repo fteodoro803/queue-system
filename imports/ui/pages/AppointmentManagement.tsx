@@ -4,10 +4,11 @@ import { AppointmentCard } from "../appointment/AppointmentCard";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { AppointmentsCollection } from "/imports/api/appointment";
 import { Loading } from "../components/Loading";
-import { DATE_TIME } from "/imports/dev/settings";
+import { useDateTime } from "../../contexts/DateTimeContext";
 
 export const AppointmentManagement = () => {
   const isAppointmentsLoading = useSubscribe("appointments");
+  const now = useDateTime(); // context date and time
   const appointments = useFind(() =>
     AppointmentsCollection.find({}, { sort: { date: 1 } }),
   );
@@ -70,7 +71,7 @@ export const AppointmentManagement = () => {
               .filter(
                 (a) =>
                   (a.status === "completed" || a.status === "cancelled") &&
-                  a.scheduled_start.getDate() === DATE_TIME.getDate(),
+                  a.scheduled_start.getDate() === now.getDate(),
               )
               .map((a) => (
                 <AppointmentCard key={a._id} appointment={a} />

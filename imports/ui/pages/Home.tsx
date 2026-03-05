@@ -1,11 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useDateTime } from "../../contexts/DateTimeContext";
 
 export const Home = () => {
+  const now = useDateTime();
+
   return (
     <div>
       <div>
         <h1>Queue Management System</h1>
+
+        <p>Current DateTime: {now.toLocaleString()}</p>
 
         <div className="flex items-center gap-2">
           <Link to="/patient">
