@@ -7,6 +7,7 @@ import {
   CalendarDaysIcon,
   WrenchScrewdriverIcon,
   BugAntIcon,
+  NumberedListIcon,
 } from "@heroicons/react/24/solid";
 import { Outlet, useLocation } from "react-router-dom";
 import { ThemeController } from "../components/ThemeController";
@@ -68,6 +69,13 @@ export const Sidebar = () => {
                   link="/admin/appointmentManagement"
                   label="Appointments"
                   icon={CalendarDaysIcon}
+                />
+
+                {/* Queue Button */}
+                <NavLinkItem
+                  link="/admin/queueManagement"
+                  label="Queue"
+                  icon={NumberedListIcon}
                 />
 
                 {/*Patients Button*/}
