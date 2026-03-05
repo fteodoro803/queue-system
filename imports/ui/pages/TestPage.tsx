@@ -13,13 +13,16 @@ import { Provider, ProviderService } from "/imports/api/provider";
 import { Service } from "/imports/api/service";
 import { DashboardCard } from "../components/DashboardCard";
 import { HomeIcon } from "@heroicons/react/24/outline";
+import { useDateTime } from "../../contexts/DateTimeContext";
 
 export const TestPage = () => {
+  const now = useDateTime(); // context date and time
+
   const [genericFieldValue, setGenericFieldValue] = useState<string>("");
   const [emailFieldValue, setEmailFieldValue] = useState<string>("");
   const [numberFieldValue, setNumberFieldValue] = useState<string>("");
 
-  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [date, setDate] = useState<Date | undefined>(now);
   const step = 2;
 
   const service1: Service = {

@@ -7,10 +7,10 @@ import { AdminDashboard } from "/imports/ui/pages/AdminDashboard";
 import { ServiceManagement } from "/imports/ui/pages/ServiceManagement";
 import { AppointmentManagement } from "./pages/AppointmentManagement";
 import { TestPage } from "./pages/TestPage";
-import { TimeProvider } from "../contexts/timeContext";
+import { DateTimeProvider } from "../contexts/DateTimeContext";
 
 export const App = () => (
-  <TimeProvider>
+  <DateTimeProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Sidebar />}>
@@ -37,5 +37,5 @@ export const App = () => (
         </Route>
       </Routes>
     </BrowserRouter>
-  </TimeProvider>
+  </DateTimeProvider>
 );

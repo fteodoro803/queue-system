@@ -1,9 +1,19 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { TEST_DATE, TEST_SETTINGS, TIME_MULTIPLIER } from "../dev/settings";
 
-export const TimeContext = createContext<Date | null>(null);
+export const DateTimeContext = createContext<Date | null>(null);
 
-export const TimeProvider = ({ children }: { children: React.ReactNode }) => {
+export const DateTimeProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [time, setTime] = useState(TEST_DATE ?? new Date());
   const updateTime = 1000; // Update every 1 second (in ms)
 
@@ -25,12 +35,15 @@ export const TimeProvider = ({ children }: { children: React.ReactNode }) => {
     return () => clearInterval(interval);
   }, []);
 
-  return <TimeContext.Provider value={time}>{children}</TimeContext.Provider>;
+  return (
+    <DateTimeContext.Provider value={time}>{children}</DateTimeContext.Provider>
+  );
 };
 
-// Custom hook for consuming time context
-export const useTime = (): Date => {
-  const context = useContext(TimeContext);
-  if (!context) throw new Error("useTime must be used inside <TimeProvider>");
+// Custom hook for consuming date and time context
+export const useDateTime = (): Date => {
+  const context = useContext(DateTimeContext);
+  if (!context)
+    throw new Error("useDateTime must be used inside <DateTimeProvider>");
   return context;
 };

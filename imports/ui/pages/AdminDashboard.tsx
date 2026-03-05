@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { DashboardCard } from "../components/DashboardCard";
-import { DATE_TIME, WORKING_HOURS } from "/imports/dev/settings";
+import { WORKING_HOURS } from "/imports/dev/settings";
 import { Clock } from "../components/Clock";
 import { CalendarIcon, ClockIcon } from "@heroicons/react/24/outline";
 import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
@@ -8,10 +8,10 @@ import { AppointmentsCollection } from "/imports/api/appointment";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { AppointmentCard } from "../appointment/AppointmentCard";
 import { Loading } from "../components/Loading";
+import { useDateTime } from "../../contexts/DateTimeContext";
 
 export const AdminDashboard = () => {
-  // Time State
-  const [currentDateTime, setCurrentDateTime] = useState(DATE_TIME);
+  const now = useDateTime();
   const isAppointmentsLoading = useSubscribe("appointments");
 
   // Find appointments for the current day
@@ -20,8 +20,8 @@ export const AdminDashboard = () => {
       {
         // find appointments where date is between start and end of current day
         scheduled_start: {
-          $gte: getStartOfDay(currentDateTime),
-          $lte: getEndOfDay(currentDateTime),
+          $gte: getStartOfDay(now),
+          $lte: getEndOfDay(now),
         },
       },
       { sort: { date: 1 } },
@@ -44,11 +44,11 @@ export const AdminDashboard = () => {
         {/* Calendar Dashboard Card */}
         <div className="my-4">
           <DashboardCard
-            header={currentDateTime.toLocaleDateString(undefined, {
+            header={now.toLocaleDateString(undefined, {
               weekday: "long",
             })}
-            body={<Clock setTime={setCurrentDateTime} />}
-            footer={currentDateTime.toLocaleDateString(undefined, {
+            body={<Clock />}
+            footer={now.toLocaleDateString(undefined, {
               month: "long",
               day: "numeric",
               year: "numeric",
@@ -84,7 +84,7 @@ export const AdminDashboard = () => {
         {appointments
           .filter(
             (a) =>
-              a.scheduled_start.getDate() === DATE_TIME.getDate() &&
+              a.scheduled_start.getDate() === now.getDate() &&
               a.status === "scheduled",
           )
           .map((a) => (
@@ -98,7 +98,7 @@ export const AdminDashboard = () => {
         {appointments
           .filter(
             (a) =>
-              a.scheduled_start.getDate() === DATE_TIME.getDate() &&
+              a.scheduled_start.getDate() === now.getDate() &&
               a.status === "in-progress",
           )
           .map((a) => (
@@ -112,7 +112,7 @@ export const AdminDashboard = () => {
         {appointments
           .filter(
             (a) =>
-              a.scheduled_start.getDate() === DATE_TIME.getDate() &&
+              a.scheduled_start.getDate() === now.getDate() &&
               a.status === "completed",
           )
           .map((a) => (
