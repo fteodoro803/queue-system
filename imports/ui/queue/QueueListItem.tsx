@@ -11,6 +11,7 @@ import {
   StopIcon,
   XMarkIcon,
   ClockIcon,
+  IdentificationIcon,
 } from "@heroicons/react/24/outline";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { QueueIcon } from "../components/QueueIcon";
@@ -42,6 +43,12 @@ export const QueueListItem = ({ entry }: { entry: QueueEntry }) => {
 
         {/* Body */}
         <div className="flex items-center gap-4 py-1">
+          {/* ID */}
+          <div className="flex items-center gap-1">
+            <IdentificationIcon className={iconSize} />
+            <p className={textSize}>{entry._id}</p>
+          </div>
+
           {/* Service */}
           <div className="flex items-center gap-1">
             <ClipboardDocumentListIcon className={iconSize} />
