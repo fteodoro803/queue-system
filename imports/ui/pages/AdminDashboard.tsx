@@ -3,7 +3,7 @@ import { DashboardCard } from "../components/DashboardCard";
 import { WORKING_HOURS } from "/imports/dev/settings";
 import { Clock } from "../components/Clock";
 import {
-  CalendarIcon,
+  CalendarDaysIcon,
   ClockIcon,
   NumberedListIcon,
 } from "@heroicons/react/24/outline";
@@ -79,7 +79,7 @@ export const AdminDashboard = () => {
             header="Appointments"
             body={appointments.length}
             footer={`Completed: ${appointments.filter((a) => a.status === "completed").length}`}
-            icon={CalendarIcon}
+            icon={CalendarDaysIcon}
           />
         </div>
 
