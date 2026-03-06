@@ -1,5 +1,5 @@
 import { Meteor } from "meteor/meteor";
-import { QUEUE_STATES, QueueEntryCollection } from "./queueEntry";
+import { QUEUE_STATES, QueueEntry, QueueEntryCollection } from "./queueEntry";
 import { Patient } from "./patient";
 import { Service } from "./service";
 import { updateServiceAnalytics } from "./serviceMethods";
@@ -19,14 +19,15 @@ Meteor.methods({
   // Inserts queue entry to database and calculates position
   async "queueEntry.enqueue"(data: QueueEntryData, time: Date) {
     // 1. Get the current max position in the queue, for respective service
-    const maxPositionEntry = await QueueEntryCollection.findOneAsync(
-      {
-        position: { $ne: null },
-        serviceId: data.service._id,
-        status: "waiting",
-      },
-      { sort: { position: -1 } },
-    );
+    const maxPositionEntry: QueueEntry | undefined =
+      await QueueEntryCollection.findOneAsync(
+        {
+          position: { $ne: null },
+          serviceId: data.service._id,
+          status: "waiting",
+        },
+        { sort: { position: -1 } },
+      );
 
     // 2. Set the position of the entry to max + 1 (or 1 if no entries in the queue)
     const newPosition = maxPositionEntry
@@ -48,7 +49,8 @@ Meteor.methods({
 
   // Removes queue entry from the database and updates positions of remaining entries
   async "queueEntry.dequeue"(id: string, reason: DequeueReason, time: Date) {
-    const entry = await QueueEntryCollection.findOneAsync(id);
+    const entry: QueueEntry | undefined =
+      await QueueEntryCollection.findOneAsync(id);
     if (!entry) {
       throw new Meteor.Error("Queue entry not found");
     }
@@ -70,11 +72,7 @@ Meteor.methods({
     });
 
     // 2. Update positions of entries behind the dequeued entry
-    await QueueEntryCollection.updateAsync(
-      { serviceId: entry.serviceId, position: { $gt: entry.position } }, // filter
-      { $inc: { position: -1 } }, // decrement
-      { multi: true }, // all matches
-    );
+    await updatePositions(entry);
 
     // 3. Update Service Analytics if completed
     if (reason === "completed" && entry.start) {
@@ -88,7 +86,8 @@ Meteor.methods({
 
   // Starts a Service
   async "queueEntry.startService"(id: string, time: Date) {
-    const entry = await QueueEntryCollection.findOneAsync(id);
+    const entry: QueueEntry | undefined =
+      await QueueEntryCollection.findOneAsync(id);
     if (!entry) {
       throw new Meteor.Error("Queue entry not found");
     }
@@ -108,11 +107,7 @@ Meteor.methods({
     });
 
     // 2. Update positions of entries behind the dequeued entry
-    await QueueEntryCollection.updateAsync(
-      { serviceId: entry.serviceId, position: { $gt: entry.position } }, // filter
-      { $inc: { position: -1 } }, // decrement
-      { multi: true }, // all matches
-    );
+    await updatePositions(entry);
   },
 });
 
@@ -137,4 +132,24 @@ export async function completeService(id: string, time: Date): Promise<void> {
 // Cancels a queue entry
 export async function cancelService(id: string, time: Date): Promise<void> {
   await Meteor.callAsync("queueEntry.dequeue", id, "cancelled", time);
+}
+
+// Updates positions of next queue entries for a service
+async function updatePositions(entry: QueueEntry): Promise<void> {
+  // If the entry is not in the queue, no need to update positions
+  if (entry.position === null || entry.position <= 0) return;
+
+  await QueueEntryCollection.updateAsync(
+    // 1. filter for entries of the same service that are behind the current entry in the queue
+    {
+      serviceId: entry.serviceId,
+      $and: [{ position: { $gt: entry.position } }, { position: { $gt: 1 } }],
+    },
+
+    // 2. decrement positions of entries behind the current entry
+    { $inc: { position: -1 } },
+
+    // 3. all matches
+    { multi: true },
+  );
 }
