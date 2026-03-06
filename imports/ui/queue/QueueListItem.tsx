@@ -75,7 +75,7 @@ export const QueueListItem = ({ entry }: { entry: QueueEntry }) => {
       </div>
 
       {/* Buttons and Status Badge*/}
-      <div className="flex items-center">
+      <div className="flex items-center gap-4">
         {/* Status */}
         <div
           className={`badge badge-soft ml-auto ${statusBadgeMap[entry.status]}`}
@@ -83,29 +83,32 @@ export const QueueListItem = ({ entry }: { entry: QueueEntry }) => {
           {entry.status}
         </div>
 
-        {/* Start Button */}
-        <button
-          className="btn btn-square btn-ghost"
-          onClick={() => {
-            startService(entry._id, now);
-          }}
-        >
-          <PlayIcon className="w-6" />
-        </button>
-        {/* Complete Button */}
-        <button
-          className="btn btn-square btn-ghost"
-          onClick={() => completeService(entry._id, now)}
-        >
-          <StopIcon className="w-6" />
-        </button>
-        {/* Cancel Button */}
-        <button
-          className="btn btn-square btn-ghost"
-          onClick={() => cancelService(entry._id, now)}
-        >
-          <XMarkIcon className="w-6" />
-        </button>
+        {/* Buttons */}
+        <div>
+          {/* Start Button */}
+          <button
+            className="btn btn-square btn-ghost"
+            onClick={() => {
+              startService(entry._id, now);
+            }}
+          >
+            <PlayIcon className="w-6" />
+          </button>
+          {/* Complete Button */}
+          <button
+            className="btn btn-square btn-ghost"
+            onClick={() => completeService(entry._id, now)}
+          >
+            <StopIcon className="w-6" />
+          </button>
+          {/* Cancel Button */}
+          <button
+            className="btn btn-square btn-ghost"
+            onClick={() => cancelService(entry._id, now)}
+          >
+            <XMarkIcon className="w-6" />
+          </button>
+        </div>
       </div>
     </li>
   );
