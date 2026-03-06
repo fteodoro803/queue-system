@@ -16,7 +16,7 @@ export const ServiceManagement = () => {
       <br />
 
       {/* Tabs for Services and Service Providers */}
-      <div className="tabs tabs-lift flex justify-center">
+      <div className="tabs tabs-border justify-center">
         {/* Services */}
         <input
           type="radio"
@@ -25,7 +25,7 @@ export const ServiceManagement = () => {
           aria-label="Services"
           defaultChecked
         />
-        <div className="tab-content bg-base-100 border-base-300 p-6">
+        <div className="tab-content border-base-300 bg-base-100 p-10">
           {/*Services Table*/}
           <div className="flex justify-between">
             <h1 className="text-2xl font-bold">Services</h1>
