@@ -28,7 +28,7 @@ export const QueueManagement = () => {
         </button>
       </div>
 
-      <div>{/* Queue List */}</div>
+      <div>{/* Test Queue List */}</div>
       <ul className="list bg-base-100 rounded-box shadow-md">
         <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
           All Queue Entries
