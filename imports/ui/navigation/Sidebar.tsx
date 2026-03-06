@@ -54,7 +54,7 @@ export const Sidebar = () => {
             aria-label="close sidebar"
             className="drawer-overlay"
           ></label>
-          <ul className="menu bg-base min-h-full w-80 p-4">
+          <ul className="menu bg-base-100 min-h-full w-80 p-4">
             {/* Date and Time */}
             <div className="flex justify-center">
               <p className="text-sm">{`${now.toLocaleDateString()} ${formatDateToLocale(now)}`}</p>
