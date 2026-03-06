@@ -5,6 +5,7 @@ import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { AppointmentsCollection } from "/imports/api/appointment";
 import { Loading } from "../components/Loading";
 import { useDateTime } from "../../contexts/DateTimeContext";
+import { AppointmentList } from "../appointment/AppointmentList";
 
 export const AppointmentManagement = () => {
   const isAppointmentsLoading = useSubscribe("appointments");
@@ -90,6 +91,8 @@ export const AppointmentManagement = () => {
           </div>
         </div>
       </div>
+
+      <AppointmentList appointments={appointments} />
 
       {/* Appointment Modal */}
       {isAppointmentModalOpen && (
