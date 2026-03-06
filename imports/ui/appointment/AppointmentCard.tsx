@@ -20,7 +20,7 @@ export const AppointmentCard = ({
 
   const statusBadgeMap: Record<string, string> = {
     scheduled: "badge-info",
-    ongoing: "badge-warning",
+    "in-progress": "badge-warning",
     completed: "badge-success",
     cancelled: "badge-error",
   };
@@ -37,6 +37,7 @@ export const AppointmentCard = ({
         <div className="card-body">
           {/* Patient Name */}
           <h2 className="card-title">{appointment.patient.name ?? "N/A"}</h2>
+
           {/* More appointment details */}
           <div className="flex gap-7">
             {/* Time */}
@@ -61,7 +62,7 @@ export const AppointmentCard = ({
 
             {/* Status */}
             <div
-              className={`badge badge-soft ${statusBadgeMap[appointment.status]}`}
+              className={`badge badge-soft ml-auto ${statusBadgeMap[appointment.status]}`}
             >
               {appointment.status}
             </div>

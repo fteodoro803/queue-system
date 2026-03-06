@@ -14,6 +14,10 @@ import { Service } from "/imports/api/service";
 import { DashboardCard } from "../components/DashboardCard";
 import { HomeIcon } from "@heroicons/react/24/outline";
 import { useDateTime } from "../../contexts/DateTimeContext";
+import { QueueIcon } from "../components/QueueIcon";
+import { QueueEntry } from "/imports/api/queueEntry";
+import { QueueListItem } from "../queue/QueueListItem";
+import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
 
 export const TestPage = () => {
   const now = useDateTime(); // context date and time
@@ -82,6 +86,58 @@ export const TestPage = () => {
       (date ?? new Date()).getTime() + service1.duration * 60000,
     ),
     status: "scheduled",
+    createdAt: date ?? new Date(),
+  };
+
+  const queueEntry1: QueueEntry = {
+    _id: "queueEntry1",
+    patientId: patient._id,
+    patient: patient,
+    serviceId: service1._id,
+    service: service1,
+    position: 1,
+    status: "waiting",
+    start: null,
+    end: null,
+    createdAt: date ?? new Date(),
+  };
+
+  const queueEntry2: QueueEntry = {
+    _id: "queueEntry2",
+    patientId: patient._id,
+    patient: patient,
+    serviceId: service1._id,
+    service: service1,
+    position: 1,
+    status: "in-progress",
+    start: getStartOfDay(date ?? new Date()),
+    end: null,
+    createdAt: date ?? new Date(),
+  };
+
+  const queueEntry3: QueueEntry = {
+    _id: "queueEntry3",
+    patientId: patient._id,
+    patient: patient,
+    serviceId: service1._id,
+    service: service1,
+    position: 1,
+    status: "completed",
+    start: getStartOfDay(now),
+    end: getEndOfDay(now),
+    createdAt: date ?? new Date(),
+  };
+
+  const queueEntry4: QueueEntry = {
+    _id: "queueEntry4",
+    patientId: patient._id,
+    patient: patient,
+    serviceId: service1._id,
+    service: service1,
+    position: 1,
+    status: "cancelled",
+    start: null,
+    end: null,
     createdAt: date ?? new Date(),
   };
 
@@ -202,6 +258,23 @@ export const TestPage = () => {
           footer="Footer"
           icon={HomeIcon}
         />
+      </div>
+
+      {/* Queue Icon */}
+      <div className="mt-4">
+        <p className="text-xl font-semibold">Queue Icon</p>
+        <QueueIcon entry={queueEntry1} />
+      </div>
+
+      {/* Queue List Item */}
+      <div className="mt-4">
+        <p className="text-xl font-semibold">Queue List Item</p>
+        <ul className="list bg-base-100 rounded-box shadow-md">
+          <QueueListItem entry={queueEntry1} />
+          <QueueListItem entry={queueEntry2} />
+          <QueueListItem entry={queueEntry3} />
+          <QueueListItem entry={queueEntry4} />
+        </ul>
       </div>
     </>
   );
