@@ -5,6 +5,7 @@ import { Loading } from "../components/Loading";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { QueueList } from "../queue/QueueList";
 import { ServicesCollection } from "/imports/api/service";
+import { resetCounter } from "/imports/api/countersMethods";
 
 export const QueueManagement = () => {
   const isQueueEntryLoading = useSubscribe("queue");
@@ -26,12 +27,22 @@ export const QueueManagement = () => {
     <>
       <div className="flex justify-between">
         <h1 className="text-3xl font-bold">Queue Management</h1>
-        <button
-          className="btn btn-primary"
-          onClick={() => setQueueEntryModalOpen(true)}
-        >
-          + Join Queue
-        </button>
+        <div className="flex gap-1">
+          <button
+            className="btn btn-primary"
+            onClick={async () => {
+              await resetCounter();
+            }}
+          >
+            - Clear Counter
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={() => setQueueEntryModalOpen(true)}
+          >
+            + Join Queue
+          </button>
+        </div>
       </div>
 
       {/* Tab Groups */}

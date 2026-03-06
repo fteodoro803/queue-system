@@ -11,6 +11,7 @@ export const QUEUE_STATES = [
 
 export interface QueueEntry {
   _id: string;
+  displayId: string; // Unique ID for display purposes (e.g., "AB12")
   patientId: string;
   patient: Patient;
   serviceId: string;

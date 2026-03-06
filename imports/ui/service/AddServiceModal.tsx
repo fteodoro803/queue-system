@@ -8,6 +8,7 @@ interface AddServiceModalProps {
 
 export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
   const [name, setName] = useState("");
+  const [shortcode, setShortcode] = useState("");
   const [duration, setDuration] = useState("");
   const [description, setDescription] = useState("");
   const [cost, setCost] = useState("");
@@ -26,6 +27,7 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
 
     await insertService({
       name,
+      shortcode,
       cost: costNum,
       duration: durationNum,
       description,
@@ -33,6 +35,7 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
 
     // Clear fields and close modal
     setName("");
+    setShortcode("");
     setDuration("");
     setCost("");
     setDescription("");
@@ -67,6 +70,17 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
               placeholder="Standard Appointment"
               value={name}
               onChange={(e) => setName(e.target.value)}
+            />
+
+            {/* Shortcode Field */}
+            <label className="label">Shortcode *</label>
+            <input
+              required
+              type="text"
+              className="input"
+              placeholder="SA"
+              value={shortcode}
+              onChange={(e) => setShortcode(e.target.value)}
             />
 
             {/* Duration Field*/}

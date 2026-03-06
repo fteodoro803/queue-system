@@ -3,6 +3,7 @@ import { QUEUE_STATES, QueueEntry, QueueEntryCollection } from "./queueEntry";
 import { Patient } from "./patient";
 import { Service } from "./service";
 import { updateServiceAnalytics } from "./serviceMethods";
+import { CountersCollection } from "./counters";
 
 export interface QueueEntryData {
   patient: Patient; // Replace with actual Patient type
@@ -34,12 +35,16 @@ Meteor.methods({
       ? (maxPositionEntry.position || 0) + 1
       : 1;
 
+    // 3. Generate display ID
+    const displayId = await generateDisplayId(data.service);
+
     return QueueEntryCollection.insertAsync({
+      displayId: displayId,
       patientId: data.patient._id,
       patient: data.patient,
       serviceId: data.service._id,
       service: data.service,
-      position: newPosition, // Position will be calculated on the server
+      position: newPosition,
       status: "waiting",
       start: null, // Start time will be set once the service is started
       end: null, // End time will be set after the service is completed
@@ -152,4 +157,31 @@ async function updatePositions(entry: QueueEntry): Promise<void> {
     // 3. all matches
     { multi: true },
   );
+}
+
+// Generate Display ID
+// TODO: fix potential for race condition between upsert and findOne
+// TODO: what if two services have the same initials? (e.g., "General Consultation" and "General Checkup" both being "GE")
+async function generateDisplayId(service: Service): Promise<string> {
+  // 1. Get count from Counters Collection
+  const counter = await CountersCollection.findOneAsync({
+    _id: service._id,
+  });
+  const currentCount = counter?.count ?? 0;
+
+  // 2. Wrap to 1 after 99
+  const nextNum = currentCount >= 99 ? 1 : currentCount + 1;
+
+  // 3. Update count in Counters Collection
+  await CountersCollection.upsertAsync(
+    { _id: service._id },
+    { $set: { count: nextNum } },
+  );
+
+  // 4. Combine initials and count to generate ID (e.g., "AB-12")
+  const numStr = `${String(nextNum).padStart(2, "0")}`;
+  const serviceStr = `${service.shortcode.toUpperCase()}`;
+  const displayId = `${serviceStr}-${numStr}`;
+
+  return displayId;
 }
