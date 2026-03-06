@@ -3,11 +3,14 @@ import { MakeQueueEntryModal } from "../queue/MakeQueueEntryModal";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "../components/Loading";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
-import { PlayIcon } from "@heroicons/react/24/outline";
+import { PlayIcon, StopIcon } from "@heroicons/react/24/outline";
+import { dequeue } from "/imports/api/queueEntryMethods";
 
 export const QueueManagement = () => {
   const isQueueEntryLoading = useSubscribe("queueEntries");
-  const queueEntries = useFind(() => QueueEntryCollection.find({})); // Replace with actual query to fetch queue entries
+  const queueEntries = useFind(() =>
+    QueueEntryCollection.find({}, { sort: { serviceId: 1, position: 1 } }),
+  );
 
   const [queueEntryModalOpen, setQueueEntryModalOpen] =
     useState<boolean>(false);
@@ -42,11 +45,17 @@ export const QueueManagement = () => {
             <div className="list-col-grow">
               <div>{entry.patient.name}</div>
               <div className="text-xs uppercase font-semibold opacity-60">
-                {entry.service.name}
+                {entry.service.name} | {entry.status}
               </div>
             </div>
             <button className="btn btn-square btn-ghost">
               <PlayIcon className="w-6" />
+            </button>
+            <button
+              className="btn btn-square btn-ghost"
+              onClick={() => dequeue(entry._id, "completed")}
+            >
+              <StopIcon className="w-6" />
             </button>
           </li>
         ))}

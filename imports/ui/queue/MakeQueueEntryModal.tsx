@@ -4,7 +4,7 @@ import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Service, ServicesCollection } from "/imports/api/service";
 import { Patient, PatientsCollection } from "/imports/api/patient";
 import { Loading } from "../components/Loading";
-import { insertQueueEntry } from "/imports/api/queueEntryMethods";
+import { enqueue } from "/imports/api/queueEntryMethods";
 
 export const MakeQueueEntryModal = ({
   setOpen,
@@ -25,7 +25,7 @@ export const MakeQueueEntryModal = ({
   const handleSubmit = async () => {
     if (!patient || !service) return;
 
-    await insertQueueEntry({ patient, service });
+    await enqueue({ patient, service });
     setOpen(false);
   };
 
