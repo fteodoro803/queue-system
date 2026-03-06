@@ -2,17 +2,23 @@ import React from "react";
 import { DashboardCard } from "../components/DashboardCard";
 import { WORKING_HOURS } from "/imports/dev/settings";
 import { Clock } from "../components/Clock";
-import { CalendarIcon, ClockIcon } from "@heroicons/react/24/outline";
+import {
+  CalendarIcon,
+  ClockIcon,
+  NumberedListIcon,
+} from "@heroicons/react/24/outline";
 import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
 import { AppointmentsCollection } from "/imports/api/appointment";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { AppointmentCard } from "../appointment/AppointmentCard";
 import { Loading } from "../components/Loading";
 import { useDateTime } from "../../contexts/DateTimeContext";
+import { QueueEntryCollection } from "/imports/api/queueEntry";
 
 export const AdminDashboard = () => {
   const now = useDateTime();
   const isAppointmentsLoading = useSubscribe("appointments");
+  const isQueueEntriesLoading = useSubscribe("queueEntries");
 
   // Find appointments for the current day
   const appointments = useFind(() =>
@@ -28,7 +34,14 @@ export const AdminDashboard = () => {
     ),
   );
 
-  if (isAppointmentsLoading()) return <Loading />;
+  // Queues
+  const queue = useFind(() =>
+    QueueEntryCollection.find({
+      end: { $gte: getStartOfDay(now), $lte: getEndOfDay(now) },
+    }),
+  );
+
+  if (isAppointmentsLoading() || isQueueEntriesLoading()) return <Loading />;
 
   return (
     <div>
@@ -67,39 +80,30 @@ export const AdminDashboard = () => {
           />
         </div>
 
-        {/* Duration Dashboard Card */}
+        {/* Queue Dashboard Card */}
         <div className="my-4">
           <DashboardCard
-            header="Duration"
-            body={appointments.length}
-            footer={`Completed: ${appointments.filter((a) => a.status === "completed").length}`}
-            icon={CalendarIcon}
+            header="In Queue"
+            body={queue.filter((q) => q.status === "waiting").length}
+            footer={`Completed: ${queue.filter((q) => q.status === "completed").length}`}
+            icon={NumberedListIcon}
           />
         </div>
       </div>
 
       {/* Today's Appointments */}
       <div className="py-4">
-        <h1 className="text-l font-semibold">Upcoming Appointments:</h1>
+        <h1 className="text-l font-semibold">
+          Upcoming and Ongoing Appointments:
+        </h1>
         {appointments
           .filter(
             (a) =>
               a.scheduled_start.getDate() === now.getDate() &&
-              a.status === "scheduled",
+              (a.status === "scheduled" || a.status === "in-progress"),
           )
-          .map((a) => (
-            <AppointmentCard key={a._id} appointment={a} />
-          ))}
-      </div>
-
-      {/* In-Progress Appointments */}
-      <div className="py-4">
-        <h1 className="text-l font-semibold">Ongoing Appointments:</h1>
-        {appointments
-          .filter(
-            (a) =>
-              a.scheduled_start.getDate() === now.getDate() &&
-              a.status === "in-progress",
+          .sort(
+            (a, b) => a.scheduled_start.getTime() - b.scheduled_start.getTime(),
           )
           .map((a) => (
             <AppointmentCard key={a._id} appointment={a} />
