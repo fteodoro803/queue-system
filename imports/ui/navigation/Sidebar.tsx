@@ -12,11 +12,14 @@ import {
 import { Outlet, useLocation } from "react-router-dom";
 import { ThemeController } from "../components/ThemeController";
 import { NavLinkItem } from "./NavLinkItem";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
+import { formatDateToLocale } from "/imports/utils/utils";
 
 export const Sidebar = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const isAdmin = location.pathname.startsWith("/admin");
+  const now = useDateTime();
 
   // Home Screen - don't show dashboard
   if (isHome) return <Outlet />;
@@ -52,6 +55,11 @@ export const Sidebar = () => {
             className="drawer-overlay"
           ></label>
           <ul className="menu bg-base min-h-full w-80 p-4">
+            {/* Date and Time */}
+            <div className="flex justify-center">
+              <p className="text-sm">{`${now.toLocaleDateString()} ${formatDateToLocale(now)}`}</p>
+            </div>
+
             <NavLinkItem link="/" label="Home" icon={HomeIcon} />
 
             {/*Admin Sidebar*/}
