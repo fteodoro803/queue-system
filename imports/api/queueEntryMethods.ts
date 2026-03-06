@@ -93,17 +93,26 @@ Meteor.methods({
       throw new Meteor.Error("Queue entry not found");
     }
 
-    if (entry.position === null) {
+    // Only entries that are in the queue (position > 0) can be started
+    if (entry.position === null || entry.position <= 0) {
       throw new Meteor.Error("Invalid queue entry position");
     }
 
-    // Update the status of the entry
+    // 1. Update the status of the entry
     await QueueEntryCollection.updateAsync(id, {
       $set: {
         status: "in-progress",
+        position: 0, // Set position to 0 to indicate it's being served, maybe temporary?
         start: time,
       },
     });
+
+    // 2. Update positions of entries behind the dequeued entry
+    await QueueEntryCollection.updateAsync(
+      { serviceId: entry.serviceId, position: { $gt: entry.position } }, // filter
+      { $inc: { position: -1 } }, // decrement
+      { multi: true }, // all matches
+    );
   },
 });
 
