@@ -4,6 +4,7 @@ import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "../components/Loading";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { QueueList } from "../queue/QueueList";
+import { ServicesCollection } from "/imports/api/service";
 
 export const QueueManagement = () => {
   const isQueueEntryLoading = useSubscribe("queueEntries");
@@ -11,10 +12,13 @@ export const QueueManagement = () => {
     QueueEntryCollection.find({}, { sort: { serviceId: 1, position: 1 } }),
   );
 
+  const isServicesLoading = useSubscribe("services");
+  const services = useFind(() => ServicesCollection.find());
+
   const [queueEntryModalOpen, setQueueEntryModalOpen] =
     useState<boolean>(false);
 
-  if (isQueueEntryLoading()) {
+  if (isQueueEntryLoading() || isServicesLoading()) {
     return <Loading />;
   }
 
@@ -30,8 +34,17 @@ export const QueueManagement = () => {
         </button>
       </div>
 
-      <div>{/* Test Queue List */}</div>
-      <QueueList queue={queueEntries} />
+      {services.map((service) => {
+        const serviceQueue = queueEntries.filter(
+          (entry) => entry.serviceId === service._id,
+        );
+        return (
+          <>
+            <h2 className="text-lg font-semibold mt-6 mb-4">{service.name}</h2>
+            <QueueList queue={serviceQueue} service={service} />
+          </>
+        );
+      })}
 
       {/* Modal */}
       {queueEntryModalOpen && (

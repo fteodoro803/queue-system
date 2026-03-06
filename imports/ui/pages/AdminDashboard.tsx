@@ -15,11 +15,13 @@ import { useDateTime } from "../../contexts/DateTimeContext";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { QueueList } from "../queue/QueueList";
 import { AppointmentList } from "../appointment/AppointmentList";
+import { ServicesCollection } from "/imports/api/service";
 
 export const AdminDashboard = () => {
   const now = useDateTime();
   const isAppointmentsLoading = useSubscribe("appointments");
   const isQueueEntriesLoading = useSubscribe("queueEntries");
+  const isServicesLoading = useSubscribe("services");
 
   // Find appointments for the current day
   const appointments = useFind(() =>
@@ -35,6 +37,9 @@ export const AdminDashboard = () => {
     ),
   );
 
+  // Services
+  const services = useFind(() => ServicesCollection.find({}));
+
   // Queues
   const queue = useFind(() =>
     // Get queue entries made today that are still waiting or in-progress
@@ -44,7 +49,8 @@ export const AdminDashboard = () => {
     }),
   );
 
-  if (isAppointmentsLoading() || isQueueEntriesLoading()) return <Loading />;
+  if (isAppointmentsLoading() || isQueueEntriesLoading() || isServicesLoading())
+    return <Loading />;
 
   return (
     <div>
@@ -116,7 +122,19 @@ export const AdminDashboard = () => {
       {/* Queue */}
       <div className="py-4">
         <h1 className="text-l font-semibold">Queue:</h1>
-        <QueueList queue={queue} />
+        {/* <QueueList queue={queue} /> */}
+        {services.map((service) => {
+          const serviceQueue = queue.filter(
+            (entry) => entry.serviceId === service._id,
+          );
+          return (
+            <QueueList
+              key={service._id}
+              queue={serviceQueue}
+              service={service}
+            />
+          );
+        })}
       </div>
     </div>
   );
