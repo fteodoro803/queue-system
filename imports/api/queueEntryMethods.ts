@@ -54,7 +54,10 @@ Meteor.methods({
     }
 
     if (entry.position === null) {
-      throw new Meteor.Error("Invalid queue entry position");
+      throw new Meteor.Error(
+        "Invalid queue entry position",
+        "Cannot complete/cancel what isn't in queue",
+      );
     }
 
     // 1. Update the status of the entry
@@ -105,20 +108,24 @@ Meteor.methods({
 });
 
 // Enqueues a patient to a service queue
-export async function enqueue(data: QueueEntryData, time: Date): Promise<string> {
-  return await Meteor.callAsync("queueEntry.enqueue", data, time);
-}
-
-// Dequeues a patient from the service queue
-export async function dequeue(
-  id: string,
-  reason: DequeueReason,
+export async function enqueue(
+  data: QueueEntryData,
   time: Date,
-): Promise<void> {
-  await Meteor.callAsync("queueEntry.dequeue", id, reason, time);
+): Promise<string> {
+  return await Meteor.callAsync("queueEntry.enqueue", data, time);
 }
 
 // Starts a service for a queue entry
 export async function startService(id: string, time: Date): Promise<void> {
   await Meteor.callAsync("queueEntry.startService", id, time);
+}
+
+// Completes a service for a queue entry and removes it from the queue
+export async function completeService(id: string, time: Date): Promise<void> {
+  await Meteor.callAsync("queueEntry.dequeue", id, "completed", time);
+}
+
+// Cancels a queue entry
+export async function cancelService(id: string, time: Date): Promise<void> {
+  await Meteor.callAsync("queueEntry.dequeue", id, "cancelled", time);
 }

@@ -1,8 +1,8 @@
 import React from "react";
 import { QueueEntry } from "/imports/api/queueEntry";
 import { formatDateToLocale } from "/imports/utils/utils";
-import { dequeue, startService } from "/imports/api/queueEntryMethods";
-import { PlayIcon, StopIcon } from "@heroicons/react/24/outline";
+import { cancelService, completeService, startService } from "/imports/api/queueEntryMethods";
+import { PlayIcon, StopIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 
 export const QueueList = ({ queue }: { queue: QueueEntry[] }) => {
@@ -24,6 +24,7 @@ export const QueueList = ({ queue }: { queue: QueueEntry[] }) => {
               {`(${entry.start ? formatDateToLocale(entry.start) : "--"} - ${entry.end ? formatDateToLocale(entry.end) : "--"})`}
             </div>
           </div>
+          {/* Start Button */}
           <button
             className="btn btn-square btn-ghost"
             onClick={() => {
@@ -32,11 +33,19 @@ export const QueueList = ({ queue }: { queue: QueueEntry[] }) => {
           >
             <PlayIcon className="w-6" />
           </button>
+          {/* Complete Button */}
           <button
             className="btn btn-square btn-ghost"
-            onClick={() => dequeue(entry._id, "completed", now)}
+            onClick={() => completeService(entry._id, now)}
           >
             <StopIcon className="w-6" />
+          </button>
+          {/* Cancel Button */}
+          <button
+            className="btn btn-square btn-ghost"
+            onClick={() => cancelService(entry._id, now)}
+          >
+            <XMarkIcon className="w-6" />
           </button>
         </li>
       ))}
