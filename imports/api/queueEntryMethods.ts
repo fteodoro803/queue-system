@@ -3,6 +3,7 @@ import { QUEUE_STATES, QueueEntry, QueueEntryCollection } from "./queueEntry";
 import { Patient } from "./patient";
 import { Service } from "./service";
 import { updateServiceAnalytics } from "./serviceMethods";
+import { CountersCollection } from "./counters";
 
 export interface QueueEntryData {
   patient: Patient; // Replace with actual Patient type
@@ -34,12 +35,27 @@ Meteor.methods({
       ? (maxPositionEntry.position || 0) + 1
       : 1;
 
+    // 3. Generate display ID
+    // Get count from Counters Collection
+    const counter = await CountersCollection.findOneAsync({
+      _id: data.service._id,
+    });
+    const nextNum = (counter?.count ?? 0) + 1;
+    await CountersCollection.upsertAsync(
+      { _id: data.service._id },
+      { $set: { count: nextNum } },
+    );
+    const numStr = `${String(nextNum).padStart(3, "0")}`;
+    const serviceStr = `${data.service.name.substring(0, 2).toUpperCase()}`;
+    const displayId = `${serviceStr}-${numStr}`;
+
     return QueueEntryCollection.insertAsync({
+      displayId: displayId,
       patientId: data.patient._id,
       patient: data.patient,
       serviceId: data.service._id,
       service: data.service,
-      position: newPosition, // Position will be calculated on the server
+      position: newPosition,
       status: "waiting",
       start: null, // Start time will be set once the service is started
       end: null, // End time will be set after the service is completed

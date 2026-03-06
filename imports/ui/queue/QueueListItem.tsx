@@ -46,7 +46,7 @@ export const QueueListItem = ({ entry }: { entry: QueueEntry }) => {
           {/* ID */}
           <div className="flex items-center gap-1">
             <IdentificationIcon className={iconSize} />
-            <p className={textSize}>{entry._id}</p>
+            <p className={textSize}>{entry.displayId}</p>
           </div>
 
           {/* Service */}
