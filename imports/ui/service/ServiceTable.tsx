@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "/imports/ui/components/Loading";
 import { Service, ServicesCollection } from "/imports/api/service";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { ServiceDetailsModal } from "./ServiceDetailsModal";
 
 export const ServiceTable = () => {
@@ -13,7 +12,7 @@ export const ServiceTable = () => {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
   // Sync selected service when services array updates
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedService) {
       const updated = services.find((s) => s._id === selectedService._id);
       if (updated) {
@@ -21,6 +20,11 @@ export const ServiceTable = () => {
       }
     }
   }, [services]);
+
+  const handleSelect = (service: Service) => {
+    setSelectedService(service);
+    setIsServiceDetailsModalOpen(true);
+  };
 
   // Loading
   if (isLoading()) {
@@ -36,14 +40,17 @@ export const ServiceTable = () => {
             <th>Name</th>
             <th>Duration (mins)</th>
             <th>Cost (PHP)</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {services.map((s) => {
             const modalId: string = `my_modal_${s._id}}`;
             return (
-              <tr key={modalId} className="hover:bg-base-300">
+              <tr
+                key={modalId}
+                className="hover:bg-base-300"
+                onClick={() => handleSelect(s)}
+              >
                 {/*Name*/}
                 <td>{s.name}</td>
 
@@ -52,19 +59,6 @@ export const ServiceTable = () => {
 
                 {/*Cost*/}
                 <td>{s.cost ? s.cost : "-"}</td>
-
-                {/*Edit Modal*/}
-                <td>
-                  <button
-                    className="btn btn-circle btn-ghost"
-                    onClick={() => {
-                      setSelectedService(s);
-                      setIsServiceDetailsModalOpen(true);
-                    }}
-                  >
-                    <EllipsisVerticalIcon className="h-5 w-5" />
-                  </button>
-                </td>
               </tr>
             );
           })}

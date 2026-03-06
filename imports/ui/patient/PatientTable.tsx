@@ -4,7 +4,6 @@ import { Patient, PatientsCollection } from "/imports/api/patient";
 import { PatientDetailsModal } from "/imports/ui/patient/PatientDetailsModal";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { Loading } from "/imports/ui/components/Loading";
-import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 
 export const PatientTable = () => {
   const isPatientsLoading = useSubscribe("patients");
@@ -21,6 +20,11 @@ export const PatientTable = () => {
     }
   }, [patients]);
 
+  const handleSelect = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setIsPatientDetailsModalOpen(true);
+  };
+
   // Loading
   if (isPatientsLoading()) {
     return <Loading />;
@@ -36,14 +40,17 @@ export const PatientTable = () => {
             <th>Name</th>
             <th>Email</th>
             <th>Number</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {patients.map((p) => {
             const modalId: string = `my_modal_${p._id}}`;
             return (
-              <tr key={modalId} className="hover:bg-base-300">
+              <tr
+                key={modalId}
+                className="hover:bg-base-300"
+                onClick={() => handleSelect(p)}
+              >
                 {/*Avatar*/}
                 <th>
                   <Avatar profile={p} />
@@ -57,19 +64,6 @@ export const PatientTable = () => {
 
                 {/*Number*/}
                 <td>{p.number ? p.number : "-"}</td>
-
-                {/*Edit Modal*/}
-                <td>
-                  <button
-                    className="btn btn-circle btn-ghost"
-                    onClick={() => {
-                      setSelectedPatient(p);
-                      setIsPatientDetailsModalOpen(true);
-                    }}
-                  >
-                    <EllipsisHorizontalIcon className="h-6 w-6" />
-                  </button>
-                </td>
               </tr>
             );
           })}
