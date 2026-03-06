@@ -17,7 +17,7 @@ type DequeueReason = Extract<
 // Client-Called methods
 Meteor.methods({
   // Inserts queue entry to database and calculates position
-  async "queueEntry.enqueue"(data: QueueEntryData) {
+  async "queueEntry.enqueue"(data: QueueEntryData, time: Date) {
     // 1. Get the current max position in the queue, for respective service
     const maxPositionEntry = await QueueEntryCollection.findOneAsync(
       {
@@ -42,7 +42,7 @@ Meteor.methods({
       status: "waiting",
       start: null, // Start time will be set once the service is started
       end: null, // End time will be set after the service is completed
-      createdAt: new Date(),
+      createdAt: time,
     });
   },
 
@@ -105,8 +105,8 @@ Meteor.methods({
 });
 
 // Enqueues a patient to a service queue
-export async function enqueue(data: QueueEntryData): Promise<string> {
-  return await Meteor.callAsync("queueEntry.enqueue", data);
+export async function enqueue(data: QueueEntryData, time: Date): Promise<string> {
+  return await Meteor.callAsync("queueEntry.enqueue", data, time);
 }
 
 // Dequeues a patient from the service queue

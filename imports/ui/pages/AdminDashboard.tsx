@@ -14,6 +14,7 @@ import { AppointmentCard } from "../appointment/AppointmentCard";
 import { Loading } from "../components/Loading";
 import { useDateTime } from "../../contexts/DateTimeContext";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
+import { QueueList } from "../queue/QueueList";
 
 export const AdminDashboard = () => {
   const now = useDateTime();
@@ -36,8 +37,10 @@ export const AdminDashboard = () => {
 
   // Queues
   const queue = useFind(() =>
+    // Get queue entries made today that are still waiting or in-progress
     QueueEntryCollection.find({
-      end: { $gte: getStartOfDay(now), $lte: getEndOfDay(now) },
+      createdAt: { $gte: getStartOfDay(now), $lte: getEndOfDay(now) },
+      status: { $in: ["waiting", "in-progress"] },
     }),
   );
 
@@ -91,7 +94,7 @@ export const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Today's Appointments */}
+      {/* Appointments */}
       <div className="py-4">
         <h1 className="text-l font-semibold">
           Upcoming and Ongoing Appointments:
@@ -110,18 +113,10 @@ export const AdminDashboard = () => {
           ))}
       </div>
 
-      {/* Completed Appointments */}
+      {/* Queue */}
       <div className="py-4">
-        <h1 className="text-l font-semibold">Completed Appointments:</h1>
-        {appointments
-          .filter(
-            (a) =>
-              a.scheduled_start.getDate() === now.getDate() &&
-              a.status === "completed",
-          )
-          .map((a) => (
-            <AppointmentCard key={a._id} appointment={a} />
-          ))}
+        <h1 className="text-l font-semibold">Queue:</h1>
+        <QueueList queue={queue} />
       </div>
     </div>
   );

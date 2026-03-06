@@ -5,6 +5,7 @@ import { Service, ServicesCollection } from "/imports/api/service";
 import { Patient, PatientsCollection } from "/imports/api/patient";
 import { Loading } from "../components/Loading";
 import { enqueue } from "/imports/api/queueEntryMethods";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
 
 export const MakeQueueEntryModal = ({
   setOpen,
@@ -18,14 +19,14 @@ export const MakeQueueEntryModal = ({
   const patients = useFind(() => PatientsCollection.find({}));
 
   // States
+  const now = useDateTime();
   const [patient, setPatient] = useState<Patient | undefined>(undefined);
   const [service, setService] = useState<Service | undefined>(undefined);
 
   // Handlers
   const handleSubmit = async () => {
     if (!patient || !service) return;
-
-    await enqueue({ patient, service });
+    await enqueue({ patient, service }, now);
     setOpen(false);
   };
 
