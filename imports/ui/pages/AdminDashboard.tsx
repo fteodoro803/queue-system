@@ -10,11 +10,11 @@ import {
 import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
 import { AppointmentsCollection } from "/imports/api/appointment";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
-import { AppointmentCard } from "../appointment/AppointmentCard";
 import { Loading } from "../components/Loading";
 import { useDateTime } from "../../contexts/DateTimeContext";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { QueueList } from "../queue/QueueList";
+import { AppointmentList } from "../appointment/AppointmentList";
 
 export const AdminDashboard = () => {
   const now = useDateTime();
@@ -99,18 +99,18 @@ export const AdminDashboard = () => {
         <h1 className="text-l font-semibold">
           Upcoming and Ongoing Appointments:
         </h1>
-        {appointments
-          .filter(
-            (a) =>
-              a.scheduled_start.getDate() === now.getDate() &&
-              (a.status === "scheduled" || a.status === "in-progress"),
-          )
-          .sort(
-            (a, b) => a.scheduled_start.getTime() - b.scheduled_start.getTime(),
-          )
-          .map((a) => (
-            <AppointmentCard key={a._id} appointment={a} />
-          ))}
+        <AppointmentList
+          appointments={appointments
+            .filter(
+              (a) =>
+                a.scheduled_start.getDate() === now.getDate() &&
+                (a.status === "scheduled" || a.status === "in-progress"),
+            )
+            .sort(
+              (a, b) =>
+                a.scheduled_start.getTime() - b.scheduled_start.getTime(),
+            )}
+        />
       </div>
 
       {/* Queue */}

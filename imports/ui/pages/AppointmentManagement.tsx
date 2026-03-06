@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { MakeAppointmentModal } from "../appointment/MakeAppointmentModal";
-import { AppointmentCard } from "../appointment/AppointmentCard";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { AppointmentsCollection } from "/imports/api/appointment";
 import { Loading } from "../components/Loading";
@@ -37,6 +36,7 @@ export const AppointmentManagement = () => {
       {/* Tab Groups */}
       {/* name of each tab group should be unique */}
       <div className="tabs tabs-border justify-center">
+        {/* Upcoming Appointments */}
         <input
           type="radio"
           name="my_tabs_2"
@@ -45,19 +45,16 @@ export const AppointmentManagement = () => {
           defaultChecked
         />
         <div className="tab-content border-base-300 bg-base-100 p-10">
-          {/* Upcoming Appointments */}
           <div className="py-4">
-            {/* <h1 className="text-l font-semibold">Upcoming Appointments:</h1> */}
-            {appointments
-              .filter(
+            <AppointmentList
+              appointments={appointments.filter(
                 (a) => a.status === "scheduled" || a.status === "in-progress",
-              )
-              .map((a) => (
-                <AppointmentCard key={a._id} appointment={a} />
-              ))}
+              )}
+            />
           </div>
         </div>
 
+        {/* Finished Appointments */}
         <input
           type="radio"
           name="my_tabs_2"
@@ -65,34 +62,25 @@ export const AppointmentManagement = () => {
           aria-label="Finished"
         />
         <div className="tab-content border-base-300 bg-base-100 p-10">
-          {/* Finished Appointments */}
           <div className="py-4">
-            {/* <h1 className="text-l font-semibold">Finished Appointments:</h1> */}
-            {appointments
-              .filter(
+            <AppointmentList
+              appointments={appointments.filter(
                 (a) =>
                   (a.status === "completed" || a.status === "cancelled") &&
                   a.scheduled_start.getDate() === now.getDate(),
-              )
-              .map((a) => (
-                <AppointmentCard key={a._id} appointment={a} />
-              ))}
+              )}
+            />
           </div>
         </div>
 
+        {/* All Appointments */}
         <input type="radio" name="my_tabs_2" className="tab" aria-label="All" />
         <div className="tab-content border-base-300 bg-base-100 p-10">
-          {/* All Appointments */}
           <div className="py-4">
-            {/* <h1 className="text-l font-semibold">All Appointments:</h1> */}
-            {appointments.map((a) => (
-              <AppointmentCard key={a._id} appointment={a} />
-            ))}
+            <AppointmentList appointments={appointments} />
           </div>
         </div>
       </div>
-
-      <AppointmentList appointments={appointments} />
 
       {/* Appointment Modal */}
       {isAppointmentModalOpen && (

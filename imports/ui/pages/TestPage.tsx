@@ -7,7 +7,6 @@ import { Steps } from "../components/Steps";
 import { DateIcon } from "../components/DateIcon";
 import { Avatar } from "../components/Avatar";
 import { Patient } from "/imports/api/patient";
-import { AppointmentCard } from "../appointment/AppointmentCard";
 import { Appointment } from "/imports/api/appointment";
 import { Provider, ProviderService } from "/imports/api/provider";
 import { Service } from "/imports/api/service";
@@ -18,6 +17,7 @@ import { QueueIcon } from "../components/QueueIcon";
 import { QueueEntry } from "/imports/api/queueEntry";
 import { QueueListItem } from "../queue/QueueListItem";
 import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
+import { AppointmentList } from "../appointment/AppointmentList";
 
 export const TestPage = () => {
   const now = useDateTime(); // context date and time
@@ -219,6 +219,23 @@ export const TestPage = () => {
         </div>
       </div>
 
+      {/* Badges */}
+      <div className="mt-4 flex flex-col gap-2">
+        <p className="text-xl font-semibold">Badges</p>
+        <div className="flex gap-2">
+          <div className="badge badge-info">Info</div>
+          <div className="badge badge-warning">Warning</div>
+          <div className="badge badge-success">Success</div>
+          <div className="badge badge-error">Error</div>
+        </div>
+        <div className="flex gap-2">
+          <div className="badge badge-soft badge-info">Info</div>
+          <div className="badge badge-soft badge-warning">Warning</div>
+          <div className="badge badge-soft badge-success">Success</div>
+          <div className="badge badge-soft badge-error">Error</div>
+        </div>
+      </div>
+
       {/* Calendar */}
       <div className="mt-4">
         <p className="text-xl font-semibold">Calendar</p>
@@ -243,10 +260,10 @@ export const TestPage = () => {
         <Avatar profile={patient} />
       </div>
 
-      {/* Appointment Card */}
+      {/* Appointment List Item */}
       <div className="mt-4">
-        <p className="text-xl font-semibold">Appointment Card</p>
-        <AppointmentCard appointment={appointment} />
+        <p className="text-xl font-semibold">Appointment List Item</p>
+        <AppointmentList appointments={[appointment]} />
       </div>
 
       {/* Dashboard Card */}
