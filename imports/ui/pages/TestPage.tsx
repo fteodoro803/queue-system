@@ -108,7 +108,7 @@ export const TestPage = () => {
     patient: patient,
     serviceId: service1._id,
     service: service1,
-    position: 1,
+    position: 0,
     status: "in-progress",
     start: getStartOfDay(date ?? new Date()),
     end: null,

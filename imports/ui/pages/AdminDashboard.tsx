@@ -128,11 +128,9 @@ export const AdminDashboard = () => {
             (entry) => entry.serviceId === service._id,
           );
           return (
-            <QueueList
-              key={service._id}
-              queue={serviceQueue}
-              service={service}
-            />
+            <div key={service._id} className="mb-2">
+              <QueueList queue={serviceQueue} service={service} />
+            </div>
           );
         })}
       </div>

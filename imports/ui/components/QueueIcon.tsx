@@ -8,7 +8,11 @@ interface QueueIconProps {
 
 export const QueueIcon = ({ entry, size = 70 }: QueueIconProps) => {
   const position: string =
-    entry.position !== null ? entry.position.toString() : "--";
+    entry.status === "completed"
+      ? "✓"
+      : entry.status === "cancelled"
+        ? "✗"
+        : entry.position?.toString() || "?";
 
   return (
     <div

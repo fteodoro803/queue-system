@@ -34,17 +34,66 @@ export const QueueManagement = () => {
         </button>
       </div>
 
-      {services.map((service) => {
-        const serviceQueue = queueEntries.filter(
-          (entry) => entry.serviceId === service._id,
-        );
-        return (
-          <>
-            <h2 className="text-lg font-semibold mt-6 mb-4">{service.name}</h2>
-            <QueueList queue={serviceQueue} service={service} />
-          </>
-        );
-      })}
+      {/* Tab Groups */}
+      {/* name of each tab group should be unique */}
+      <div className="tabs tabs-border justify-center">
+        {/* Upcoming and Ongoing Queue Entries */}
+        <input
+          type="radio"
+          name="my_tabs_2"
+          className="tab"
+          aria-label="Upcoming"
+          defaultChecked
+        />
+        <div className="tab-content border-base-300 bg-base-100 p-10">
+          <div className="py-4">
+            {services.map((service) => {
+              const serviceQueue = queueEntries.filter(
+                (entry) =>
+                  entry.serviceId === service._id &&
+                  (entry.status === "waiting" ||
+                    entry.status === "in-progress"),
+              );
+              return (
+                <>
+                  <h2 className="text-lg font-semibold mt-6 mb-4">
+                    {service.name}
+                  </h2>
+                  <QueueList queue={serviceQueue} service={service} />
+                </>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Finished Queue Entries */}
+        <input
+          type="radio"
+          name="my_tabs_2"
+          className="tab"
+          aria-label="Finished"
+        />
+        <div className="tab-content border-base-300 bg-base-100 p-10">
+          <div className="py-4">
+            {services.map((service) => {
+              const serviceQueue = queueEntries.filter(
+                (entry) =>
+                  entry.serviceId === service._id &&
+                  (entry.status === "completed" ||
+                    entry.status === "cancelled"),
+              );
+              return (
+                <>
+                  <h2 className="text-lg font-semibold mt-6 mb-4">
+                    {service.name}
+                  </h2>
+                  <QueueList queue={serviceQueue} service={service} />
+                </>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
       {/* Modal */}
       {queueEntryModalOpen && (
