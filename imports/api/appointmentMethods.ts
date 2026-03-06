@@ -49,6 +49,7 @@ Meteor.methods({
   },
 
   // Marks appointment as in-progress and update timestamp
+  // TODO: change startTime to an argument
   "appointments.start"(id: string) {
     const startTime = TEST_DATE ?? new Date();
     return AppointmentsCollection.updateAsync(id, {
@@ -57,6 +58,7 @@ Meteor.methods({
   },
 
   // Marks appointment as complete and update timestamp and analytics
+  // TODO: change startTime to an argument
   async "appointments.complete"(id: string) {
     // 1. Get the appointment to calculate the actual duration
     const appointment = await AppointmentsCollection.findOneAsync(id);

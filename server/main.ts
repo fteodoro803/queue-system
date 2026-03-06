@@ -7,6 +7,8 @@ import { ServicesCollection } from "/imports/api/service";
 import "../imports/api/serviceMethods";
 import { ProviderCollection } from "../imports/api/provider";
 import "../imports/api/providerMethods";
+import { QueueEntryCollection } from "/imports/api/queueEntry";
+import "../imports/api/queueEntryMethods";
 
 // TODO: Add userId field to appointments and filter by it in publications and useFind hooks, so that patients only see their own appointments and providers only see appointments assigned to them. For now, we will just return all appointments for simplicity.
 // Meteor.user()?.type === "patient"
@@ -29,6 +31,11 @@ Meteor.publish("appointments", function () {
 // Publish Patients
 Meteor.publish("patients", function () {
   return PatientsCollection.find();
+});
+
+// Publish Queue Entries
+Meteor.publish("queueEntries", function () {
+  return QueueEntryCollection.find();
 });
 
 Meteor.startup(async () => {

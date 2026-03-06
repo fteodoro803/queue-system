@@ -4,7 +4,7 @@ import { convertStrToHrs } from "../utils/utils";
 export const TEST_SETTINGS = {
   USE_TEST_DATE: true,
   FREEZE_TIME: false, // if true, clock won't update time
-  USE_TIME_MULTIPLIER: false, // if true, time will pass faster than real time (for testing long appointments), only works when USE_TEST_DATE is true
+  USE_TIME_MULTIPLIER: true, // if true, time will pass faster than real time (for testing long appointments), only works when USE_TEST_DATE is true
 };
 
 // Test Time for Development
