@@ -54,7 +54,7 @@ export const ServiceManagement = () => {
           className="tab"
           aria-label="Providers"
         />
-        <div className="tab-content bg-base-100 border-base-300 p-6">
+        <div className="tab-content border-base-300 bg-base-100 p-10">
           {/* Service Providers */}
           <div className="flex justify-between">
             <h1 className="text-2xl font-bold">Service Providers</h1>

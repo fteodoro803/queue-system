@@ -46,7 +46,7 @@ export const QueueManagement = () => {
           defaultChecked
         />
         <div className="tab-content border-base-300 bg-base-100 p-10">
-          <div className="py-4">
+          <div className="">
             {services.map((service) => {
               const serviceQueue = queueEntries.filter(
                 (entry) =>
@@ -55,12 +55,10 @@ export const QueueManagement = () => {
                     entry.status === "in-progress"),
               );
               return (
-                <>
-                  <h2 className="text-lg font-semibold mt-6 mb-4">
-                    {service.name}
-                  </h2>
+                <div key={service._id} className="mb-6">
+                  <h2 className="text-2xl font-bold">{service.name}</h2>
                   <QueueList queue={serviceQueue} service={service} />
-                </>
+                </div>
               );
             })}
           </div>
@@ -74,7 +72,7 @@ export const QueueManagement = () => {
           aria-label="Finished"
         />
         <div className="tab-content border-base-300 bg-base-100 p-10">
-          <div className="py-4">
+          <div className="">
             {services.map((service) => {
               const serviceQueue = queueEntries.filter(
                 (entry) =>
@@ -83,12 +81,10 @@ export const QueueManagement = () => {
                     entry.status === "cancelled"),
               );
               return (
-                <>
-                  <h2 className="text-lg font-semibold mt-6 mb-4">
-                    {service.name}
-                  </h2>
+                <div key={service._id} className="mb-6">
+                  <h2 className="text-2xl font-bold">{service.name}</h2>
                   <QueueList queue={serviceQueue} service={service} />
-                </>
+                </div>
               );
             })}
           </div>
