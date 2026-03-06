@@ -2,6 +2,7 @@ import { Meteor } from "meteor/meteor";
 import { QUEUE_STATES, QueueEntryCollection } from "./queueEntry";
 import { Patient } from "./patient";
 import { Service } from "./service";
+import { updateServiceAnalytics } from "./serviceMethods";
 
 export interface QueueEntryData {
   patient: Patient; // Replace with actual Patient type
@@ -46,7 +47,44 @@ Meteor.methods({
   },
 
   // Removes queue entry from the database and updates positions of remaining entries
-  async "queueEntry.dequeue"(id: string, reason: DequeueReason) {
+  async "queueEntry.dequeue"(id: string, reason: DequeueReason, time: Date) {
+    const entry = await QueueEntryCollection.findOneAsync(id);
+    if (!entry) {
+      throw new Meteor.Error("Queue entry not found");
+    }
+
+    if (entry.position === null) {
+      throw new Meteor.Error("Invalid queue entry position");
+    }
+
+    // 1. Update the status of the entry
+    await QueueEntryCollection.updateAsync(id, {
+      $set: {
+        status: reason === "completed" ? "completed" : "cancelled",
+        position: null,
+        end: reason === "completed" ? time : null,
+      },
+    });
+
+    // 2. Update positions of entries behind the dequeued entry
+    await QueueEntryCollection.updateAsync(
+      { serviceId: entry.serviceId, position: { $gt: entry.position } }, // filter
+      { $inc: { position: -1 } }, // decrement
+      { multi: true }, // all matches
+    );
+
+    // 3. Update Service Analytics if completed
+    if (reason === "completed" && entry.start) {
+      const startTime: Date = entry.start;
+      const endTime: Date = time;
+      const duration: number =
+        (endTime.getTime() - startTime.getTime()) / 60000; // duration in minutes
+      await updateServiceAnalytics(entry.serviceId, duration);
+    }
+  },
+
+  // Starts a Service
+  async "queueEntry.startService"(id: string, time: Date) {
     const entry = await QueueEntryCollection.findOneAsync(id);
     if (!entry) {
       throw new Meteor.Error("Queue entry not found");
@@ -57,21 +95,12 @@ Meteor.methods({
     }
 
     // Update the status of the entry
-    const time: Date = new Date();
     await QueueEntryCollection.updateAsync(id, {
       $set: {
-        status: reason === "completed" ? "completed" : "cancelled",
-        position: null,
-        end: reason === "completed" ? time : null,
+        status: "in-progress",
+        start: time,
       },
     });
-
-    // Update positions of entries behind the dequeued entry
-    await QueueEntryCollection.updateAsync(
-      { serviceId: entry.serviceId, position: { $gt: entry.position } }, // filter
-      { $inc: { position: -1 } }, // decrement
-      { multi: true }, // all matches
-    );
   },
 });
 
@@ -84,6 +113,12 @@ export async function enqueue(data: QueueEntryData): Promise<string> {
 export async function dequeue(
   id: string,
   reason: DequeueReason,
+  time: Date,
 ): Promise<void> {
-  await Meteor.callAsync("queueEntry.dequeue", id, reason);
+  await Meteor.callAsync("queueEntry.dequeue", id, reason, time);
+}
+
+// Starts a service for a queue entry
+export async function startService(id: string, time: Date): Promise<void> {
+  await Meteor.callAsync("queueEntry.startService", id, time);
 }

@@ -4,9 +4,12 @@ import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "../components/Loading";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { PlayIcon, StopIcon } from "@heroicons/react/24/outline";
-import { dequeue } from "/imports/api/queueEntryMethods";
+import { dequeue, startService } from "/imports/api/queueEntryMethods";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
+import { formatDateToLocale } from "/imports/utils/utils";
 
 export const QueueManagement = () => {
+  const now = useDateTime();
   const isQueueEntryLoading = useSubscribe("queueEntries");
   const queueEntries = useFind(() =>
     QueueEntryCollection.find({}, { sort: { serviceId: 1, position: 1 } }),
@@ -45,15 +48,21 @@ export const QueueManagement = () => {
             <div className="list-col-grow">
               <div>{entry.patient.name}</div>
               <div className="text-xs uppercase font-semibold opacity-60">
-                {entry.service.name} | {entry.status}
+                {entry.service.name} | {entry.status} |
+                {`(${entry.start ? formatDateToLocale(entry.start) : "--"} - ${entry.end ? formatDateToLocale(entry.end) : "--"})`}
               </div>
             </div>
-            <button className="btn btn-square btn-ghost">
+            <button
+              className="btn btn-square btn-ghost"
+              onClick={() => {
+                startService(entry._id, now);
+              }}
+            >
               <PlayIcon className="w-6" />
             </button>
             <button
               className="btn btn-square btn-ghost"
-              onClick={() => dequeue(entry._id, "completed")}
+              onClick={() => dequeue(entry._id, "completed", now)}
             >
               <StopIcon className="w-6" />
             </button>
