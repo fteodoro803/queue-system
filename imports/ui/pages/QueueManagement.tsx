@@ -7,7 +7,7 @@ import { QueueList } from "../queue/QueueList";
 import { ServicesCollection } from "/imports/api/service";
 
 export const QueueManagement = () => {
-  const isQueueEntryLoading = useSubscribe("queueEntries");
+  const isQueueEntryLoading = useSubscribe("queue");
   const queueEntries = useFind(() =>
     QueueEntryCollection.find({}, { sort: { serviceId: 1, position: 1 } }),
   );

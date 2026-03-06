@@ -22,6 +22,4 @@ export interface QueueEntry {
   createdAt: Date;
 }
 
-export const QueueEntryCollection = new Mongo.Collection<QueueEntry>(
-  "queueEntry",
-);
+export const QueueEntryCollection = new Mongo.Collection<QueueEntry>("queue");

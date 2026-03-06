@@ -34,7 +34,7 @@ Meteor.publish("patients", function () {
 });
 
 // Publish Queue Entries
-Meteor.publish("queueEntries", function () {
+Meteor.publish("queue", function () {
   return QueueEntryCollection.find();
 });
 

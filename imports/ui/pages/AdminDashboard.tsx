@@ -20,7 +20,7 @@ import { ServicesCollection } from "/imports/api/service";
 export const AdminDashboard = () => {
   const now = useDateTime();
   const isAppointmentsLoading = useSubscribe("appointments");
-  const isQueueEntriesLoading = useSubscribe("queueEntries");
+  const isQueueEntriesLoading = useSubscribe("queue");
   const isServicesLoading = useSubscribe("services");
 
   // Find appointments for the current day
