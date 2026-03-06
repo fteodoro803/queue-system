@@ -3,6 +3,7 @@ import { ServicesCollection } from "/imports/api/service";
 
 export interface ServiceData {
   name: string;
+  shortcode: string;
   cost?: number | null;
   duration: number;
   description: string;
@@ -13,6 +14,7 @@ Meteor.methods({
   "services.insert"(data: ServiceData) {
     return ServicesCollection.insertAsync({
       name: data.name,
+      shortcode: data.shortcode,
       cost: data.cost ?? null,
       duration: data.duration,
       description: data.description,

@@ -36,18 +36,7 @@ Meteor.methods({
       : 1;
 
     // 3. Generate display ID
-    // Get count from Counters Collection
-    const counter = await CountersCollection.findOneAsync({
-      _id: data.service._id,
-    });
-    const nextNum = (counter?.count ?? 0) + 1;
-    await CountersCollection.upsertAsync(
-      { _id: data.service._id },
-      { $set: { count: nextNum } },
-    );
-    const numStr = `${String(nextNum).padStart(3, "0")}`;
-    const serviceStr = `${data.service.name.substring(0, 2).toUpperCase()}`;
-    const displayId = `${serviceStr}-${numStr}`;
+    const displayId = await generateDisplayId(data.service);
 
     return QueueEntryCollection.insertAsync({
       displayId: displayId,
@@ -168,4 +157,31 @@ async function updatePositions(entry: QueueEntry): Promise<void> {
     // 3. all matches
     { multi: true },
   );
+}
+
+// Generate Display ID
+// TODO: fix potential for race condition between upsert and findOne
+// TODO: what if two services have the same initials? (e.g., "General Consultation" and "General Checkup" both being "GE")
+async function generateDisplayId(service: Service): Promise<string> {
+  // 1. Get count from Counters Collection
+  const counter = await CountersCollection.findOneAsync({
+    _id: service._id,
+  });
+  const currentCount = counter?.count ?? 0;
+
+  // 2. Wrap to 1 after 99
+  const nextNum = currentCount >= 99 ? 1 : currentCount + 1;
+
+  // 3. Update count in Counters Collection
+  await CountersCollection.upsertAsync(
+    { _id: service._id },
+    { $set: { count: nextNum } },
+  );
+
+  // 4. Combine initials and count to generate ID (e.g., "AB-12")
+  const numStr = `${String(nextNum).padStart(2, "0")}`;
+  const serviceStr = `${service.shortcode.toUpperCase()}`;
+  const displayId = `${serviceStr}-${numStr}`;
+
+  return displayId;
 }

@@ -3,6 +3,7 @@ import { Mongo } from "meteor/mongo";
 export interface Service {
   _id: string;
   name: string;
+  shortcode: string;
   cost?: number | null;
   duration: number; // duration in minutes
   description: string;
