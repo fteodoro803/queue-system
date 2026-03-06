@@ -44,7 +44,7 @@ export const PatientTable = () => {
         </thead>
         <tbody>
           {patients.map((p) => {
-            const modalId: string = `my_modal_${p._id}}`;
+            const modalId: string = `my_modal_${p._id}`;
             return (
               <tr
                 key={modalId}

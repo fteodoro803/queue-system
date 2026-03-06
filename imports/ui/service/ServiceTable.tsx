@@ -44,7 +44,7 @@ export const ServiceTable = () => {
         </thead>
         <tbody>
           {services.map((s) => {
-            const modalId: string = `my_modal_${s._id}}`;
+            const modalId: string = `my_modal_${s._id}`;
             return (
               <tr
                 key={modalId}
