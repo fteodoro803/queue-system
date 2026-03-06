@@ -8,9 +8,9 @@ export interface QueueEntry {
   patient: Patient;
   serviceId: string;
   service: Service;
-  position?: number;
-  start?: Date;
-  end?: Date;
+  position: number | null;
+  start: Date | null;
+  end: Date | null;
   createdAt: Date;
 }
 

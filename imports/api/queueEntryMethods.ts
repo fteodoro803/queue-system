@@ -11,15 +11,15 @@ export interface QueueEntryData {
 // Client-Called methods
 Meteor.methods({
   // Adds queue entry to the database
-  "queueEntry.insert"(data: QueueEntryData) {
+  async "queueEntry.insert"(data: QueueEntryData) {
     return QueueEntryCollection.insertAsync({
       patientId: data.patient._id,
       patient: data.patient,
       serviceId: data.service._id,
       service: data.service,
-      position: undefined, // Position will be calculated on the server
-      start: undefined, // Start time will be set when the patient is called
-      end: undefined, // End time will be set when the patient is called
+      position: null, // Position will be calculated on the server
+      start: null, // Start time will be set when the patient is called
+      end: null, // End time will be set when the patient is called
       createdAt: new Date(),
     });
   },
@@ -29,3 +29,7 @@ Meteor.methods({
     return QueueEntryCollection.removeAsync(id);
   },
 });
+
+export async function insertQueueEntry(data: QueueEntryData) {
+  return await Meteor.callAsync("queueEntry.insert", data);
+}
