@@ -27,10 +27,19 @@ export const TestPage = () => {
   const [numberFieldValue, setNumberFieldValue] = useState<string>("");
 
   const [date, setDate] = useState<Date | undefined>(now);
-  const step = 2;
+
+  const step = 3;
+  const steps: Record<number, string> = {
+    1: "Step1",
+    2: "Step2",
+    3: "Step3",
+    4: "Step4",
+    5: "Step5",
+  };
 
   const service1: Service = {
     _id: "service1",
+    shortcode: "CON",
     name: "General Consultation",
     description: "A general health consultation with a provider.",
     duration: 30,
@@ -40,6 +49,7 @@ export const TestPage = () => {
 
   const service2: Service = {
     _id: "service2",
+    shortcode: "DEN",
     name: "Dental Cleaning",
     description: "Professional dental cleaning service.",
     duration: 45,
@@ -91,6 +101,7 @@ export const TestPage = () => {
 
   const queueEntry1: QueueEntry = {
     _id: "queueEntry1",
+    displayId: "Q-0001",
     patientId: patient._id,
     patient: patient,
     serviceId: service1._id,
@@ -104,6 +115,7 @@ export const TestPage = () => {
 
   const queueEntry2: QueueEntry = {
     _id: "queueEntry2",
+    displayId: "Q-0002",
     patientId: patient._id,
     patient: patient,
     serviceId: service1._id,
@@ -117,6 +129,7 @@ export const TestPage = () => {
 
   const queueEntry3: QueueEntry = {
     _id: "queueEntry3",
+    displayId: "Q-0003",
     patientId: patient._id,
     patient: patient,
     serviceId: service1._id,
@@ -130,6 +143,7 @@ export const TestPage = () => {
 
   const queueEntry4: QueueEntry = {
     _id: "queueEntry4",
+    displayId: "Q-0004",
     patientId: patient._id,
     patient: patient,
     serviceId: service1._id,
@@ -251,7 +265,7 @@ export const TestPage = () => {
       {/* Steps */}
       <div className="mt-4">
         <p className="text-xl font-semibold">Steps</p>
-        <Steps step={step} />
+        <Steps currentStep={step} steps={steps} />
       </div>
 
       {/* Avatar */}

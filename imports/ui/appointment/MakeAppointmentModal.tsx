@@ -26,6 +26,14 @@ export const MakeAppointmentModal = ({
     changePage("next");
   }, [service, provider, date, patient]);
 
+  const steps: Record<number, string> = {
+    1: "Service",
+    2: "Provider",
+    3: "Date",
+    4: "Patient",
+    5: "Confirm",
+  };
+
   function changePage(change: "next" | "previous") {
     const maxPages: number = 5;
     if (change === "next" && page < maxPages) {
@@ -50,6 +58,7 @@ export const MakeAppointmentModal = ({
           </button>
 
           {/* Navigation Buttons */}
+          {/* TODO: integreate the changePage functionality with the component */}
           <div className="w-full flex justify-center py-3">
             <div className="join">
               <button
@@ -58,7 +67,7 @@ export const MakeAppointmentModal = ({
               >
                 <ChevronLeftIcon className="size-6" />
               </button>
-              <Steps step={page} />
+              <Steps currentStep={page} steps={steps} />
               <button
                 className="join-item btn btn-ghost btn-circle"
                 onClick={() => changePage("next")}
