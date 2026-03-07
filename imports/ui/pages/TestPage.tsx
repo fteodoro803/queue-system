@@ -18,6 +18,7 @@ import { QueueEntry } from "/imports/api/queueEntry";
 import { QueueListItem } from "../queue/QueueListItem";
 import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
 import { AppointmentList } from "../appointment/AppointmentList";
+import { QueueListItemPatient } from "../queue/QueueListItemPatient";
 
 export const TestPage = () => {
   const now = useDateTime(); // context date and time
@@ -101,7 +102,7 @@ export const TestPage = () => {
 
   const queueEntry1: QueueEntry = {
     _id: "queueEntry1",
-    displayId: "Q-0001",
+    displayId: "QU-01",
     patientId: patient._id,
     patient: patient,
     serviceId: service1._id,
@@ -115,7 +116,7 @@ export const TestPage = () => {
 
   const queueEntry2: QueueEntry = {
     _id: "queueEntry2",
-    displayId: "Q-0002",
+    displayId: "QU-02",
     patientId: patient._id,
     patient: patient,
     serviceId: service1._id,
@@ -129,7 +130,7 @@ export const TestPage = () => {
 
   const queueEntry3: QueueEntry = {
     _id: "queueEntry3",
-    displayId: "Q-0003",
+    displayId: "QU-03",
     patientId: patient._id,
     patient: patient,
     serviceId: service1._id,
@@ -143,7 +144,7 @@ export const TestPage = () => {
 
   const queueEntry4: QueueEntry = {
     _id: "queueEntry4",
-    displayId: "Q-0004",
+    displayId: "QU-04",
     patientId: patient._id,
     patient: patient,
     serviceId: service1._id,
@@ -297,14 +298,23 @@ export const TestPage = () => {
         <QueueIcon entry={queueEntry1} />
       </div>
 
-      {/* Queue List Item */}
+      {/* Queue List Item (Admin) */}
       <div className="mt-4">
-        <p className="text-xl font-semibold">Queue List Item</p>
+        <p className="text-xl font-semibold">Queue List Item (Admin)</p>
         <ul className="list bg-base-100 rounded-box shadow-md">
           <QueueListItem entry={queueEntry1} />
           <QueueListItem entry={queueEntry2} />
           <QueueListItem entry={queueEntry3} />
           <QueueListItem entry={queueEntry4} />
+        </ul>
+      </div>
+
+      {/* Queue List Item (Patient) */}
+      <div className="mt-4">
+        <p className="text-xl font-semibold">Queue List Item (Patient)</p>
+        <ul className="list bg-base-100 rounded-box shadow-md">
+          <QueueListItemPatient entry={queueEntry1} />
+          <QueueListItemPatient entry={queueEntry2} />
         </ul>
       </div>
     </>

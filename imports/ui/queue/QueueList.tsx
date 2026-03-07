@@ -2,15 +2,17 @@ import React from "react";
 import { QueueEntry } from "/imports/api/queueEntry";
 import { QueueListItem } from "./QueueListItem";
 import { Service } from "/imports/api/service";
+import { QueueListItemPatient } from "./QueueListItemPatient";
 
 export const QueueList = ({
   queue,
   service,
+  adminView,
 }: {
   queue: QueueEntry[];
   service: Service;
+  adminView?: boolean;
 }) => {
-
   return (
     <ul className="list bg-base-100 rounded-box shadow-md">
       {/* Header */}
@@ -23,7 +25,13 @@ export const QueueList = ({
 
       {/* List of Queue Entries */}
       {queue.length > 0 ? (
-        queue.map((entry) => <QueueListItem key={entry._id} entry={entry} />)
+        queue.map((entry) =>
+          adminView ? (
+            <QueueListItem key={entry._id} entry={entry} />
+          ) : (
+            <QueueListItemPatient key={entry._id} entry={entry} />
+          ),
+        )
       ) : (
         <li className="p-4 text-center text-sm opacity-60">
           No entries in queue
