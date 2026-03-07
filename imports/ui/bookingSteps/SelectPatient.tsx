@@ -1,5 +1,5 @@
 import React from "react";
-import { Loading } from "../../components/Loading";
+import { Loading } from "../components/Loading";
 import { useSubscribe, useTracker } from "meteor/react-meteor-data";
 import { Patient, PatientsCollection } from "/imports/api/patient";
 

@@ -1,8 +1,8 @@
 import { useSubscribe, useTracker } from "meteor/react-meteor-data";
 import React, { useEffect, useState } from "react";
 import { Provider, ProviderCollection } from "/imports/api/provider";
-import { Loading } from "../../components/Loading";
-import { Avatar } from "../../components/Avatar";
+import { Loading } from "../components/Loading";
+import { Avatar } from "../components/Avatar";
 import { Service } from "/imports/api/service";
 import { getEarliestAppointment } from "/imports/api/appointmentMethods";
 
