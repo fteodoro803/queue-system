@@ -313,7 +313,7 @@ export const TestPage = () => {
       <div className="mt-4">
         <p className="text-xl font-semibold">Queue List Item (Patient)</p>
         <ul className="list bg-base-100 rounded-box shadow-md">
-          <QueueListItemPatient entry={queueEntry1} />
+          <QueueListItemPatient entry={queueEntry1} serviceDuration={30} />
           <QueueListItemPatient entry={queueEntry2} />
         </ul>
       </div>

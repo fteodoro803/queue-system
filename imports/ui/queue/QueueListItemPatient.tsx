@@ -7,7 +7,13 @@ import {
 import { QueueIcon } from "../components/QueueIcon";
 import { formatDateToLocale } from "/imports/utils/utils";
 
-export const QueueListItemPatient = ({ entry }: { entry: QueueEntry }) => {
+export const QueueListItemPatient = ({
+  entry,
+  serviceDuration,
+}: {
+  entry: QueueEntry;
+  serviceDuration?: number;
+}) => {
   const iconSize: string = "size-6";
   const textSize: string = "text-sm";
 
@@ -35,6 +41,14 @@ export const QueueListItemPatient = ({ entry }: { entry: QueueEntry }) => {
             <ClipboardDocumentListIcon className={iconSize} />
             <p className={textSize}>{entry.service.name ?? "N/A"}</p>
           </div>
+
+          {/* Estimated Time Until */}
+          {entry.status === "waiting" && serviceDuration !== undefined && (
+            <div className="flex items-center gap-1">
+              <ClockIcon className={iconSize} />
+              <p className={textSize}>{`est. ${serviceDuration} min`}</p>
+            </div>
+          )}
 
           {/* Started */}
           {entry.start && !entry.end && (
