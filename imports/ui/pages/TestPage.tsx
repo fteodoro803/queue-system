@@ -15,7 +15,7 @@ import { HomeIcon } from "@heroicons/react/24/outline";
 import { useDateTime } from "../../contexts/DateTimeContext";
 import { QueueIcon } from "../components/QueueIcon";
 import { QueueEntry } from "/imports/api/queueEntry";
-import { QueueListItem } from "../queue/QueueListItem";
+import { QueueListItemAdmin } from "../queue/QueueListItemAdmin";
 import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
 import { AppointmentList } from "../appointment/AppointmentList";
 import { QueueListItemPatient } from "../queue/QueueListItemPatient";
@@ -302,10 +302,10 @@ export const TestPage = () => {
       <div className="mt-4">
         <p className="text-xl font-semibold">Queue List Item (Admin)</p>
         <ul className="list bg-base-100 rounded-box shadow-md">
-          <QueueListItem entry={queueEntry1} />
-          <QueueListItem entry={queueEntry2} />
-          <QueueListItem entry={queueEntry3} />
-          <QueueListItem entry={queueEntry4} />
+          <QueueListItemAdmin entry={queueEntry1} />
+          <QueueListItemAdmin entry={queueEntry2} />
+          <QueueListItemAdmin entry={queueEntry3} />
+          <QueueListItemAdmin entry={queueEntry4} />
         </ul>
       </div>
 

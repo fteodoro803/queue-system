@@ -17,7 +17,7 @@ import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { QueueIcon } from "../components/QueueIcon";
 import { formatDateToLocale } from "/imports/utils/utils";
 
-export const QueueListItem = ({ entry }: { entry: QueueEntry }) => {
+export const QueueListItemAdmin = ({ entry }: { entry: QueueEntry }) => {
   const now = useDateTime();
   const iconSize: string = "size-6";
   const textSize: string = "text-sm";

@@ -1,6 +1,6 @@
 import React from "react";
 import { QueueEntry } from "/imports/api/queueEntry";
-import { QueueListItem } from "./QueueListItem";
+import { QueueListItemAdmin } from "./QueueListItemAdmin";
 import { Service } from "/imports/api/service";
 import { QueueListItemPatient } from "./QueueListItemPatient";
 
@@ -27,7 +27,7 @@ export const QueueList = ({
       {queue.length > 0 ? (
         queue.map((entry) =>
           adminView ? (
-            <QueueListItem key={entry._id} entry={entry} />
+            <QueueListItemAdmin key={entry._id} entry={entry} />
           ) : (
             <QueueListItemPatient key={entry._id} entry={entry} />
           ),
