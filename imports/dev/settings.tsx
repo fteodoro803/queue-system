@@ -13,7 +13,7 @@ const time: string = "09:00";
 export const TEST_DATE = TEST_SETTINGS.USE_TEST_DATE
   ? new Date(year, month - 1, day, ...convertStrToHrs(time))
   : null;
-export const TIME_MULTIPLIER = TEST_SETTINGS.USE_TIME_MULTIPLIER ? 60 : 1; // 1 real second = 1 simulated minute
+export const TIME_MULTIPLIER = TEST_SETTINGS.USE_TIME_MULTIPLIER ? 60 : 1; // 1 real second = 30 seconds
 
 // Start and End of Working Day
 // TODO: convert these to Date objects

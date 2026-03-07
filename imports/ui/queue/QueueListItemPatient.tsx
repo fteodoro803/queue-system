@@ -5,7 +5,8 @@ import {
   ClockIcon,
 } from "@heroicons/react/24/outline";
 import { QueueIcon } from "../components/QueueIcon";
-import { formatDateToLocale } from "/imports/utils/utils";
+import { addMinutes, formatDateToLocale } from "/imports/utils/utils";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
 
 export const QueueListItemPatient = ({
   entry,
@@ -16,6 +17,14 @@ export const QueueListItemPatient = ({
 }) => {
   const iconSize: string = "size-6";
   const textSize: string = "text-sm";
+  const now = useDateTime();
+  const timeUntil: number | undefined =
+    serviceDuration !== undefined
+      ? entry.position * (addMinutes(entry.createdAt, serviceDuration).getTime() - now.getTime())
+      : undefined;
+
+  const timeUntilDisplay =
+    timeUntil !== undefined ? Math.ceil(timeUntil / 60000) : undefined;
 
   const statusBadgeMap: Record<string, string> = {
     waiting: "badge-info",
@@ -43,10 +52,10 @@ export const QueueListItemPatient = ({
           </div>
 
           {/* Estimated Time Until */}
-          {entry.status === "waiting" && serviceDuration !== undefined && (
+          {entry.status === "waiting" && timeUntil && (
             <div className="flex items-center gap-1">
               <ClockIcon className={iconSize} />
-              <p className={textSize}>{`est. ${serviceDuration} min`}</p>
+              <p className={textSize}>{`est. ${timeUntilDisplay} min`}</p>
             </div>
           )}
 

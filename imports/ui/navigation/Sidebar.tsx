@@ -58,7 +58,7 @@ export const Sidebar = () => {
           <ul className="menu bg-base-100 min-h-full w-80 p-4">
             {/* Date and Time */}
             <div className="flex justify-center">
-              <p className="text-sm">{`${now.toLocaleDateString()} ${formatDateToLocale(now)}`}</p>
+              <p className="text-sm">{`${now.toLocaleDateString()} ${formatDateToLocale(now, true)}`}</p>
             </div>
 
             <NavLinkItem link="/" label="Home" icon={HomeIcon} />

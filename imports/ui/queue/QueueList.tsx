@@ -15,7 +15,7 @@ export const QueueList = ({
 }) => {
   // Get current time for calculating waiting times, etc.
   // TODO: account for if there are two or more available providers
-  const avgServiceDuration: number = service.avgDuration ?? service.duration; // Fallback to service duration if avgDuration is not provided
+  const avgServiceDuration: number = Math.ceil(service.avgDuration ?? service.duration); // Fallback to service duration if avgDuration is not provided
 
   return (
     <ul className="list bg-base-100 rounded-box shadow-md">

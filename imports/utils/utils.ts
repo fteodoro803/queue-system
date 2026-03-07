@@ -52,11 +52,12 @@ export function timeStrToLocaleTime(timeStr: string): string {
 }
 
 // Time format (like "02:30 PM")
-export function formatDateToLocale(date: Date): string {
+export function formatDateToLocale(date: Date, seconds?: boolean): string {
   return date.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
+    ...(seconds ? { second: "2-digit" } : {}),
   });
 }
 
@@ -66,3 +67,8 @@ export function addMonths(date: Date, months: number): Date {
   newDate.setMonth(newDate.getMonth() + months);
   return newDate;
 }
+
+// Adds minutes to a date
+export const addMinutes = (date: Date, minutes: number): Date => {
+  return new Date(date.getTime() + minutes * 60000);
+};
