@@ -5,7 +5,7 @@ import { Service } from "/imports/api/service";
 import { Provider } from "/imports/api/provider";
 import { SelectProvider } from "../bookingSteps/SelectProvider";
 import { SelectDateTime } from "../bookingSteps/SelectDateTime";
-import { Confirmation } from "../bookingSteps/Confirmation";
+import { AppointmentConfirmation } from "../bookingSteps/AppointmentConfirmation";
 import { MODAL_SIZES } from "/imports/utils/modalSizes";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { SelectPatient } from "../bookingSteps/SelectPatient";
@@ -79,10 +79,12 @@ export const MakeAppointmentModal = ({
 
           {/* Select Service */}
           {page === 1 && <SelectService setService={setService} />}
+
           {/* Select Provider */}
           {page === 2 && (
             <SelectProvider setProvider={setProvider} service={service} />
           )}
+
           {/* Select Date and Time */}
           {page === 3 && (
             <SelectDateTime
@@ -93,9 +95,10 @@ export const MakeAppointmentModal = ({
           )}
           {/* Select Patient */}
           {page === 4 && <SelectPatient setPatient={setPatient} />}
+
           {/* Confirmation */}
           {page === 5 && (
-            <Confirmation
+            <AppointmentConfirmation
               service={service}
               provider={provider}
               date={date}
@@ -103,10 +106,6 @@ export const MakeAppointmentModal = ({
               setOpen={setOpen}
             />
           )}
-
-          {/* <p>Service: {service?.name}</p>
-        <p>Provider: {provider?.name}</p>
-        <p>Date: {date?.getDate()}</p> */}
         </div>
       }
 

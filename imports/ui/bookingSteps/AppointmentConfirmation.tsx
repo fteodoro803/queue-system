@@ -4,7 +4,7 @@ import { Provider } from "/imports/api/provider";
 import { insertAppointment } from "/imports/api/appointmentMethods";
 import { Patient } from "/imports/api/patient";
 
-export const Confirmation = ({
+export const AppointmentConfirmation = ({
   patient,
   service,
   provider,
