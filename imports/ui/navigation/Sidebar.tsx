@@ -19,6 +19,7 @@ export const Sidebar = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const isAdmin = location.pathname.startsWith("/admin");
+  const isPatient = location.pathname.startsWith("/patient");
   const now = useDateTime();
 
   // Home Screen - don't show dashboard
@@ -110,6 +111,16 @@ export const Sidebar = () => {
             )}
 
             {/*Patient Sidebars*/}
+            {isPatient && (
+              <>
+                {/*Join Queue Button*/}
+                <NavLinkItem
+                  link="/patient/joinQueue"
+                  label="Join Queue"
+                  icon={NumberedListIcon}
+                />
+              </>
+            )}
 
             {/* Theme Controller */}
             <ThemeController />
