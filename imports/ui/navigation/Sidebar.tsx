@@ -115,8 +115,8 @@ export const Sidebar = () => {
               <>
                 {/*Join Queue Button*/}
                 <NavLinkItem
-                  link="/patient/joinQueue"
-                  label="Join Queue"
+                  link="/patient/queue"
+                  label="Queue"
                   icon={NumberedListIcon}
                 />
               </>

@@ -9,7 +9,7 @@ import { AppointmentManagement } from "./pages/AppointmentManagement";
 import { TestPage } from "./pages/TestPage";
 import { DateTimeProvider } from "../contexts/DateTimeContext";
 import { QueueManagement } from "./pages/QueueManagement";
-import { JoinQueue } from "./pages/patient/JoinQueue";
+import { Queue } from "./pages/patient/Queue";
 
 export const App = () => (
   <DateTimeProvider>
@@ -34,7 +34,7 @@ export const App = () => (
 
           {/* Patient Routes */}
           <Route path="patient">
-            <Route path="joinQueue" element={<JoinQueue />} />
+            <Route path="Queue" element={<Queue />} />
           </Route>
 
           {/* Service Provider Routes */}
