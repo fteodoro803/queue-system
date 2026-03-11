@@ -3,6 +3,8 @@ import { QueueEntry } from "/imports/api/queueEntry";
 import { QueueListItemAdmin } from "./QueueListItemAdmin";
 import { Service } from "/imports/api/service";
 import { QueueListItemPatient } from "./QueueListItemPatient";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
+import { calculateEstimatedWaitTime } from "/imports/utils/queueUtils";
 
 export const QueueList = ({
   queue,
@@ -13,9 +15,7 @@ export const QueueList = ({
   service: Service;
   adminView?: boolean;
 }) => {
-  // Get current time for calculating waiting times, etc.
-  // TODO: account for if there are two or more available providers
-  const avgServiceDuration: number = Math.ceil(service.avgDuration ?? service.duration); // Fallback to service duration if avgDuration is not provided
+  const now = useDateTime();
 
   return (
     <ul className="list bg-base-100 rounded-box shadow-md">
@@ -31,9 +31,17 @@ export const QueueList = ({
       {queue.length > 0 ? (
         queue.map((entry) =>
           adminView ? (
-            <QueueListItemAdmin key={entry._id} entry={entry} />
+            <QueueListItemAdmin
+              key={entry._id}
+              entry={entry}
+              timeUntil={calculateEstimatedWaitTime(entry, queue, service, now)}
+            />
           ) : (
-            <QueueListItemPatient key={entry._id} entry={entry} serviceDuration={avgServiceDuration} />
+            <QueueListItemPatient
+              key={entry._id}
+              entry={entry}
+              timeUntil={calculateEstimatedWaitTime(entry, queue, service, now)}
+            />
           ),
         )
       ) : (

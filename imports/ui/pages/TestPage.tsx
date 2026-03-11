@@ -108,6 +108,7 @@ export const TestPage = () => {
     serviceId: service1._id,
     service: service1,
     position: 1,
+    readyAt: null,
     status: "waiting",
     start: null,
     end: null,
@@ -122,6 +123,7 @@ export const TestPage = () => {
     serviceId: service1._id,
     service: service1,
     position: 0,
+    readyAt: null,
     status: "in-progress",
     start: getStartOfDay(date ?? new Date()),
     end: null,
@@ -136,6 +138,7 @@ export const TestPage = () => {
     serviceId: service1._id,
     service: service1,
     position: 1,
+    readyAt: null,
     status: "completed",
     start: getStartOfDay(now),
     end: getEndOfDay(now),
@@ -150,6 +153,7 @@ export const TestPage = () => {
     serviceId: service1._id,
     service: service1,
     position: 1,
+    readyAt: null,
     status: "cancelled",
     start: null,
     end: null,
@@ -313,7 +317,7 @@ export const TestPage = () => {
       <div className="mt-4">
         <p className="text-xl font-semibold">Queue List Item (Patient)</p>
         <ul className="list bg-base-100 rounded-box shadow-md">
-          <QueueListItemPatient entry={queueEntry1} serviceDuration={30} />
+          <QueueListItemPatient entry={queueEntry1} />
           <QueueListItemPatient entry={queueEntry2} />
         </ul>
       </div>

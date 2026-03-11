@@ -13,11 +13,17 @@ import {
   ClockIcon,
   IdentificationIcon,
 } from "@heroicons/react/24/outline";
-import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { QueueIcon } from "../components/QueueIcon";
 import { formatDateToLocale } from "/imports/utils/utils";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
 
-export const QueueListItemAdmin = ({ entry }: { entry: QueueEntry }) => {
+export const QueueListItemAdmin = ({
+  entry,
+  timeUntil,
+}: {
+  entry: QueueEntry;
+  timeUntil?: number;
+}) => {
   const now = useDateTime();
   const iconSize: string = "size-6";
   const textSize: string = "text-sm";
@@ -54,6 +60,14 @@ export const QueueListItemAdmin = ({ entry }: { entry: QueueEntry }) => {
             <ClipboardDocumentListIcon className={iconSize} />
             <p className={textSize}>{entry.service.name ?? "N/A"}</p>
           </div>
+
+          {/* Estimated Time Until */}
+          {entry.status === "waiting" && timeUntil && (
+            <div className="flex items-center gap-1">
+              <ClockIcon className={iconSize} />
+              <p className={textSize}>{`est. ${timeUntil} min`}</p>
+            </div>
+          )}
 
           {/* Started */}
           {entry.start && !entry.end && (
