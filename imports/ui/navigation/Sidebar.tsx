@@ -14,6 +14,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { NavLinkItem } from "./NavLinkItem";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { formatDateToLocale } from "/imports/utils/utils";
+import { TEST_SETTINGS } from "/imports/dev/settings";
 
 export const Sidebar = () => {
   const location = useLocation();
@@ -61,7 +62,9 @@ export const Sidebar = () => {
               <p className="text-sm">{`${now.toLocaleDateString()} ${formatDateToLocale(now, true)}`}</p>
             </div>
 
-            <NavLinkItem link="/" label="Home" icon={HomeIcon} />
+            {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+              <NavLinkItem link="/" label="Home" icon={HomeIcon} />
+            )}
 
             {/*Admin Sidebar*/}
             {isAdmin && (
@@ -74,11 +77,13 @@ export const Sidebar = () => {
                 />
 
                 {/*Appointments Button*/}
-                <NavLinkItem
-                  link="/admin/appointmentManagement"
-                  label="Appointments"
-                  icon={CalendarDaysIcon}
-                />
+                {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+                  <NavLinkItem
+                    link="/admin/appointmentManagement"
+                    label="Appointments"
+                    icon={CalendarDaysIcon}
+                  />
+                )}
 
                 {/* Queue Button */}
                 <NavLinkItem
@@ -88,11 +93,13 @@ export const Sidebar = () => {
                 />
 
                 {/*Patients Button*/}
-                <NavLinkItem
-                  link="/admin/patientManagement"
-                  label="Patients"
-                  icon={UserGroupIcon}
-                />
+                {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+                  <NavLinkItem
+                    link="/admin/patientManagement"
+                    label="Patients"
+                    icon={UserGroupIcon}
+                  />
+                )}
 
                 {/*Services Button*/}
                 <NavLinkItem
@@ -102,11 +109,13 @@ export const Sidebar = () => {
                 />
 
                 {/* Test Page Button */}
-                <NavLinkItem
-                  link="/admin/test"
-                  label="Test Page"
-                  icon={BugAntIcon}
-                />
+                {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+                  <NavLinkItem
+                    link="/admin/test"
+                    label="Test Page"
+                    icon={BugAntIcon}
+                  />
+                )}
 
                 <NavLinkItem
                   link="/admin/settings"
@@ -127,7 +136,6 @@ export const Sidebar = () => {
                 />
               </>
             )}
-
           </ul>
         </div>
       </div>
