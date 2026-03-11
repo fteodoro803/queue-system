@@ -7,6 +7,7 @@ import { Provider } from "../../api/provider";
 import { updateProvider } from "../../api/providerMethods";
 import { ProviderServicesTable } from "./ProviderServicesTable";
 import { ModalButtons } from "../components/ModalButtons";
+import { UserCircleIcon } from "@heroicons/react/24/outline";
 
 export const ProviderDetailsModal = ({
   provider,
@@ -64,7 +65,114 @@ export const ProviderDetailsModal = ({
   // Closed
   if (!open) return null;
 
-  // Open
+  return (
+    <div className="modal modal-open" role="dialog">
+      <div className="modal-box relative p-0 overflow-hidden max-w-lg">
+        {/* Header */}
+        <div className="px-6 py-5 bg-base-200 flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-primary/10 text-primary">
+            <UserCircleIcon className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="font-bold text-lg leading-none">
+              {name || "Provider Details"}
+            </h3>
+            <p className="text-sm text-base-content/50 mt-0.5">
+              Edit provider information
+            </p>
+          </div>
+          <button
+            className="btn btn-circle btn-ghost btn-sm absolute top-3 right-3"
+            onClick={() => {
+              handleCancel();
+              setOpen(false);
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-5 flex flex-col gap-4">
+          {/* Avatar */}
+          <div className="flex justify-center py-1">
+            <Avatar profile={provider} />
+          </div>
+
+          {/* Name */}
+          <div>
+            <label className="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-1 block">
+              Name
+            </label>
+            <NameField
+              value={name}
+              onChange={setName}
+              additionalAttributes="input input-bordered w-full bg-base-100"
+              placeholder="N/A"
+              mode="editable"
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-1 block">
+              Email
+            </label>
+            <EmailField
+              value={email}
+              onChange={setEmail}
+              additionalAttributes="input-bordered bg-base-100"
+              placeholder="N/A"
+              mode="editable"
+            />
+          </div>
+
+          {/* Number */}
+          <div>
+            <label className="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-1 block">
+              Phone Number
+            </label>
+            <NumberField
+              value={number}
+              onChange={setNumber}
+              additionalAttributes="input-bordered bg-base-100"
+              placeholder="N/A"
+              mode="editable"
+            />
+          </div>
+
+          {/* Services Table */}
+          <div>
+            <label className="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2 block">
+              Services
+            </label>
+            <div className="rounded-lg overflow-hidden ring-1 ring-base-300">
+              <ProviderServicesTable provider={provider} />
+            </div>
+          </div>
+
+          <div className="pt-1">
+            <ModalButtons
+              setOpen={setOpen}
+              hasChanges={hasChanges}
+              handleSave={handleSave}
+              handleCancel={handleCancel}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="modal-backdrop"
+        onClick={() => {
+          handleCancel();
+          setOpen(false);
+        }}
+      />
+    </div>
+  );
+
+  // Open OLD
   return (
     <div className="modal modal-open" role={"dialog"}>
       <div className="modal-box">
