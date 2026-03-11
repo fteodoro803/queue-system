@@ -8,9 +8,9 @@ import {
   WrenchScrewdriverIcon,
   BugAntIcon,
   NumberedListIcon,
+  Cog6ToothIcon,
 } from "@heroicons/react/24/solid";
 import { Outlet, useLocation } from "react-router-dom";
-import { ThemeController } from "../components/ThemeController";
 import { NavLinkItem } from "./NavLinkItem";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { formatDateToLocale } from "/imports/utils/utils";
@@ -107,6 +107,12 @@ export const Sidebar = () => {
                   label="Test Page"
                   icon={BugAntIcon}
                 />
+
+                <NavLinkItem
+                  link="/admin/settings"
+                  label="Settings"
+                  icon={Cog6ToothIcon}
+                />
               </>
             )}
 
@@ -122,8 +128,6 @@ export const Sidebar = () => {
               </>
             )}
 
-            {/* Theme Controller */}
-            <ThemeController />
           </ul>
         </div>
       </div>

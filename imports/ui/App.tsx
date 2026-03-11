@@ -10,6 +10,7 @@ import { TestPage } from "./pages/TestPage";
 import { DateTimeProvider } from "../contexts/DateTimeContext";
 import { QueueManagement } from "./pages/QueueManagement";
 import { Queue } from "./pages/patient/Queue";
+import { Settings } from "./pages/Settings";
 
 export const App = () => (
   <DateTimeProvider>
@@ -30,11 +31,12 @@ export const App = () => (
             />
             <Route path="queueManagement" element={<QueueManagement />} />
             <Route path="test" element={<TestPage />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           {/* Patient Routes */}
           <Route path="patient">
-            <Route path="Queue" element={<Queue />} />
+            <Route path="queue" element={<Queue />} />
           </Route>
 
           {/* Service Provider Routes */}
