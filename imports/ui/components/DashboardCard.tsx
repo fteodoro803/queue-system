@@ -5,6 +5,7 @@ interface DashboardCardProps {
   body: ReactNode;
   footer?: ReactNode;
   icon: ComponentType<{ className?: string }>;
+  onClick?: () => void;
 }
 
 export const DashboardCard = ({
@@ -12,9 +13,13 @@ export const DashboardCard = ({
   body,
   footer,
   icon: Icon,
+  onClick,
 }: DashboardCardProps) => {
   return (
-    <div className="card w-3xs h-35 p-6 rounded-xl border shadow-lg hover:-translate-y-1 transition-transform duration-200">
+    <div
+      className="card w-3xs h-35 p-6 rounded-xl border shadow-lg hover:-translate-y-1 transition-transform duration-200"
+      onClick={onClick}
+    >
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-semibold mb-1">{header}</p>

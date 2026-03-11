@@ -28,14 +28,14 @@ export const QueueManagement = () => {
       <div className="flex justify-between">
         <h1 className="text-3xl font-bold">Queue Management</h1>
         <div className="flex gap-1">
-          <button
+          {/* <button
             className="btn btn-primary"
             onClick={async () => {
               await resetCounter();
             }}
           >
             - Clear Counter
-          </button>
+          </button> */}
           <button
             className="btn btn-primary"
             onClick={() => setQueueEntryModalOpen(true)}
