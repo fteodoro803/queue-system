@@ -27,6 +27,7 @@ export const QueueListItemAdmin = ({
   const now = useDateTime();
   const iconSize: string = "size-6";
   const textSize: string = "text-sm";
+  const isHighPriority = entry.service.priority > 1 ? true : false;
 
   const statusBadgeMap: Record<string, string> = {
     waiting: "badge-info",
@@ -58,14 +59,20 @@ export const QueueListItemAdmin = ({
           {/* Service */}
           <div className="flex items-center gap-1">
             <ClipboardDocumentListIcon className={iconSize} />
-            <p className={textSize}>{entry.service.name ?? "N/A"}</p>
+            <p
+              className={`${textSize} ${isHighPriority ? "text-error animate-pulse" : ""}`}
+            >
+              {entry.service.name ?? "N/A"}
+            </p>
           </div>
 
           {/* Estimated Time Until */}
-          {entry.status === "waiting" && timeUntil && (
+          {entry.status === "waiting" && timeUntil != undefined && (
             <div className="flex items-center gap-1">
               <ClockIcon className={iconSize} />
-              <p className={textSize}>{`est. ${timeUntil} min`}</p>
+              <p className={textSize}>
+                {timeUntil > 0 ? `est. ${timeUntil} min` : "delayed"}
+              </p>
             </div>
           )}
 

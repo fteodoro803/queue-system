@@ -43,10 +43,12 @@ export const QueueListItemPatient = ({
           </div>
 
           {/* Estimated Time Until */}
-          {entry.status === "waiting" && timeUntil && (
+          {entry.status === "waiting" && timeUntil != undefined && (
             <div className="flex items-center gap-1">
               <ClockIcon className={iconSize} />
-              <p className={textSize}>{`est. ${timeUntil} min`}</p>
+              <p className={textSize}>
+                {timeUntil > 0 ? `est. ${timeUntil} min` : "delayed"}
+              </p>
             </div>
           )}
 
