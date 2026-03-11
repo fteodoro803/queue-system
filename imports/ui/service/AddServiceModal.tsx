@@ -11,6 +11,7 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
   const [shortcode, setShortcode] = useState("");
   const [duration, setDuration] = useState("");
   const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState(1);
   const [cost, setCost] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,6 +32,7 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
       cost: costNum,
       duration: durationNum,
       description,
+      priority: priority,
     });
 
     // Clear fields and close modal
@@ -40,6 +42,7 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
     setCost("");
     setDescription("");
     setOpen(false);
+    setPriority(0);
   };
 
   if (!open) {
@@ -117,6 +120,19 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+
+            {/* Priority Field */}
+            <label className="label">Priority *</label>
+            <select
+              defaultValue="Pick a color"
+              className="select"
+              onChange={(e) => setPriority(Number(e.target.value))}
+            >
+              <option disabled={true}>Higher number is higher priority</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+            </select>
 
             {/* Add Button */}
             <button type="submit" className="btn btn-primary">

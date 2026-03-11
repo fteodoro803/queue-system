@@ -7,6 +7,7 @@ export interface ServiceData {
   cost?: number | null;
   duration: number;
   description: string;
+  priority: number; //
 }
 
 Meteor.methods({
@@ -18,6 +19,7 @@ Meteor.methods({
       cost: data.cost ?? null,
       duration: data.duration,
       description: data.description,
+      priority: data.priority ?? 1, // default priority
       createdAt: new Date(),
     });
   },

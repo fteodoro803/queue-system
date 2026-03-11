@@ -2,6 +2,7 @@ import React from "react";
 import { useTracker, useSubscribe } from "meteor/react-meteor-data";
 import { Service, ServicesCollection } from "/imports/api/service";
 import { Loading } from "/imports/ui/components/Loading";
+import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
 export const SelectService = ({
   setService,
@@ -35,6 +36,12 @@ export const SelectService = ({
               <div>{s.name}</div>
               <div className="text-xs uppercase font-semibold opacity-60">
                 {s.description}
+                {s.priority > 1 && (
+                  <span className="inline-flex items-center gap-1 text-error ml-2">
+                    <ExclamationCircleIcon className="w-3 h-3" />
+                    <span>High priority</span>
+                  </span>
+                )}
               </div>
             </div>
             <p>from ₱{s.cost}</p>

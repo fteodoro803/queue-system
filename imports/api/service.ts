@@ -7,6 +7,7 @@ export interface Service {
   cost?: number | null;
   duration: number; // duration in minutes
   description: string;
+  priority: number; // Higher number means higher priority
 
   // Analytics fields
   count?: number | null;
