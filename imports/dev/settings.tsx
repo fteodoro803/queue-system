@@ -2,7 +2,7 @@ import { convertStrToHrs } from "../utils/utils";
 
 // Test Settings (all should be false in production)
 export const TEST_SETTINGS = {
-  ENABLE_TEST_PAGES: true,
+  ENABLE_TEST_PAGES: false,
   USE_TEST_DATE: true,
   FREEZE_TIME: true, // if true, clock won't update time
   USE_TIME_MULTIPLIER: false, // if true, time will pass faster than real time (for testing long appointments), only works when USE_TEST_DATE is true
