@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Steps } from "../components/Steps";
-import { SelectService } from "./makeAppointment/SelectService";
+import { SelectService } from "../bookingSteps/SelectService";
 import { Service } from "/imports/api/service";
 import { Provider } from "/imports/api/provider";
-import { SelectProvider } from "./makeAppointment/SelectProvider";
-import { SelectDateTime } from "./makeAppointment/SelectDateTime";
-import { Confirmation } from "./makeAppointment/Confirmation";
+import { SelectProvider } from "../bookingSteps/SelectProvider";
+import { SelectDateTime } from "../bookingSteps/SelectDateTime";
+import { AppointmentConfirmation } from "../bookingSteps/AppointmentConfirmation";
 import { MODAL_SIZES } from "/imports/utils/modalSizes";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { SelectPatient } from "./makeAppointment/SelectPatient";
+import { SelectPatient } from "../bookingSteps/SelectPatient";
 import { Patient } from "/imports/api/patient";
 
 export const MakeAppointmentModal = ({
@@ -25,6 +25,14 @@ export const MakeAppointmentModal = ({
   useEffect(() => {
     changePage("next");
   }, [service, provider, date, patient]);
+
+  const steps: Record<number, string> = {
+    1: "Service",
+    2: "Provider",
+    3: "Date",
+    4: "Patient",
+    5: "Confirm",
+  };
 
   function changePage(change: "next" | "previous") {
     const maxPages: number = 5;
@@ -50,6 +58,7 @@ export const MakeAppointmentModal = ({
           </button>
 
           {/* Navigation Buttons */}
+          {/* TODO: integreate the changePage functionality with the component */}
           <div className="w-full flex justify-center py-3">
             <div className="join">
               <button
@@ -58,7 +67,7 @@ export const MakeAppointmentModal = ({
               >
                 <ChevronLeftIcon className="size-6" />
               </button>
-              <Steps step={page} />
+              <Steps currentStep={page} steps={steps} />
               <button
                 className="join-item btn btn-ghost btn-circle"
                 onClick={() => changePage("next")}
@@ -70,10 +79,12 @@ export const MakeAppointmentModal = ({
 
           {/* Select Service */}
           {page === 1 && <SelectService setService={setService} />}
+
           {/* Select Provider */}
           {page === 2 && (
             <SelectProvider setProvider={setProvider} service={service} />
           )}
+
           {/* Select Date and Time */}
           {page === 3 && (
             <SelectDateTime
@@ -84,9 +95,10 @@ export const MakeAppointmentModal = ({
           )}
           {/* Select Patient */}
           {page === 4 && <SelectPatient setPatient={setPatient} />}
+
           {/* Confirmation */}
           {page === 5 && (
-            <Confirmation
+            <AppointmentConfirmation
               service={service}
               provider={provider}
               date={date}
@@ -94,10 +106,6 @@ export const MakeAppointmentModal = ({
               setOpen={setOpen}
             />
           )}
-
-          {/* <p>Service: {service?.name}</p>
-        <p>Provider: {provider?.name}</p>
-        <p>Date: {date?.getDate()}</p> */}
         </div>
       }
 

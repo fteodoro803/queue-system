@@ -18,6 +18,7 @@ export interface QueueEntry {
   service: Service;
   position: number | null;
   status: (typeof QUEUE_STATES)[number];
+  readyAt: Date | null;
   start: Date | null;
   end: Date | null;
   createdAt: Date;

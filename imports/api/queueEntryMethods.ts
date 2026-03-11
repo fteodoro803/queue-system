@@ -46,6 +46,7 @@ Meteor.methods({
       service: data.service,
       position: newPosition,
       status: "waiting",
+      readyAt: null,
       start: null, // Start time will be set once the service is started
       end: null, // End time will be set after the service is completed
       createdAt: time,
@@ -77,7 +78,7 @@ Meteor.methods({
     });
 
     // 2. Update positions of entries behind the dequeued entry
-    await updatePositions(entry);
+    await updatePositions(entry, time);
 
     // 3. Update Service Analytics if completed
     if (reason === "completed" && entry.start) {
@@ -112,7 +113,7 @@ Meteor.methods({
     });
 
     // 2. Update positions of entries behind the dequeued entry
-    await updatePositions(entry);
+    await updatePositions(entry, time);
   },
 });
 
@@ -140,7 +141,7 @@ export async function cancelService(id: string, time: Date): Promise<void> {
 }
 
 // Updates positions of next queue entries for a service
-async function updatePositions(entry: QueueEntry): Promise<void> {
+async function updatePositions(entry: QueueEntry, time: Date): Promise<void> {
   // If the entry is not in the queue, no need to update positions
   if (entry.position === null || entry.position <= 0) return;
 
@@ -157,6 +158,17 @@ async function updatePositions(entry: QueueEntry): Promise<void> {
     // 3. all matches
     { multi: true },
   );
+
+  // 2. Find whoever just moved to position 1
+  const newPositionOne = await QueueEntryCollection.findOneAsync({
+    serviceId: entry.serviceId,
+    position: 1,
+  });
+
+  // 3. Mark them as ready
+  if (newPositionOne) {
+    await markAsReady(newPositionOne._id, time);
+  }
 }
 
 // Generate Display ID
@@ -184,4 +196,13 @@ async function generateDisplayId(service: Service): Promise<string> {
   const displayId = `${serviceStr}-${numStr}`;
 
   return displayId;
+}
+
+// Marks a queue entry as ready (used for timing)
+async function markAsReady(id: string, time: Date): Promise<void> {
+  await QueueEntryCollection.updateAsync(id, {
+    $set: {
+      readyAt: time,
+    },
+  });
 }

@@ -15,9 +15,10 @@ import { HomeIcon } from "@heroicons/react/24/outline";
 import { useDateTime } from "../../contexts/DateTimeContext";
 import { QueueIcon } from "../components/QueueIcon";
 import { QueueEntry } from "/imports/api/queueEntry";
-import { QueueListItem } from "../queue/QueueListItem";
+import { QueueListItemAdmin } from "../queue/QueueListItemAdmin";
 import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
 import { AppointmentList } from "../appointment/AppointmentList";
+import { QueueListItemPatient } from "../queue/QueueListItemPatient";
 
 export const TestPage = () => {
   const now = useDateTime(); // context date and time
@@ -27,10 +28,19 @@ export const TestPage = () => {
   const [numberFieldValue, setNumberFieldValue] = useState<string>("");
 
   const [date, setDate] = useState<Date | undefined>(now);
-  const step = 2;
+
+  const step = 3;
+  const steps: Record<number, string> = {
+    1: "Step1",
+    2: "Step2",
+    3: "Step3",
+    4: "Step4",
+    5: "Step5",
+  };
 
   const service1: Service = {
     _id: "service1",
+    shortcode: "CON",
     name: "General Consultation",
     description: "A general health consultation with a provider.",
     duration: 30,
@@ -40,6 +50,7 @@ export const TestPage = () => {
 
   const service2: Service = {
     _id: "service2",
+    shortcode: "DEN",
     name: "Dental Cleaning",
     description: "Professional dental cleaning service.",
     duration: 45,
@@ -91,11 +102,13 @@ export const TestPage = () => {
 
   const queueEntry1: QueueEntry = {
     _id: "queueEntry1",
+    displayId: "QU-01",
     patientId: patient._id,
     patient: patient,
     serviceId: service1._id,
     service: service1,
     position: 1,
+    readyAt: null,
     status: "waiting",
     start: null,
     end: null,
@@ -104,11 +117,13 @@ export const TestPage = () => {
 
   const queueEntry2: QueueEntry = {
     _id: "queueEntry2",
+    displayId: "QU-02",
     patientId: patient._id,
     patient: patient,
     serviceId: service1._id,
     service: service1,
     position: 0,
+    readyAt: null,
     status: "in-progress",
     start: getStartOfDay(date ?? new Date()),
     end: null,
@@ -117,11 +132,13 @@ export const TestPage = () => {
 
   const queueEntry3: QueueEntry = {
     _id: "queueEntry3",
+    displayId: "QU-03",
     patientId: patient._id,
     patient: patient,
     serviceId: service1._id,
     service: service1,
     position: 1,
+    readyAt: null,
     status: "completed",
     start: getStartOfDay(now),
     end: getEndOfDay(now),
@@ -130,11 +147,13 @@ export const TestPage = () => {
 
   const queueEntry4: QueueEntry = {
     _id: "queueEntry4",
+    displayId: "QU-04",
     patientId: patient._id,
     patient: patient,
     serviceId: service1._id,
     service: service1,
     position: 1,
+    readyAt: null,
     status: "cancelled",
     start: null,
     end: null,
@@ -251,7 +270,7 @@ export const TestPage = () => {
       {/* Steps */}
       <div className="mt-4">
         <p className="text-xl font-semibold">Steps</p>
-        <Steps step={step} />
+        <Steps currentStep={step} steps={steps} />
       </div>
 
       {/* Avatar */}
@@ -283,14 +302,23 @@ export const TestPage = () => {
         <QueueIcon entry={queueEntry1} />
       </div>
 
-      {/* Queue List Item */}
+      {/* Queue List Item (Admin) */}
       <div className="mt-4">
-        <p className="text-xl font-semibold">Queue List Item</p>
+        <p className="text-xl font-semibold">Queue List Item (Admin)</p>
         <ul className="list bg-base-100 rounded-box shadow-md">
-          <QueueListItem entry={queueEntry1} />
-          <QueueListItem entry={queueEntry2} />
-          <QueueListItem entry={queueEntry3} />
-          <QueueListItem entry={queueEntry4} />
+          <QueueListItemAdmin entry={queueEntry1} />
+          <QueueListItemAdmin entry={queueEntry2} />
+          <QueueListItemAdmin entry={queueEntry3} />
+          <QueueListItemAdmin entry={queueEntry4} />
+        </ul>
+      </div>
+
+      {/* Queue List Item (Patient) */}
+      <div className="mt-4">
+        <p className="text-xl font-semibold">Queue List Item (Patient)</p>
+        <ul className="list bg-base-100 rounded-box shadow-md">
+          <QueueListItemPatient entry={queueEntry1} />
+          <QueueListItemPatient entry={queueEntry2} />
         </ul>
       </div>
     </>

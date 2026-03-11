@@ -129,7 +129,11 @@ export const AdminDashboard = () => {
           );
           return (
             <div key={service._id} className="mb-2">
-              <QueueList queue={serviceQueue} service={service} />
+              <QueueList
+                queue={serviceQueue}
+                service={service}
+                adminView={true}
+              />
             </div>
           );
         })}

@@ -19,6 +19,7 @@ export const Sidebar = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const isAdmin = location.pathname.startsWith("/admin");
+  const isPatient = location.pathname.startsWith("/patient");
   const now = useDateTime();
 
   // Home Screen - don't show dashboard
@@ -57,7 +58,7 @@ export const Sidebar = () => {
           <ul className="menu bg-base-100 min-h-full w-80 p-4">
             {/* Date and Time */}
             <div className="flex justify-center">
-              <p className="text-sm">{`${now.toLocaleDateString()} ${formatDateToLocale(now)}`}</p>
+              <p className="text-sm">{`${now.toLocaleDateString()} ${formatDateToLocale(now, true)}`}</p>
             </div>
 
             <NavLinkItem link="/" label="Home" icon={HomeIcon} />
@@ -110,6 +111,16 @@ export const Sidebar = () => {
             )}
 
             {/*Patient Sidebars*/}
+            {isPatient && (
+              <>
+                {/*Join Queue Button*/}
+                <NavLinkItem
+                  link="/patient/queue"
+                  label="Queue"
+                  icon={NumberedListIcon}
+                />
+              </>
+            )}
 
             {/* Theme Controller */}
             <ThemeController />

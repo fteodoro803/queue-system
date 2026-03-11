@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Calendar } from "../../components/Calendar";
+import { Calendar } from "../components/Calendar";
 import { Service } from "/imports/api/service";
 import {
   convertStrToHrs,
@@ -46,7 +46,11 @@ export const SelectDateTime = ({
   };
 
   if (!service || !provider)
-    return <p className="text-2xl text-warning">Select a Service and Provider first</p>;
+    return (
+      <p className="text-2xl text-warning">
+        Select a Service and Provider first
+      </p>
+    );
 
   return (
     <div className="flex gap-2">
@@ -76,7 +80,10 @@ export const SelectDateTime = ({
           className="btn"
           onClick={async () => {
             try {
-              const earliest = await findEarliestAppointment(service._id, provider._id);
+              const earliest = await findEarliestAppointment(
+                service._id,
+                provider._id,
+              );
               if (earliest) setCurrDate(earliest);
             } catch (e) {
               console.error("Failed to get earliest appointment:", e);

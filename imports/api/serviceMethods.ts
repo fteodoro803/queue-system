@@ -26,7 +26,7 @@ Meteor.methods({
   "services.clearAnalytics"() {
     return ServicesCollection.updateAsync(
       {},
-      { $set: { count: 0, totalDuration: 0, avgDuration: 0 } },
+      { $set: { count: 0, totalDuration: null, avgDuration: null } },
       { multi: true },
     );
   },
@@ -48,8 +48,10 @@ export async function updateServiceAnalytics(
   const newAverage = newTotal / newCount;
 
   await ServicesCollection.updateAsync(serviceId, {
-    $inc: { count: 1, totalDuration: duration },
-    $set: { avgDuration: newAverage },
+    // $inc: { count: 1, totalDuration: duration },
+    // $set: { avgDuration: newAverage },
+
+    $set: { count: newCount, totalDuration: newTotal, avgDuration: newAverage },
   });
 }
 

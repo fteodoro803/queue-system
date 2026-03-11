@@ -1,37 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MODAL_SIZES } from "/imports/utils/modalSizes";
-import { useFind, useSubscribe } from "meteor/react-meteor-data";
-import { Service, ServicesCollection } from "/imports/api/service";
-import { Patient, PatientsCollection } from "/imports/api/patient";
-import { Loading } from "../components/Loading";
-import { enqueue } from "/imports/api/queueEntryMethods";
-import { useDateTime } from "/imports/contexts/DateTimeContext";
+import { Service } from "/imports/api/service";
+import { Patient } from "/imports/api/patient";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { Steps } from "../components/Steps";
+import { SelectService } from "../bookingSteps/SelectService";
+import { SelectPatient } from "../bookingSteps/SelectPatient";
+import { QueueConfirmation } from "../bookingSteps/QueueConfirmation";
 
 export const MakeQueueEntryModal = ({
   setOpen,
 }: {
   setOpen: (value: boolean) => void;
 }) => {
-  // Subscriptions
-  const isServicesLoading = useSubscribe("services");
-  const isPatientsLoading = useSubscribe("patients");
-  const services = useFind(() => ServicesCollection.find({}));
-  const patients = useFind(() => PatientsCollection.find({}));
-
   // States
-  const now = useDateTime();
   const [patient, setPatient] = useState<Patient | undefined>(undefined);
   const [service, setService] = useState<Service | undefined>(undefined);
+  const [page, setPage] = useState<number>(0);
 
-  // Handlers
-  const handleSubmit = async () => {
-    if (!patient || !service) return;
-    await enqueue({ patient, service }, now);
-    setOpen(false);
+  const steps: Record<number, string> = {
+    1: "Service",
+    2: "Patient",
+    3: "Confirm",
   };
 
-  if (isServicesLoading() || isPatientsLoading()) {
-    return <Loading />;
+  useEffect(() => {
+    changePage("next");
+  }, [service, patient]);
+
+  function changePage(change: "next" | "previous") {
+    const maxPages: number = 3;
+    if (change === "next" && page < maxPages) {
+      setPage(page + 1);
+    }
+
+    if (change === "previous" && page > 1) {
+      setPage(page - 1);
+    }
   }
 
   return (
@@ -46,70 +51,43 @@ export const MakeQueueEntryModal = ({
             X
           </button>
 
+          {/* Navigation Buttons */}
+          {/* TODO: integreate the changePage functionality with the component */}
+          <div className="w-full flex justify-center py-3">
+            <div className="join">
+              <button
+                className="join-item btn btn-ghost btn-circle"
+                onClick={() => changePage("previous")}
+              >
+                <ChevronLeftIcon className="size-6" />
+              </button>
+              <Steps currentStep={page} steps={steps} />
+              <button
+                className="join-item btn btn-ghost btn-circle"
+                onClick={() => changePage("next")}
+              >
+                <ChevronRightIcon className="size-6" />
+              </button>
+            </div>
+          </div>
+
           {/* Modal Content */}
           <div className="flex flex-col py-3 gap-6">
             <h2 className="text-2xl font-bold mb-4">Join Queue</h2>
 
-            {/* Patients List */}
-            <ul className="list bg-base-100 rounded-box shadow-md">
-              <li className="p-4 pb-2 text-xs opacity-60 tracking-wide flex">
-                Patients
-              </li>
-              {patients.map((p) => (
-                <li
-                  className="list-row hover:bg-base-300"
-                  key={p._id}
-                  onClick={() => {
-                    setPatient(p);
-                  }}
-                >
-                  <div></div>
-                  <div>
-                    <div>{p.name}</div>
-                    <div className="text-xs uppercase font-semibold opacity-60">
-                      {p.email ?? "No email"} | {p.number ?? "No number"}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            {/* Select Service */}
+            {page === 1 && <SelectService setService={setService} />}
 
-            {/* Services List */}
-            <ul className="list bg-base-100 rounded-box shadow-md">
-              <li className="p-4 pb-2 text-xs opacity-60 tracking-wide flex">
-                Services
-              </li>
-              {services.map((s) => (
-                <li
-                  className="list-row hover:bg-base-300"
-                  key={s._id}
-                  onClick={() => {
-                    setService(s);
-                  }}
-                >
-                  <div></div>
-                  <div>
-                    <div>{s.name}</div>
-                    <div className="text-xs uppercase font-semibold opacity-60">
-                      {s.description}
-                    </div>
-                  </div>
-                  <p>from ₱{s.cost}</p>
-                  <p>{s.duration} minutes</p>
-                </li>
-              ))}
-            </ul>
+            {page === 2 && <SelectPatient setPatient={setPatient} />}
 
             {/* Confirm Details */}
-            <div>
-              <p>Patient: {patient?.name ?? "None selected"}</p>
-              <p>Service: {service?.name ?? "None selected"}</p>
-            </div>
-
-            {/* Confirm Button */}
-            <button className="btn btn-primary" onClick={handleSubmit}>
-              Confirm
-            </button>
+            {page === 3 && (
+              <QueueConfirmation
+                patient={patient}
+                service={service}
+                setOpen={setOpen}
+              />
+            )}
           </div>
         </div>
       }
