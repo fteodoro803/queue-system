@@ -12,6 +12,7 @@ import "../imports/api/queueEntryMethods";
 import { CountersCollection } from "../imports/api/counters";
 import "../imports/api/countersMethods";
 import { DEFAULT_SETTINGS, SettingsCollection } from "/imports/api/settings";
+import "../imports/api/settingsMethods";
 
 // TODO: Add userId field to appointments and filter by it in publications and useFind hooks, so that patients only see their own appointments and providers only see appointments assigned to them. For now, we will just return all appointments for simplicity.
 // Meteor.user()?.type === "patient"

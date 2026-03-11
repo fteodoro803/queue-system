@@ -25,7 +25,7 @@ export const DEFAULT_SETTINGS: Omit<Settings, "_id"> = {
   end_of_day: "17:00",
   text_frequency: 30,
   text_message_template:
-    "Hi {patientName}, you are currently number {positionInQueue} in the queue. Estimated wait time: {estimatedWaitTime}.",
+    "Hi {patientName}, you are currently number {positionInQueue} in the queue. Estimated wait time: {estimatedWaitTime}. Please check-in with the receptionist when you arrive.",
   emergency_option: EMERGENCY_OPTION[0],
   accept_queue_after_hours: false,
 };

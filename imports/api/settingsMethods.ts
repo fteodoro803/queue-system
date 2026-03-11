@@ -8,40 +8,42 @@ const updateSetting = <K extends keyof Omit<Settings, "_id">>(
   key: K,
   value: Settings[K],
 ) => {
-  SettingsCollection.updateAsync(
+  return SettingsCollection.updateAsync(
     { _id: "app_settings" },
     { $set: { [key]: value } },
   );
 };
 
 Meteor.methods({
-  "settings.setStartOfDay"(start: string) {
+  async "settings.setStartOfDay"(start: string) {
     check(start, String);
-    updateSetting("start_of_day", start);
+    await updateSetting("start_of_day", start);
   },
 
-  "settings.setEndOfDay"(end: string) {
+  async "settings.setEndOfDay"(end: string) {
     check(end, String);
-    updateSetting("end_of_day", end);
+    await updateSetting("end_of_day", end);
   },
 
-  "settings.setTextFrequency"(minutes: number) {
+  async "settings.setTextFrequency"(minutes: number) {
     check(minutes, Number);
-    updateSetting("text_frequency", minutes);
+    await updateSetting("text_frequency", minutes);
   },
 
-  "settings.setTextMessageTemplate"(template: string) {
+  async "settings.setTextMessageTemplate"(template: string) {
     check(template, String);
-    updateSetting("text_message_template", template);
+    await updateSetting("text_message_template", template);
   },
 
-  "settings.setEmergencyOption"(option: (typeof EMERGENCY_OPTION)[number]) {
-    updateSetting("emergency_option", option);
+  async "settings.setEmergencyOption"(
+    option: (typeof EMERGENCY_OPTION)[number],
+  ) {
+    await updateSetting("emergency_option", option);
   },
 
-  "settings.setAcceptQueueAfterHours"(value: boolean) {
+  async "settings.setAcceptQueueAfterHours"(value: boolean) {
     check(value, Boolean);
-    updateSetting("accept_queue_after_hours", value);
+    await updateSetting("accept_queue_after_hours", value);
   },
 });
 
