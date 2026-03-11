@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { ThemeController } from "../components/ThemeController";
 
+// TODO: currently does nothing, implement actual functionality later
+
 export const Settings = () => {
   const [acceptAfterHours, setAcceptAfterHours] = useState(false);
 
