@@ -12,12 +12,12 @@ export const ServiceManagement = () => {
       <div className="flex justify-between">
         <h1 className="text-3xl font-bold">Services</h1>
         <div className="flex gap-1">
-          <button
+          {/* <button
             className="btn btn-primary"
             onClick={() => clearServiceAnalytics()}
           >
             - Clear Analytics
-          </button>
+          </button> */}
           <button
             className="btn btn-primary"
             onClick={() => setAddServiceModalOpen(true)}

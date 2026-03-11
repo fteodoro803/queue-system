@@ -52,7 +52,9 @@ export const ServiceTable = () => {
                 onClick={() => handleSelect(s)}
               >
                 {/*Name*/}
-                <td>{s.name}</td>
+                <td>
+                  {s.name} ({s.shortcode})
+                </td>
 
                 {/*Duration*/}
                 <td>{s.duration ? s.duration : "-"}</td>
