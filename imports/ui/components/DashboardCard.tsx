@@ -1,10 +1,10 @@
-import React from "react";
+import React, { ComponentType, ReactNode } from "react";
 
 interface DashboardCardProps {
   header: string;
-  body: React.ReactNode;
-  icon: React.ComponentType<{ className?: string }>;
-  footer?: string;
+  body: ReactNode;
+  footer?: ReactNode;
+  icon: ComponentType<{ className?: string }>;
 }
 
 export const DashboardCard = ({
@@ -14,7 +14,7 @@ export const DashboardCard = ({
   icon: Icon,
 }: DashboardCardProps) => {
   return (
-    <div className="card w-3xs p-6 rounded-xl border shadow-lg hover:-translate-y-1 transition-transform duration-200">
+    <div className="card w-3xs h-35 p-6 rounded-xl border shadow-lg hover:-translate-y-1 transition-transform duration-200">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-semibold mb-1">{header}</p>

@@ -15,6 +15,11 @@ const updateSetting = <K extends keyof Omit<Settings, "_id">>(
 };
 
 Meteor.methods({
+  async "settings.setDayStarted"(started: boolean) {
+    check(started, Boolean);
+    await updateSetting("day_started", started);
+  },
+
   async "settings.setStartOfDay"(start: string) {
     check(start, String);
     await updateSetting("start_of_day", start);
@@ -46,6 +51,10 @@ Meteor.methods({
     await updateSetting("accept_queue_after_hours", value);
   },
 });
+
+export async function setDayStarted(started: boolean) {
+  return await Meteor.callAsync("settings.setDayStarted", started);
+}
 
 // TODO: do tests for the working hours to make sure theyre properly formatted
 export async function setStartOfDay(start: string) {

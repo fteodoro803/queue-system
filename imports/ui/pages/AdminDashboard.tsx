@@ -3,11 +3,16 @@ import { DashboardCard } from "../components/DashboardCard";
 import { WORKING_HOURS } from "/imports/dev/settings";
 import { Clock } from "../components/Clock";
 import {
+  BriefcaseIcon,
   CalendarDaysIcon,
   ClockIcon,
   NumberedListIcon,
 } from "@heroicons/react/24/outline";
-import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
+import {
+  getEndOfDay,
+  getStartOfDay,
+  timeStrToLocaleTime,
+} from "/imports/utils/utils";
 import { AppointmentsCollection } from "/imports/api/appointment";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "../components/Loading";
@@ -16,12 +21,20 @@ import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { QueueList } from "../queue/QueueList";
 import { AppointmentList } from "../appointment/AppointmentList";
 import { ServicesCollection } from "/imports/api/service";
+import { SettingsCollection } from "/imports/api/settings";
 
 export const AdminDashboard = () => {
   const now = useDateTime();
+  const isSettingsLoading = useSubscribe("settings");
   const isAppointmentsLoading = useSubscribe("appointments");
   const isQueueEntriesLoading = useSubscribe("queue");
   const isServicesLoading = useSubscribe("services");
+
+  // Settings
+  const settings = useFind(() => SettingsCollection.find({}))[0];
+  const dayStarted: boolean = settings?.day_started ?? false;
+  const startOfDay: string = settings?.start_of_day;
+  const endOfDay: string = settings?.end_of_day;
 
   // Find appointments for the current day
   const appointments = useFind(() =>
@@ -49,7 +62,12 @@ export const AdminDashboard = () => {
     }),
   );
 
-  if (isAppointmentsLoading() || isQueueEntriesLoading() || isServicesLoading())
+  if (
+    isAppointmentsLoading() ||
+    isQueueEntriesLoading() ||
+    isServicesLoading() ||
+    isSettingsLoading()
+  )
     return <Loading />;
 
   return (
@@ -58,6 +76,9 @@ export const AdminDashboard = () => {
 
       <h3 className="text-lg font-semibold">
         Work day: {WORKING_HOURS.startTime} - {WORKING_HOURS.endTime}
+      </h3>
+      <h3 className="text-lg font-semibold">
+        Started: {dayStarted ? "True" : "False"}
       </h3>
 
       {/* Dashboard Cards */}
@@ -79,15 +100,37 @@ export const AdminDashboard = () => {
           />
         </div>
 
-        {/* Appointment Dashboard Card */}
+        {/* Workday Dashboard Card */}
         <div className="my-4">
+          <DashboardCard
+            header="Workday"
+            body={
+              <div>
+                {dayStarted ? (
+                  <p className="text-success-content text-center border border-success bg-success rounded px-2 py-0.5">
+                    Open
+                  </p>
+                ) : (
+                  <p className="text-error-content text-center border border-error bg-error rounded px-2 py-0.5">
+                    Closed
+                  </p>
+                )}
+              </div>
+            }
+            footer={`${timeStrToLocaleTime(startOfDay)} - ${timeStrToLocaleTime(endOfDay)}`}
+            icon={BriefcaseIcon}
+          />
+        </div>
+
+        {/* Appointment Dashboard Card */}
+        {/* <div className="my-4">
           <DashboardCard
             header="Appointments"
             body={appointments.length}
             footer={`Completed: ${appointments.filter((a) => a.status === "completed").length}`}
             icon={CalendarDaysIcon}
           />
-        </div>
+        </div> */}
 
         {/* Queue Dashboard Card */}
         <div className="my-4">
