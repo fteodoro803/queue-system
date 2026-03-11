@@ -9,11 +9,13 @@ import {
   BugAntIcon,
   NumberedListIcon,
   Cog6ToothIcon,
+  IdentificationIcon,
 } from "@heroicons/react/24/solid";
 import { Outlet, useLocation } from "react-router-dom";
 import { NavLinkItem } from "./NavLinkItem";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { formatDateToLocale } from "/imports/utils/utils";
+import { TEST_SETTINGS } from "/imports/dev/settings";
 
 export const Sidebar = () => {
   const location = useLocation();
@@ -61,7 +63,9 @@ export const Sidebar = () => {
               <p className="text-sm">{`${now.toLocaleDateString()} ${formatDateToLocale(now, true)}`}</p>
             </div>
 
-            <NavLinkItem link="/" label="Home" icon={HomeIcon} />
+            {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+              <NavLinkItem link="/" label="Home" icon={HomeIcon} />
+            )}
 
             {/*Admin Sidebar*/}
             {isAdmin && (
@@ -74,39 +78,52 @@ export const Sidebar = () => {
                 />
 
                 {/*Appointments Button*/}
-                <NavLinkItem
-                  link="/admin/appointmentManagement"
-                  label="Appointments"
-                  icon={CalendarDaysIcon}
-                />
+                {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+                  <NavLinkItem
+                    link="/admin/appointments"
+                    label="Appointments"
+                    icon={CalendarDaysIcon}
+                  />
+                )}
 
                 {/* Queue Button */}
                 <NavLinkItem
-                  link="/admin/queueManagement"
+                  link="/admin/queue"
                   label="Queue"
                   icon={NumberedListIcon}
                 />
 
                 {/*Patients Button*/}
-                <NavLinkItem
-                  link="/admin/patientManagement"
-                  label="Patients"
-                  icon={UserGroupIcon}
-                />
+                {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+                  <NavLinkItem
+                    link="/admin/patients"
+                    label="Patients"
+                    icon={UserGroupIcon}
+                  />
+                )}
 
                 {/*Services Button*/}
                 <NavLinkItem
-                  link="/admin/serviceManagement"
+                  link="/admin/services"
                   label="Services"
                   icon={WrenchScrewdriverIcon}
                 />
 
-                {/* Test Page Button */}
+                {/*Service Providers Button*/}
                 <NavLinkItem
-                  link="/admin/test"
-                  label="Test Page"
-                  icon={BugAntIcon}
+                  link="/admin/providers"
+                  label="Service Providers"
+                  icon={IdentificationIcon}
                 />
+
+                {/* Test Page Button */}
+                {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+                  <NavLinkItem
+                    link="/admin/test"
+                    label="Test Page"
+                    icon={BugAntIcon}
+                  />
+                )}
 
                 <NavLinkItem
                   link="/admin/settings"
@@ -127,7 +144,6 @@ export const Sidebar = () => {
                 />
               </>
             )}
-
           </ul>
         </div>
       </div>
