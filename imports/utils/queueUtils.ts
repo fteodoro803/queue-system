@@ -12,6 +12,8 @@ export function calculateEstimatedWaitTime(
     return undefined;
   }
 
+  if (!activeProviders || activeProviders <= 0) return undefined;
+
   const serviceDuration = service.avgDuration ?? service.duration;
 
   // Find the currently in-progress entry for this service

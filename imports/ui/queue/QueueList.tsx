@@ -7,6 +7,7 @@ import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { calculateEstimatedWaitTime } from "/imports/utils/queueUtils";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { ProviderCollection } from "/imports/api/provider";
+import { Loading } from "../components/Loading";
 
 export const QueueList = ({
   queue,
@@ -22,7 +23,15 @@ export const QueueList = ({
   // Get number of Providers for this service to calculate wait times
   const providersIsLoading = useSubscribe("providers");
   const providers = useFind(() =>
-    ProviderCollection.find({ serviceIds: service._id }),
+    ProviderCollection.find({
+      services: { $elemMatch: { id: service._id, enabled: true } },
+    }),
+  );
+
+  if (providersIsLoading()) return <Loading />;
+
+  console.log(
+    `Rendering QueueList for service ${service.name} with ${queue.length} entries and ${providers.length} providers`,
   );
 
   return (
