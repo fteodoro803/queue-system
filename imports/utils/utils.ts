@@ -43,6 +43,13 @@ export function createTimeSlots(
   return timeSlots;
 }
 
+// Check if a time string is in the format "HH:MM" and represents a valid time
+export function isValidTimeStr(timeStr: string): boolean {
+  if (!/^\d{2}:\d{2}$/.test(timeStr)) return false;
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60;
+}
+
 // Converts "HH:MM" to locale time string like "02:30 PM"
 export function timeStrToLocaleTime(timeStr: string): string {
   const [hours, minutes] = timeStr.split(":").map(Number);

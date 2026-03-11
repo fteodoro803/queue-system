@@ -1,6 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import { check } from "meteor/check";
 import { SettingsCollection, Settings, EMERGENCY_OPTION } from "./settings";
+import { isValidTimeStr } from "../utils/utils";
 
 // Helper to update a single field
 const updateSetting = <K extends keyof Omit<Settings, "_id">>(
@@ -44,15 +45,14 @@ Meteor.methods({
   },
 });
 
-export async function setWorkingHours(start: string, end: string) {
-  return await Meteor.callAsync("settings.setWorkingHours", start, end);
-}
-
+// TODO: do tests for the working hours to make sure theyre properly formatted
 export async function setStartOfDay(start: string) {
+  if (!isValidTimeStr(start)) return;
   return await Meteor.callAsync("settings.setStartOfDay", start);
 }
 
 export async function setEndOfDay(end: string) {
+  if (!isValidTimeStr(end)) return;
   return await Meteor.callAsync("settings.setEndOfDay", end);
 }
 

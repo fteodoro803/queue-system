@@ -18,6 +18,7 @@ export const TIME_MULTIPLIER = TEST_SETTINGS.USE_TIME_MULTIPLIER ? 60 : 1; // 1 
 
 // Start and End of Working Day
 // TODO: convert these to Date objects
+// TODO: use the settings in mongo
 const [startTime, endTime]: [string, string] = ["09:00", "12:00"];
 export const WORKING_HOURS = {
   startTime,
