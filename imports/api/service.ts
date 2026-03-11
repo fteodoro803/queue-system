@@ -9,9 +9,9 @@ export interface Service {
   description: string;
 
   // Analytics fields
-  count?: number;
-  totalDuration?: number; // total duration in minutes
-  avgDuration?: number; // average duration in minutes
+  count?: number | null;
+  totalDuration?: number | null; // total duration in minutes
+  avgDuration?: number | null; // average duration in minutes
   createdAt: Date;
 }
 
