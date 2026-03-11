@@ -14,12 +14,22 @@ export const QueueIcon = ({ entry, size = 70 }: QueueIconProps) => {
         ? "✗"
         : entry.position?.toString() || "?";
 
+  const isInProgress = entry.status === "in-progress";
+
   return (
     <div
-      className="flex flex-col items-center justify-center rounded-2xl bg-primary/10 text-primary"
+      className={`flex flex-col items-center justify-center rounded-2xl ${
+        isInProgress
+          ? "bg-success/15 text-success"
+          : "bg-primary/10 text-primary"
+      }`}
       style={{ width: size, height: size }}
     >
-      <span className="text-3xl font-bold">{position}</span>
+      {isInProgress ? (
+        <span className="loading loading-dots loading-xl"></span>
+      ) : (
+        <span className="text-3xl font-bold">{position}</span>
+      )}
     </div>
   );
 };
