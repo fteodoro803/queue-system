@@ -5,6 +5,8 @@ import { Service } from "/imports/api/service";
 import { QueueListItemPatient } from "./QueueListItemPatient";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { calculateEstimatedWaitTime } from "/imports/utils/queueUtils";
+import { useFind, useSubscribe } from "meteor/react-meteor-data";
+import { ProviderCollection } from "/imports/api/provider";
 
 export const QueueList = ({
   queue,
@@ -16,6 +18,12 @@ export const QueueList = ({
   adminView?: boolean;
 }) => {
   const now = useDateTime();
+
+  // Get number of Providers for this service to calculate wait times
+  const providersIsLoading = useSubscribe("providers");
+  const providers = useFind(() =>
+    ProviderCollection.find({ serviceIds: service._id }),
+  );
 
   return (
     <ul className="list bg-base-100 rounded-box shadow-md">
@@ -34,13 +42,25 @@ export const QueueList = ({
             <QueueListItemAdmin
               key={entry._id}
               entry={entry}
-              timeUntil={calculateEstimatedWaitTime(entry, queue, service, now)}
+              timeUntil={calculateEstimatedWaitTime(
+                entry,
+                queue,
+                service,
+                providers.length,
+                now,
+              )}
             />
           ) : (
             <QueueListItemPatient
               key={entry._id}
               entry={entry}
-              timeUntil={calculateEstimatedWaitTime(entry, queue, service, now)}
+              timeUntil={calculateEstimatedWaitTime(
+                entry,
+                queue,
+                service,
+                providers.length,
+                now,
+              )}
             />
           ),
         )

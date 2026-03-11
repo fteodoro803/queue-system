@@ -5,14 +5,14 @@ export function calculateEstimatedWaitTime(
   queueEntry: QueueEntry,
   queue: QueueEntry[],
   service: Service,
+  activeProviders: number,
   currentTime: Date,
 ): number | undefined {
   if (queueEntry.position === undefined || queueEntry.position === null) {
     return undefined;
   }
 
-  const serviceDuration =
-    service.avgDuration ?? service.duration;
+  const serviceDuration = service.avgDuration ?? service.duration;
 
   // Find the currently in-progress entry for this service
   const inProgress = queue.find(
@@ -44,6 +44,11 @@ export function calculateEstimatedWaitTime(
   // People ahead excluding the in-progress one (position 0)
   const peopleAhead = queueEntry.position - 1;
 
+  // TODO: implement better doctor tracking later
+  const effectiveProviders = Math.max(1, activeProviders); // Avoid division by zero
+
   // remaining time for current + full duration for everyone else ahead
-  return Math.ceil(remainingTime + peopleAhead * serviceDuration);
+  return Math.ceil(
+    (remainingTime + peopleAhead * serviceDuration) / effectiveProviders,
+  );
 }
