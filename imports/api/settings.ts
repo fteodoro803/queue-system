@@ -6,6 +6,7 @@ export interface Settings {
   _id: "app_settings";
 
   // 24-hour time format HH:mm
+  day_started: boolean;
   start_of_day: string; // ex: "09:00" -- 9am
   end_of_day: string; // ex: "17:00" -- 5pm"
 
@@ -21,6 +22,7 @@ export interface Settings {
 export const SettingsCollection = new Mongo.Collection<Settings>("settings");
 
 export const DEFAULT_SETTINGS: Omit<Settings, "_id"> = {
+  day_started: false,
   start_of_day: "09:00",
   end_of_day: "17:00",
   text_frequency: 30,

@@ -30,6 +30,10 @@ Meteor.methods({
       { multi: true },
     );
   },
+
+  // TODO: Calculate performance across all services
+  // "services.calculatePerformance"() {
+  // }
 });
 
 export async function insertService(data: ServiceData) {
