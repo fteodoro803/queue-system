@@ -177,7 +177,8 @@ async function updatePositions(entry: QueueEntry, time: Date): Promise<void> {
 async function generateDisplayId(service: Service): Promise<string> {
   // 1. Get count from Counters Collection
   const counter = await CountersCollection.findOneAsync({
-    _id: service._id,
+    // _id: service._id,
+    _id: "placeholderId",
   });
   const currentCount = counter?.count ?? 0;
 
@@ -186,7 +187,8 @@ async function generateDisplayId(service: Service): Promise<string> {
 
   // 3. Update count in Counters Collection
   await CountersCollection.upsertAsync(
-    { _id: service._id },
+    // { _id: service._id },
+    { _id: "placeholderId" },
     { $set: { count: nextNum } },
   );
 
