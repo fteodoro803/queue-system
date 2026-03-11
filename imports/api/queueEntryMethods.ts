@@ -203,6 +203,7 @@ async function markAsReady(id: string, time: Date): Promise<void> {
   await QueueEntryCollection.updateAsync(id, {
     $set: {
       readyAt: time,
+      status: "ready",
     },
   });
 }

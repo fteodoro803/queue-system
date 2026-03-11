@@ -4,6 +4,7 @@ import { Service } from "./service";
 
 export const QUEUE_STATES = [
   "waiting",
+  "ready",
   "in-progress",
   "completed",
   "cancelled",
