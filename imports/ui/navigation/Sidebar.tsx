@@ -9,6 +9,7 @@ import {
   BugAntIcon,
   NumberedListIcon,
   Cog6ToothIcon,
+  IdentificationIcon,
 } from "@heroicons/react/24/solid";
 import { Outlet, useLocation } from "react-router-dom";
 import { NavLinkItem } from "./NavLinkItem";
@@ -79,7 +80,7 @@ export const Sidebar = () => {
                 {/*Appointments Button*/}
                 {TEST_SETTINGS.ENABLE_TEST_PAGES && (
                   <NavLinkItem
-                    link="/admin/appointmentManagement"
+                    link="/admin/appointments"
                     label="Appointments"
                     icon={CalendarDaysIcon}
                   />
@@ -87,7 +88,7 @@ export const Sidebar = () => {
 
                 {/* Queue Button */}
                 <NavLinkItem
-                  link="/admin/queueManagement"
+                  link="/admin/queue"
                   label="Queue"
                   icon={NumberedListIcon}
                 />
@@ -95,7 +96,7 @@ export const Sidebar = () => {
                 {/*Patients Button*/}
                 {TEST_SETTINGS.ENABLE_TEST_PAGES && (
                   <NavLinkItem
-                    link="/admin/patientManagement"
+                    link="/admin/patients"
                     label="Patients"
                     icon={UserGroupIcon}
                   />
@@ -103,9 +104,16 @@ export const Sidebar = () => {
 
                 {/*Services Button*/}
                 <NavLinkItem
-                  link="/admin/serviceManagement"
+                  link="/admin/services"
                   label="Services"
                   icon={WrenchScrewdriverIcon}
+                />
+
+                {/*Service Providers Button*/}
+                <NavLinkItem
+                  link="/admin/providers"
+                  label="Service Providers"
+                  icon={IdentificationIcon}
                 />
 
                 {/* Test Page Button */}

@@ -11,6 +11,7 @@ import { DateTimeProvider } from "../contexts/DateTimeContext";
 import { QueueManagement } from "./pages/QueueManagement";
 import { Queue } from "./pages/patient/Queue";
 import { Settings } from "./pages/Settings";
+import { ProviderManagement } from "./pages/ProviderManagement";
 
 export const App = () => (
   <DateTimeProvider>
@@ -23,13 +24,11 @@ export const App = () => (
           <Route path="admin">
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="patientManagement" element={<PatientManagement />} />
-            <Route path="serviceManagement" element={<ServiceManagement />} />
-            <Route
-              path="appointmentManagement"
-              element={<AppointmentManagement />}
-            />
-            <Route path="queueManagement" element={<QueueManagement />} />
+            <Route path="patients" element={<PatientManagement />} />
+            <Route path="services" element={<ServiceManagement />} />
+            <Route path="providers" element={<ProviderManagement />} />
+            <Route path="appointments" element={<AppointmentManagement />} />
+            <Route path="queue" element={<QueueManagement />} />
             <Route path="test" element={<TestPage />} />
             <Route path="settings" element={<Settings />} />
           </Route>

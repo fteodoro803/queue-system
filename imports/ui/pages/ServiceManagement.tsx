@@ -1,84 +1,37 @@
 import React, { useState } from "react";
 import { AddServiceModal } from "/imports/ui/service/AddServiceModal";
-import { AddProviderModal } from "../provider/AddProviderModal";
-import { ProviderTable } from "../provider/ProviderTable";
 import { ServiceTable } from "/imports/ui/service/ServiceTable";
 import { clearServiceAnalytics } from "/imports/api/serviceMethods";
 
 export const ServiceManagement = () => {
-  const [addServiceProviderModalOpen, setAddServiceProviderModalOpen] =
-    useState(false);
   const [addServiceModalOpen, setAddServiceModalOpen] = useState(false);
 
   return (
     <>
-      <h1 className="text-3xl font-bold">Service Management</h1>
-      <br />
-
-      {/* Tabs for Services and Service Providers */}
-      <div className="tabs tabs-border justify-center">
-        {/* Services */}
-        <input
-          type="radio"
-          name="my_tabs_3"
-          className="tab"
-          aria-label="Services"
-          defaultChecked
-        />
-        <div className="tab-content border-base-300 bg-base-100 p-10">
-          {/*Services Table*/}
-          <div className="flex justify-between">
-            <h1 className="text-2xl font-bold">Services</h1>
-            <div className="flex gap-1">
-              <button
-                className="btn btn-primary"
-                onClick={() => clearServiceAnalytics()}
-              >
-                - Clear Analytics
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={() => setAddServiceModalOpen(true)}
-              >
-                + New Service
-              </button>
-            </div>
-          </div>
-          <ServiceTable />
-        </div>
-
-        {/* Service Providers */}
-        <input
-          type="radio"
-          name="my_tabs_3"
-          className="tab"
-          aria-label="Providers"
-        />
-        <div className="tab-content border-base-300 bg-base-100 p-10">
-          {/* Service Providers */}
-          <div className="flex justify-between">
-            <h1 className="text-2xl font-bold">Service Providers</h1>
-            <button
-              className="btn btn-primary"
-              onClick={() => setAddServiceProviderModalOpen(true)}
-            >
-              + New Provider
-            </button>
-          </div>
-
-          <ProviderTable />
+      {/*Services Table*/}
+      <div className="flex justify-between">
+        <h1 className="text-3xl font-bold">Services</h1>
+        <div className="flex gap-1">
+          <button
+            className="btn btn-primary"
+            onClick={() => clearServiceAnalytics()}
+          >
+            - Clear Analytics
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={() => setAddServiceModalOpen(true)}
+          >
+            + New Service
+          </button>
         </div>
       </div>
+      <ServiceTable />
 
-      {/* Modals */}
-      {/*<AddServiceModal/>*/}
+      {/* Modal */}
       <AddServiceModal
         open={addServiceModalOpen}
         setOpen={setAddServiceModalOpen}
-      />
-      <AddProviderModal
-        open={addServiceProviderModalOpen}
-        setOpen={setAddServiceProviderModalOpen}
       />
     </>
   );
