@@ -8,6 +8,7 @@ import {
   WrenchScrewdriverIcon,
   BugAntIcon,
   NumberedListIcon,
+  Cog6ToothIcon,
 } from "@heroicons/react/24/solid";
 import { Outlet, useLocation } from "react-router-dom";
 import { ThemeController } from "../components/ThemeController";
@@ -106,6 +107,12 @@ export const Sidebar = () => {
                   link="/admin/test"
                   label="Test Page"
                   icon={BugAntIcon}
+                />
+
+                <NavLinkItem
+                  link="/admin/settings"
+                  label="Settings"
+                  icon={Cog6ToothIcon}
                 />
               </>
             )}
