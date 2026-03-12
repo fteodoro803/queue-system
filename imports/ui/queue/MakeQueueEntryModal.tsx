@@ -18,7 +18,9 @@ export const MakeQueueEntryModal = ({
   // States
   const [patient, setPatient] = useState<Patient | undefined>(undefined);
   const [service, setService] = useState<Service | undefined>(undefined);
-  const [queueEntry, setQueueEntry] = useState<QueueEntry | undefined>(undefined)
+  const [queueEntry, setQueueEntry] = useState<QueueEntry | undefined>(
+    undefined,
+  );
   const [page, setPage] = useState<number>(0);
 
   const steps: Record<number, string> = {
@@ -77,8 +79,6 @@ export const MakeQueueEntryModal = ({
 
           {/* Modal Content */}
           <div className="flex flex-col py-3 gap-6">
-            <h2 className="text-2xl font-bold mb-4">Join Queue</h2>
-
             {/* Select Service */}
             {page === 1 && <SelectService setService={setService} />}
 
@@ -94,12 +94,9 @@ export const MakeQueueEntryModal = ({
               />
             )}
 
-                        {/* Finalised Queue Details */}
+            {/* Finalised Queue Details */}
             {page === 4 && (
-              <QueueDetails 
-              entry={queueEntry}
-                setOpen={setOpen}
-              />
+              <QueueDetails entry={queueEntry} setOpen={setOpen} />
             )}
           </div>
         </div>

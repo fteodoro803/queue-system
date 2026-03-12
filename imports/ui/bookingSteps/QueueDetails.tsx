@@ -2,11 +2,14 @@ import React from "react";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import {
   CalendarDaysIcon,
+  CheckCircleIcon,
   ExclamationTriangleIcon,
-  UserIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
 import { QueueEntry } from "/imports/api/queueEntry";
+import { Session } from "meteor/session";
+import { useTracker } from "meteor/react-meteor-data";
+import { convertMinutesToTime } from "/imports/utils/utils";
 
 export const QueueDetails = ({
   entry,
@@ -17,26 +20,49 @@ export const QueueDetails = ({
 }) => {
   const now = useDateTime();
 
+  // TODO: temporary? probably should be calculated on the server and stored somewhere
+  const maxQueueLength = useTracker(
+    () => Session.get("maxQueueLength") || null,
+  );
+
   if (!entry) return null;
   const isPriority = entry.service.priority > 1;
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-xs font-semibold text-base-content/50 uppercase tracking-wider">
+      {/* Joined Queue Alert */}
+      <div role="alert" className="alert alert-success">
+        <CheckCircleIcon className="h-6 w-6" />
+        <span>
+          You have joined the queue in{" "}
+          <strong>position {entry.position}</strong>!
+        </span>
+      </div>
+
+      {/* Queue ID Hero */}
+      <div className="flex flex-col items-center py-6 gap-1">
+        <p className="text-xs font-semibold text-base-content/40 uppercase tracking-widest">
+          Queue ID
+        </p>
+        <p className="text-7xl font-black">{entry.displayId ?? "—"}</p>
+        <div className="flex items-center gap-1.5 mt-2 text-base-content/50">
+          <CalendarDaysIcon className="h-4 w-4" />
+          <span className="text-sm">
+            Est. wait:{" "}
+            <span className="font-semibold text-base-content">
+              {convertMinutesToTime(maxQueueLength)}
+            </span>
+          </span>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="divider text-xs text-base-content/30 uppercase tracking-wider">
         Details
-      </p>
+      </div>
 
       {/* Summary rows */}
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-base-200">
-          <UserIcon className="h-4 w-4 text-base-content/40 shrink-0" />
-          <span className="text-sm text-base-content/60">Queue ID</span>
-          <span className="text-base-content/30">·</span>
-          <span className="text-sm font-semibold">
-            {entry.displayId ?? "None"}
-          </span>
-        </div>
-
         <div className="flex items-center gap-3 p-3 rounded-lg bg-base-200">
           <WrenchIcon className="h-4 w-4 text-base-content/40 shrink-0" />
           <span className="text-sm text-base-content/60">Service</span>
@@ -44,13 +70,6 @@ export const QueueDetails = ({
           <span className="text-sm font-semibold">
             {entry.service?.name ?? "None"}
           </span>
-        </div>
-
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-base-200">
-          <CalendarDaysIcon className="h-4 w-4 text-base-content/40 shrink-0" />
-          <span className="text-sm text-base-content/60">Estimated Time</span>
-          <span className="text-base-content/30">·</span>
-          <span className="text-sm font-semibold">CALCULATING</span>
         </div>
 
         <div className="flex items-center gap-3 p-3 rounded-lg bg-base-200">
@@ -77,13 +96,8 @@ export const QueueDetails = ({
         </div>
       )}
 
-      <button
-        className="btn btn-primary w-full"
-        onClick={() => {
-          setOpen(false);
-        }}
-      >
-        Confirm
+      <button className="btn btn-primary w-full" onClick={() => setOpen(false)}>
+        Close
       </button>
     </div>
   );
