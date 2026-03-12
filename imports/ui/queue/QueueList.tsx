@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { QueueEntry } from "/imports/api/queueEntry";
 import { QueueListItemAdmin } from "./QueueListItemAdmin";
 import { Service } from "/imports/api/service";
@@ -35,11 +35,23 @@ export const QueueList = ({
     () => Session.get("maxQueueLength") || null,
   );
 
-  if (providersIsLoading()) return <Loading />;
+  // Update maxQueueLength in Session for testing purposes (to show the max wait time in the UI, can be removed later)
+  useEffect(() => {
+    if (queue.length === 0) Session.set("maxQueueLength", null);
+    else {
+      const estimatedWaitTime = calculateEstimatedWaitTime(
+        queue[queue.length - 1],
+        queue,
+        service,
+        providers.length,
+        now,
+      );
+      if (estimatedWaitTime && estimatedWaitTime > maxQueueLength)
+        Session.set("maxQueueLength", estimatedWaitTime);
+    }
+  }, [queue.length, providers.length, now]);
 
-  console.log(
-    `Rendering QueueList for service ${service.name} with ${queue.length} entries and ${providers.length} providers`,
-  );
+  if (providersIsLoading()) return <Loading />;
 
   return (
     <ul className="list bg-base-100 rounded-box shadow-md">
