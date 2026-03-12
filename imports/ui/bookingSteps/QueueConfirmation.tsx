@@ -43,14 +43,16 @@ export const QueueConfirmation = ({
   return (
     <div className="flex flex-col gap-4">
       <p className="text-xs font-semibold text-base-content/50 uppercase tracking-wider">
-        Confirm Queue Entry
+        Confirm Your Details
       </p>
 
       {/* Summary rows */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-3 p-3 rounded-lg bg-base-200">
-          <UserIcon className="h-4 w-4 text-base-content/40 shrink-0" />
-          <span className="text-sm text-base-content/60">Patient</span>
+          <div className="w-18 flex items-center gap-3">
+            <UserIcon className="h-4 w-4 text-base-content/40 shrink-0" />
+            <span className="text-sm text-base-content/60">Patient</span>
+          </div>
           <span className="text-base-content/30">·</span>
           <span className="text-sm font-semibold">
             {patient?.name ?? "None"}
@@ -59,8 +61,10 @@ export const QueueConfirmation = ({
 
         {hasNumber && (
           <div className="flex items-center gap-3 p-3 rounded-lg bg-base-200">
-            <PhoneIcon className="h-4 w-4 text-base-content/40 shrink-0" />
-            <span className="text-sm text-base-content/60">Number</span>
+            <div className="w-18 flex items-center gap-3">
+              <PhoneIcon className="h-4 w-4 text-base-content/40 shrink-0" />
+              <span className="text-sm text-base-content/60">Number</span>
+            </div>
             <span className="text-base-content/30">·</span>
             <span className="text-sm font-semibold">
               {patient?.number ?? "None"}
@@ -70,8 +74,10 @@ export const QueueConfirmation = ({
 
         {hasEmail && (
           <div className="flex items-center gap-3 p-3 rounded-lg bg-base-200">
-            <EnvelopeIcon className="h-4 w-4 text-base-content/40 shrink-0" />
-            <span className="text-sm text-base-content/60">Email</span>
+            <div className="w-18 flex items-center gap-3">
+              <EnvelopeIcon className="h-4 w-4 text-base-content/40 shrink-0" />
+              <span className="text-sm text-base-content/60">Email</span>
+            </div>
             <span className="text-base-content/30">·</span>
             <span className="text-sm font-semibold">
               {patient?.email ?? "None"}
@@ -80,8 +86,10 @@ export const QueueConfirmation = ({
         )}
 
         <div className="flex items-center gap-3 p-3 rounded-lg bg-base-200">
-          <WrenchIcon className="h-4 w-4 text-base-content/40 shrink-0" />
-          <span className="text-sm text-base-content/60">Service</span>
+          <div className="w-18 flex items-center gap-3">
+            <WrenchIcon className="h-4 w-4 text-base-content/40 shrink-0" />
+            <span className="text-sm text-base-content/60">Service</span>
+          </div>
           <span className="text-base-content/30">·</span>
           <span className="text-sm font-semibold">
             {service?.name ?? "None"}
@@ -89,8 +97,10 @@ export const QueueConfirmation = ({
         </div>
 
         <div className="flex items-center gap-3 p-3 rounded-lg bg-base-200">
-          <CalendarDaysIcon className="h-4 w-4 text-base-content/40 shrink-0" />
-          <span className="text-sm text-base-content/60">Date</span>
+          <div className="w-18 flex items-center gap-3">
+            <CalendarDaysIcon className="h-4 w-4 text-base-content/40 shrink-0" />
+            <span className="text-sm text-base-content/60">Date</span>
+          </div>
           <span className="text-base-content/30">·</span>
           <span className="text-sm font-semibold">
             {now.toLocaleDateString(undefined, {

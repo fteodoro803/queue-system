@@ -1,18 +1,16 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { MakeQueueEntryModal } from "../queue/MakeQueueEntryModal";
 import { useFind, useSubscribe, useTracker } from "meteor/react-meteor-data";
 import { Loading } from "../components/Loading";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { QueueList } from "../queue/QueueList";
 import { ServicesCollection } from "/imports/api/service";
-import { resetCounter } from "/imports/api/countersMethods";
 import { DashboardCard } from "../components/DashboardCard";
 import {
   ClockIcon,
   IdentificationIcon,
   NumberedListIcon,
 } from "@heroicons/react/24/outline";
-import { ProviderCollection } from "/imports/api/provider";
 import { Session } from "meteor/session";
 import {
   convertMillisecondsToTime,
@@ -32,7 +30,7 @@ export const QueueManagement = () => {
   const services = useFind(() => ServicesCollection.find());
 
   const isProvidersLoading = useSubscribe("providers");
-  const providers = useFind(() => ProviderCollection.find({}));
+  // const providers = useFind(() => ProviderCollection.find({}));
 
   const [queueEntryModalOpen, setQueueEntryModalOpen] =
     useState<boolean>(false);
@@ -41,6 +39,26 @@ export const QueueManagement = () => {
   const maxQueueLength = useTracker(
     () => Session.get("maxQueueLength") || null,
   );
+
+  
+
+  const TOTAL_PROVIDERS = 3;
+
+  const [ongoing, waiting, cancelled, finished] = useMemo(() => {
+    const ongoing = queueEntries.filter(
+      (entry) => entry.status === "in-progress",
+    );
+    const waiting = queueEntries.filter((entry) => entry.status === "waiting");
+    const cancelled = queueEntries.filter(
+      (entry) => entry.status === "cancelled",
+    );
+    const finished = queueEntries.filter(
+      (entry) => entry.status === "completed",
+    );
+    return [ongoing, waiting, cancelled, finished];
+  }, [queueEntries]);
+
+  const unavailableProviders = ongoing?.length;
 
   const isSettingsLoading = useSubscribe("settings");
   const settings = useFind(() => SettingsCollection.find({}))[0];
@@ -103,10 +121,8 @@ export const QueueManagement = () => {
         <div className="my-4">
           <DashboardCard
             header="Available Providers"
-            body={
-              providers.filter((p) => p.services.some((s) => s.enabled)).length
-            }
-            footer={`Unavailable: ${providers.filter((p) => !p.services.some((s) => s.enabled)).length}`}
+            body={TOTAL_PROVIDERS - unavailableProviders}
+            footer={`Unavailable: ${unavailableProviders}`}
             icon={IdentificationIcon}
           />
         </div>
@@ -142,16 +158,11 @@ export const QueueManagement = () => {
         <div className="tab-content border-base-300 bg-base-100 p-10">
           <div className="">
             {services.map((service) => {
-              const serviceQueue = queueEntries.filter(
-                (entry) =>
-                  entry.serviceId === service._id &&
-                  entry.status === "in-progress",
-              );
               return (
                 <div key={service._id} className="mb-6">
                   <h2 className="text-2xl font-bold">Ongoing</h2>
                   <QueueList
-                    queue={serviceQueue}
+                    queue={ongoing}
                     service={service}
                     adminView={true}
                   />
@@ -163,15 +174,12 @@ export const QueueManagement = () => {
           {/* TODO: TEMPORARY CHANGE THIS LATER */}
           <div className="">
             {services.map((service) => {
-              const serviceQueue = queueEntries.filter(
-                (entry) =>
-                  entry.serviceId === service._id && entry.status === "waiting",
-              );
               return (
                 <div key={service._id} className="mb-6">
                   <h2 className="text-2xl font-bold">Waiting</h2>
                   <QueueList
-                    queue={serviceQueue}
+                    availableProviders={TOTAL_PROVIDERS - unavailableProviders}
+                    queue={waiting}
                     service={service}
                     adminView={true}
                   />
@@ -191,16 +199,11 @@ export const QueueManagement = () => {
         <div className="tab-content border-base-300 bg-base-100 p-10">
           <div className="">
             {services.map((service) => {
-              const serviceQueue = queueEntries.filter(
-                (entry) =>
-                  entry.serviceId === service._id &&
-                  entry.status === "completed",
-              );
               return (
                 <div key={service._id} className="mb-6">
                   <h2 className="text-2xl font-bold">{service.name}</h2>
                   <QueueList
-                    queue={serviceQueue}
+                    queue={finished}
                     service={service}
                     adminView={true}
                   />
@@ -220,16 +223,11 @@ export const QueueManagement = () => {
         <div className="tab-content border-base-300 bg-base-100 p-10">
           <div className="">
             {services.map((service) => {
-              const serviceQueue = queueEntries.filter(
-                (entry) =>
-                  entry.serviceId === service._id &&
-                  entry.status === "cancelled",
-              );
               return (
                 <div key={service._id} className="mb-6">
                   <h2 className="text-2xl font-bold">{service.name}</h2>
                   <QueueList
-                    queue={serviceQueue}
+                    queue={cancelled}
                     service={service}
                     adminView={true}
                   />
@@ -247,3 +245,4 @@ export const QueueManagement = () => {
     </>
   );
 };
+
