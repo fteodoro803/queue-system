@@ -28,6 +28,7 @@ export const QueueManagement = () => {
 
   const isServicesLoading = useSubscribe("services");
   const services = useFind(() => ServicesCollection.find());
+  const demoService = services[0];
 
   const isProvidersLoading = useSubscribe("providers");
   // const providers = useFind(() => ProviderCollection.find({}));
@@ -155,35 +156,27 @@ export const QueueManagement = () => {
         {/* TODO: TEMPORARY CHANGE THIS LATER */}
         <div className="tab-content border-base-300 bg-base-100 p-10">
           <div className="">
-            {services.map((service) => {
-              return (
-                <div key={service._id} className="mb-6">
-                  <h2 className="text-2xl font-bold">Ongoing</h2>
-                  <QueueList
-                    queue={ongoing}
-                    service={service}
-                    adminView={true}
-                  />
-                </div>
-              );
-            })}
+            <div key={demoService._id} className="mb-6">
+              <h2 className="text-2xl font-bold">Ongoing</h2>
+              <QueueList
+                queue={ongoing}
+                service={demoService}
+                adminView={true}
+              />
+            </div>
           </div>
 
           {/* TODO: TEMPORARY CHANGE THIS LATER */}
           <div className="">
-            {services.map((service) => {
-              return (
-                <div key={service._id} className="mb-6">
-                  <h2 className="text-2xl font-bold">Waiting</h2>
-                  <QueueList
-                    availableProviders={TOTAL_PROVIDERS - unavailableProviders}
-                    queue={waiting}
-                    service={service}
-                    adminView={true}
-                  />
-                </div>
-              );
-            })}
+            <div key={demoService._id} className="mb-6">
+              <h2 className="text-2xl font-bold">Waiting</h2>
+              <QueueList
+                availableProviders={TOTAL_PROVIDERS - unavailableProviders}
+                queue={waiting}
+                service={demoService}
+                adminView={true}
+              />
+            </div>
           </div>
         </div>
 
@@ -201,7 +194,7 @@ export const QueueManagement = () => {
                 <div key={service._id} className="mb-6">
                   <h2 className="text-2xl font-bold">{service.name}</h2>
                   <QueueList
-                    queue={finished}
+                    queue={finished.filter((entry) => entry.serviceId === service._id)}
                     service={service}
                     adminView={true}
                   />
@@ -225,7 +218,7 @@ export const QueueManagement = () => {
                 <div key={service._id} className="mb-6">
                   <h2 className="text-2xl font-bold">{service.name}</h2>
                   <QueueList
-                    queue={cancelled}
+                    queue={cancelled.filter((entry) => entry.serviceId === service._id)}
                     service={service}
                     adminView={true}
                   />
