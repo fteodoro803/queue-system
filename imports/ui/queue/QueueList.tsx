@@ -48,7 +48,7 @@ export const QueueList = ({
         key={`${service._id}_list_header`}
         className="p-4 pb-2 text-xs opacity-60 tracking-wide"
       >
-        {service.name}
+        {/* {service.name} */}
       </li>
 
       {/* List of Queue Entries */}
@@ -75,7 +75,7 @@ export const QueueList = ({
             );
           else
             return (
-          // TODO: Match this later with admin one, or merge it 
+              // TODO: Match this later with admin one, or merge it
               <QueueListItemPatient
                 key={entry._id}
                 entry={entry}

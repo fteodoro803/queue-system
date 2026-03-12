@@ -87,7 +87,7 @@ export const QueueListItemAdmin = ({
               <div className="flex items-center gap-1">
                 <ClockIcon className={iconSize} />
                 <p className={textSize}>
-                  {timeUntil > 0 ? `est. ${timeUntil} min` : "delayed"}
+                  {timeUntil > 0 ? `est. ${timeUntil} min` : "est. 0 min"}
                 </p>
               </div>
             )}

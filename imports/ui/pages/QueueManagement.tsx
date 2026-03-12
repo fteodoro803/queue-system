@@ -40,9 +40,7 @@ export const QueueManagement = () => {
     () => Session.get("maxQueueLength") || null,
   );
 
-  
-
-  const TOTAL_PROVIDERS = 3;
+  const TOTAL_PROVIDERS = 2;
 
   const [ongoing, waiting, cancelled, finished] = useMemo(() => {
     const ongoing = queueEntries.filter(
@@ -245,4 +243,3 @@ export const QueueManagement = () => {
     </>
   );
 };
-
