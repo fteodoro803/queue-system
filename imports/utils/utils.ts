@@ -26,6 +26,14 @@ export function getEndOfDay(date: Date): Date {
   return endOfDay;
 }
 
+// Get the end of the work day based on a time string like "17:00" and a date
+export function getEndOfWorkDay(date: Date, time: string): Date {
+  const [hour, minute] = convertStrToHrs(time);
+  const endOfWorkDay = new Date(date);
+  endOfWorkDay.setHours(hour, minute, 0, 0);
+  return endOfWorkDay;
+}
+
 export function createTimeSlots(
   minHour: number,
   maxHour: number,
@@ -79,3 +87,23 @@ export function addMonths(date: Date, months: number): Date {
 export const addMinutes = (date: Date, minutes: number): Date => {
   return new Date(date.getTime() + minutes * 60000);
 };
+
+// Format milliseconds to human-readable format like "1h 30m"
+export function convertMillisecondsToTime(time_ms: number): string {
+  const hours = Math.floor(time_ms / (1000 * 60 * 60));
+  const minutes = Math.floor((time_ms % (1000 * 60 * 60)) / (1000 * 60));
+
+  if (hours === 0) return `${minutes}m`;
+  if (minutes === 0) return `${hours}h`;
+  return `${hours}h ${minutes}m`;
+}
+
+// Format minutes to human-readable format like "1h 30m"
+export function convertMinutesToTime(time_min: number): string {
+  const hours = Math.floor(time_min / 60);
+  const minutes = time_min % 60;
+
+  if (hours === 0) return `${minutes}m`;
+  if (minutes === 0) return `${hours}h`;
+  return `${hours}h ${minutes}m`;
+}

@@ -7,6 +7,8 @@ import { Steps } from "../components/Steps";
 import { SelectService } from "../bookingSteps/SelectService";
 import { SelectPatient } from "../bookingSteps/SelectPatient";
 import { QueueConfirmation } from "../bookingSteps/QueueConfirmation";
+import { QueueDetails } from "../bookingSteps/QueueDetails";
+import { QueueEntry } from "/imports/api/queueEntry";
 
 export const MakeQueueEntryModal = ({
   setOpen,
@@ -16,20 +18,22 @@ export const MakeQueueEntryModal = ({
   // States
   const [patient, setPatient] = useState<Patient | undefined>(undefined);
   const [service, setService] = useState<Service | undefined>(undefined);
+  const [queueEntry, setQueueEntry] = useState<QueueEntry | undefined>(undefined)
   const [page, setPage] = useState<number>(0);
 
   const steps: Record<number, string> = {
     1: "Service",
     2: "Patient",
     3: "Confirm",
+    4: "Details",
   };
 
   useEffect(() => {
     changePage("next");
-  }, [service, patient]);
+  }, [service, patient, queueEntry]);
 
   function changePage(change: "next" | "previous") {
-    const maxPages: number = 3;
+    const maxPages: number = 4;
     if (change === "next" && page < maxPages) {
       setPage(page + 1);
     }
@@ -85,6 +89,15 @@ export const MakeQueueEntryModal = ({
               <QueueConfirmation
                 patient={patient}
                 service={service}
+                setQueueEntry={setQueueEntry}
+                setOpen={setOpen}
+              />
+            )}
+
+                        {/* Finalised Queue Details */}
+            {page === 4 && (
+              <QueueDetails 
+              entry={queueEntry}
                 setOpen={setOpen}
               />
             )}

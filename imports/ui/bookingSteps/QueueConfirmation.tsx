@@ -11,14 +11,17 @@ import {
   UserIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
+import { QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
 
 export const QueueConfirmation = ({
   patient,
   service,
+  setQueueEntry,
   setOpen,
 }: {
   patient: Patient | undefined;
   service: Service | undefined;
+  setQueueEntry: (entry: QueueEntry) => void;
   setOpen: (value: boolean) => void;
 }) => {
   const now = useDateTime();
@@ -29,7 +32,12 @@ export const QueueConfirmation = ({
   // Handlers
   const handleSubmit = async () => {
     if (!patient || !service) return;
-    await enqueue({ patient, service }, now);
+    const queueId: string = await enqueue({ patient, service }, now);
+
+    if (queueId) {
+      const newQueueEntry = await QueueEntryCollection.findOneAsync(queueId);
+      if (newQueueEntry) setQueueEntry(newQueueEntry);
+    }
   };
 
   return (
@@ -108,7 +116,6 @@ export const QueueConfirmation = ({
         className="btn btn-primary w-full"
         onClick={() => {
           handleSubmit();
-          setOpen(false);
         }}
       >
         Confirm

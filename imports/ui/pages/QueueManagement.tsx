@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { MakeQueueEntryModal } from "../queue/MakeQueueEntryModal";
-import { useFind, useSubscribe } from "meteor/react-meteor-data";
+import { useFind, useSubscribe, useTracker } from "meteor/react-meteor-data";
 import { Loading } from "../components/Loading";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { QueueList } from "../queue/QueueList";
@@ -8,11 +8,19 @@ import { ServicesCollection } from "/imports/api/service";
 import { resetCounter } from "/imports/api/countersMethods";
 import { DashboardCard } from "../components/DashboardCard";
 import {
-  ChartBarIcon,
+  ClockIcon,
   IdentificationIcon,
   NumberedListIcon,
 } from "@heroicons/react/24/outline";
 import { ProviderCollection } from "/imports/api/provider";
+import { Session } from "meteor/session";
+import {
+  convertMillisecondsToTime,
+  convertMinutesToTime,
+  getEndOfWorkDay,
+} from "/imports/utils/utils";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
+import { SettingsCollection } from "/imports/api/settings";
 
 export const QueueManagement = () => {
   const isQueueEntryLoading = useSubscribe("queue");
@@ -29,24 +37,34 @@ export const QueueManagement = () => {
   const [queueEntryModalOpen, setQueueEntryModalOpen] =
     useState<boolean>(false);
 
-  if (isQueueEntryLoading() || isServicesLoading() || isProvidersLoading()) {
+  // TODO: temporary? probably should be calculated on the server and stored somewhere
+  const maxQueueLength = useTracker(
+    () => Session.get("maxQueueLength") || null,
+  );
+
+  const isSettingsLoading = useSubscribe("settings");
+  const settings = useFind(() => SettingsCollection.find({}))[0];
+
+  if (
+    isQueueEntryLoading() ||
+    isServicesLoading() ||
+    isProvidersLoading() ||
+    isSettingsLoading()
+  ) {
     return <Loading />;
   }
 
-  const selectedService = services[0]; // TODO: make this dynamic based on user selection
-  const serviceEfficiency =
-    selectedService?.avgDuration != null
-      ? Math.ceil(
-          (selectedService.duration / selectedService.avgDuration) * 100,
-        )
-      : undefined;
+  // Data for Queue Time dashboard Card
+  const now = useDateTime();
+  const endOfDay = getEndOfWorkDay(now, settings.end_of_day);
+  const timeRemainingMs = endOfDay.getTime() - now.getTime(); // in milliseconds
+  const formattedTimeRemaining = convertMillisecondsToTime(timeRemainingMs);
+  const maxQueueLengthMs = maxQueueLength * 60 * 1000; // convert mins to ms
 
-  const getEfficiencyLabel = (score: number) => {
-    if (score >= 115) return "well ahead of schedule";
-    if (score >= 105) return "beating expectations";
-    if (score >= 95) return "meeting expectations";
-    if (score >= 80) return "review workload";
-    return "needs attention";
+  const getQueueTimeColor = () => {
+    if (maxQueueLengthMs >= timeRemainingMs) return "text-error";
+    if (maxQueueLengthMs >= timeRemainingMs * 0.5) return "text-warning";
+    return "";
   };
 
   return (
@@ -93,17 +111,17 @@ export const QueueManagement = () => {
           />
         </div>
 
-        {/* Performance Card */}
         <div className="my-4">
           <DashboardCard
-            header="Performance Score"
-            body={serviceEfficiency != null ? `${serviceEfficiency}%` : "N/A"}
+            header="Total Queue Time"
+            body={convertMinutesToTime(maxQueueLength)}
+            // footer={`${formattedTimeRemaining} remaining`}
             footer={
-              serviceEfficiency != null
-                ? getEfficiencyLabel(serviceEfficiency)
-                : "No data yet"
+              <p className={getQueueTimeColor()}>
+                {formattedTimeRemaining} left in day
+              </p>
             }
-            icon={ChartBarIcon}
+            icon={ClockIcon}
           />
         </div>
       </div>

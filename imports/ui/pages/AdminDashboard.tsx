@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { DashboardCard } from "../components/DashboardCard";
-import { TEST_SETTINGS, WORKING_HOURS } from "/imports/dev/settings";
+import { TEST_SETTINGS } from "/imports/dev/settings";
 import { Clock } from "../components/Clock";
 import {
   BriefcaseIcon,
-  CalendarDaysIcon,
+  ChartBarIcon,
   ClockIcon,
   IdentificationIcon,
   NumberedListIcon,
@@ -78,6 +78,22 @@ export const AdminDashboard = () => {
     isProvidersLoading()
   )
     return <Loading />;
+
+  const selectedService = services[0]; // TODO: make this dynamic based on user selection
+  const serviceEfficiency =
+    selectedService?.avgDuration != null
+      ? Math.ceil(
+          (selectedService.duration / selectedService.avgDuration) * 100,
+        )
+      : undefined;
+
+  const getEfficiencyLabel = (score: number) => {
+    if (score >= 115) return "well ahead of schedule";
+    if (score >= 105) return "beating expectations";
+    if (score >= 95) return "meeting expectations";
+    if (score >= 80) return "review workload";
+    return "needs attention";
+  };
 
   return (
     <>
@@ -160,6 +176,22 @@ export const AdminDashboard = () => {
                   }
                   footer={`Unavailable: ${providers.filter((p) => !p.services.some((s) => s.enabled)).length}`}
                   icon={IdentificationIcon}
+                />
+              </div>
+
+              {/* Performance Card */}
+              <div className="my-4">
+                <DashboardCard
+                  header="Performance Score"
+                  body={
+                    serviceEfficiency != null ? `${serviceEfficiency}%` : "N/A"
+                  }
+                  footer={
+                    serviceEfficiency != null
+                      ? getEfficiencyLabel(serviceEfficiency)
+                      : "No data yet"
+                  }
+                  icon={ChartBarIcon}
                 />
               </div>
             </>
