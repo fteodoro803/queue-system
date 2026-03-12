@@ -66,7 +66,7 @@ export const QueueConfirmation = ({
             <span className="text-sm text-base-content/60">Email</span>
             <span className="text-base-content/30">·</span>
             <span className="text-sm font-semibold">
-              {patient?.number ?? "None"}
+              {patient?.email ?? "None"}
             </span>
           </div>
         )}
