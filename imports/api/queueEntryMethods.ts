@@ -8,6 +8,8 @@ import { CountersCollection } from "./counters";
 export interface QueueEntryData {
   patient: Patient; // Replace with actual Patient type
   service: Service; // Replace with actual Service type
+  // initialExpectedWaitTime?: number; // in minutes, optional field for expected wait time at the moment of enqueueing
+  // currentExpectedWaitTime?: number; // in minutes, optional field for current expected wait time, can be updated over time based on queue dynamics
 }
 
 type DequeueReason = Extract<
@@ -46,6 +48,8 @@ Meteor.methods({
       service: data.service,
       position: newPosition,
       status: "waiting",
+      // initialExpectedWaitTime: data.initialExpectedWaitTime ?? null,
+      // currentExpectedWaitTime: data.currentExpectedWaitTime ?? null,
       readyAt: null,
       start: null, // Start time will be set once the service is started
       end: null, // End time will be set after the service is completed
