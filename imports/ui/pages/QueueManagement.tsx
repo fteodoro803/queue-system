@@ -14,7 +14,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { ProviderCollection } from "/imports/api/provider";
 
-
 export const QueueManagement = () => {
   const isQueueEntryLoading = useSubscribe("queue");
   const queueEntries = useFind(() =>
@@ -72,41 +71,42 @@ export const QueueManagement = () => {
         </div>
       </div>
 
-<div className="flex flex-wrap gap-4 justify-start mt-6">
-      <div className="my-4">
-        <DashboardCard
-          header="In Queue"
-          body={queueEntries.filter((q) => q.status === "waiting").length}
-          footer={`Completed: ${queueEntries.filter((q) => q.status === "completed").length}`}
-          icon={NumberedListIcon}
-        />
-      </div>
+      <div className="flex flex-wrap gap-4 justify-start mt-6">
+        <div className="my-4">
+          <DashboardCard
+            header="In Queue"
+            body={queueEntries.filter((q) => q.status === "waiting").length}
+            footer={`Completed: ${queueEntries.filter((q) => q.status === "completed").length}`}
+            icon={NumberedListIcon}
+          />
+        </div>
 
-      {/* Available Doctors Card */}
-      <div className="my-4">
-        <DashboardCard
-          header="Available Providers"
-          body={
-            providers.filter((p) => p.services.some((s) => s.enabled)).length
-          }
-          footer={`Unavailable: ${providers.filter((p) => !p.services.some((s) => s.enabled)).length}`}
-          icon={IdentificationIcon}
-        />
-      </div>
+        {/* Available Doctors Card */}
+        <div className="my-4">
+          <DashboardCard
+            header="Available Providers"
+            body={
+              providers.filter((p) => p.services.some((s) => s.enabled)).length
+            }
+            footer={`Unavailable: ${providers.filter((p) => !p.services.some((s) => s.enabled)).length}`}
+            icon={IdentificationIcon}
+          />
+        </div>
 
-      {/* Performance Card */}
-      <div className="my-4">
-        <DashboardCard
-          header="Performance Score"
-          body={serviceEfficiency != null ? `${serviceEfficiency}%` : "N/A"}
-          footer={
-            serviceEfficiency != null
-              ? getEfficiencyLabel(serviceEfficiency)
-              : "No data yet"
-          }
-          icon={ChartBarIcon}
-        />
-      </div></div>
+        {/* Performance Card */}
+        <div className="my-4">
+          <DashboardCard
+            header="Performance Score"
+            body={serviceEfficiency != null ? `${serviceEfficiency}%` : "N/A"}
+            footer={
+              serviceEfficiency != null
+                ? getEfficiencyLabel(serviceEfficiency)
+                : "No data yet"
+            }
+            icon={ChartBarIcon}
+          />
+        </div>
+      </div>
 
       {/* Tab Groups */}
       {/* name of each tab group should be unique */}
@@ -119,18 +119,39 @@ export const QueueManagement = () => {
           aria-label="Upcoming"
           defaultChecked
         />
+
+        {/* TODO: TEMPORARY CHANGE THIS LATER */}
         <div className="tab-content border-base-300 bg-base-100 p-10">
           <div className="">
             {services.map((service) => {
               const serviceQueue = queueEntries.filter(
                 (entry) =>
                   entry.serviceId === service._id &&
-                  (entry.status === "waiting" ||
-                    entry.status === "in-progress"),
+                  entry.status === "in-progress",
               );
               return (
                 <div key={service._id} className="mb-6">
-                  <h2 className="text-2xl font-bold">{service.name}</h2>
+                  <h2 className="text-2xl font-bold">Ongoing</h2>
+                  <QueueList
+                    queue={serviceQueue}
+                    service={service}
+                    adminView={true}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          {/* TODO: TEMPORARY CHANGE THIS LATER */}
+          <div className="">
+            {services.map((service) => {
+              const serviceQueue = queueEntries.filter(
+                (entry) =>
+                  entry.serviceId === service._id && entry.status === "waiting",
+              );
+              return (
+                <div key={service._id} className="mb-6">
+                  <h2 className="text-2xl font-bold">Waiting</h2>
                   <QueueList
                     queue={serviceQueue}
                     service={service}
