@@ -45,6 +45,7 @@ export const TestPage = () => {
     description: "A general health consultation with a provider.",
     duration: 30,
     cost: 500,
+    priority: 1,
     createdAt: date ?? new Date(),
   };
 
@@ -55,6 +56,7 @@ export const TestPage = () => {
     description: "Professional dental cleaning service.",
     duration: 45,
     cost: 300,
+    priority: 1,
     createdAt: date ?? new Date(),
   };
 
