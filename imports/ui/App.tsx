@@ -1,17 +1,17 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Home } from "./pages/Home";
-import { PatientManagement } from "./pages/PatientManagement";
+import { PatientManagement } from "./pages/admin/PatientManagement";
 import { Sidebar } from "/imports/ui/navigation/Sidebar";
-import { AdminDashboard } from "/imports/ui/pages/AdminDashboard";
-import { ServiceManagement } from "/imports/ui/pages/ServiceManagement";
-import { AppointmentManagement } from "./pages/AppointmentManagement";
+import { AdminDashboard } from "./pages/admin/AdminDashboard";
+import { ServiceManagement } from "./pages/admin/ServiceManagement";
+import { AppointmentManagement } from "./pages/admin/AppointmentManagement";
 import { TestPage } from "./pages/TestPage";
 import { DateTimeProvider } from "../contexts/DateTimeContext";
-import { QueueManagement } from "./pages/QueueManagement";
+import { QueueManagement } from "./pages/admin/QueueManagement";
 import { Queue } from "./pages/patient/Queue";
-import { Settings } from "./pages/Settings";
-import { ProviderManagement } from "./pages/ProviderManagement";
+import { Settings } from "./pages/admin/Settings";
+import { ProviderManagement } from "./pages/admin/ProviderManagement";
 
 export const App = () => (
   <DateTimeProvider>

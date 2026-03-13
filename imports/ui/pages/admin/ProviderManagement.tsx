@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { AddProviderModal } from "../provider/AddProviderModal";
-import { ProviderTable } from "../provider/ProviderTable";
+import { AddProviderModal } from "../../provider/AddProviderModal";
+import { ProviderTable } from "../../provider/ProviderTable";
 
 export const ProviderManagement = () => {
   const [addServiceProviderModalOpen, setAddServiceProviderModalOpen] =

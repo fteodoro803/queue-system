@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from "react";
-import { MakeQueueEntryModal } from "../queue/MakeQueueEntryModal";
+import { MakeQueueEntryModal } from "../../queue/MakeQueueEntryModal";
 import { useFind, useSubscribe, useTracker } from "meteor/react-meteor-data";
-import { Loading } from "../components/Loading";
+import { Loading } from "../../components/Loading";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
-import { QueueList } from "../queue/QueueList";
+import { QueueList } from "../../queue/QueueList";
 import { ServicesCollection } from "/imports/api/service";
-import { DashboardCard } from "../components/DashboardCard";
+import { DashboardCard } from "../../components/DashboardCard";
 import {
   ClockIcon,
   IdentificationIcon,

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { ThemeController } from "../components/ThemeController";
+import { ThemeController } from "../../components/ThemeController";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { SettingsCollection } from "/imports/api/settings";
-import { Loading } from "../components/Loading";
+import { Loading } from "../../components/Loading";
 import { setAcceptQueueAfterHours } from "/imports/api/settingsMethods";
 
 // TODO: currently does nothing, implement actual functionality later

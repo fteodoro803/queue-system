@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { MakeAppointmentModal } from "../appointment/MakeAppointmentModal";
+import { MakeAppointmentModal } from "../../appointment/MakeAppointmentModal";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { AppointmentsCollection } from "/imports/api/appointment";
-import { Loading } from "../components/Loading";
-import { useDateTime } from "../../contexts/DateTimeContext";
-import { AppointmentList } from "../appointment/AppointmentList";
+import { Loading } from "../../components/Loading";
+import { useDateTime } from "../../../contexts/DateTimeContext";
+import { AppointmentList } from "../../appointment/AppointmentList";
 
 export const AppointmentManagement = () => {
   const isAppointmentsLoading = useSubscribe("appointments");
