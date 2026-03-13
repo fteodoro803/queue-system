@@ -14,7 +14,7 @@ import {
   UserIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
-import { GenericField } from "../components/GenericField";
+import { GenericField } from "/imports/ui/components/GenericField";
 
 export const AppointmentDetailsModal = ({
   appointment,

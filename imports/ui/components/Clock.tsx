@@ -1,6 +1,6 @@
 import React from "react";
 import { formatDateToLocale } from "/imports/utils/utils";
-import { useDateTime } from "../../contexts/DateTimeContext";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
 
 /**
  * Clock component that displays the current time.

@@ -1,24 +1,24 @@
 import React, { useState } from "react";
-import { GenericField } from "../components/GenericField";
-import { EmailField } from "../components/EmailField";
-import { NumberField } from "../components/NumberField";
-import { Calendar } from "../components/Calendar";
-import { Steps } from "../components/Steps";
-import { DateIcon } from "../components/DateIcon";
-import { Avatar } from "../components/Avatar";
+import { GenericField } from "/imports/ui/components/GenericField";
+import { EmailField } from "/imports/ui/components/EmailField";
+import { NumberField } from "/imports/ui/components/NumberField";
+import { Calendar } from "/imports/ui/components/Calendar";
+import { Steps } from "/imports/ui/components/Steps";
+import { DateIcon } from "/imports/ui/components/DateIcon";
+import { Avatar } from "/imports/ui/components/Avatar";
 import { Patient } from "/imports/api/patient";
 import { Appointment } from "/imports/api/appointment";
 import { Provider, ProviderService } from "/imports/api/provider";
 import { Service } from "/imports/api/service";
-import { DashboardCard } from "../components/DashboardCard";
+import { DashboardCard } from "/imports/ui/components/DashboardCard";
 import { HomeIcon } from "@heroicons/react/24/outline";
-import { useDateTime } from "../../contexts/DateTimeContext";
-import { QueueIcon } from "../components/QueueIcon";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
+import { QueueIcon } from "/imports/ui/components/QueueIcon";
 import { QueueEntry } from "/imports/api/queueEntry";
-import { QueueListItemAdmin } from "../queue/QueueListItemAdmin";
+import { QueueListItemAdmin } from "/imports/ui/queue/QueueListItemAdmin";
 import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
-import { AppointmentList } from "../appointment/AppointmentList";
-import { QueueListItemPatient } from "../queue/QueueListItemPatient";
+import { AppointmentList } from "/imports/ui/appointment/AppointmentList";
+import { QueueListItemPatient } from "/imports/ui/queue/QueueListItemPatient";
 
 export const TestPage = () => {
   const now = useDateTime(); // context date and time

@@ -1,7 +1,7 @@
 import React from "react";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { SettingsCollection } from "/imports/api/settings";
-import { Loading } from "../components/Loading";
+import { Loading } from "/imports/ui/components/Loading";
 import { setDayStarted } from "/imports/api/settingsMethods";
 import { timeStrToLocaleTime } from "/imports/utils/utils";
 import { BriefcaseIcon, ClockIcon } from "@heroicons/react/24/outline";

@@ -1,9 +1,9 @@
 import { Meteor } from "meteor/meteor";
-import { QUEUE_STATES, QueueEntry, QueueEntryCollection } from "./queueEntry";
-import { Patient } from "./patient";
-import { Service } from "./service";
-import { updateServiceAnalytics } from "./serviceMethods";
-import { CountersCollection } from "./counters";
+import { QUEUE_STATES, QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
+import { Patient } from "/imports/api/patient";
+import { Service } from "/imports/api/service";
+import { updateServiceAnalytics } from "/imports/api/serviceMethods";
+import { CountersCollection } from "/imports/api/counters";
 
 export interface QueueEntryData {
   patient: Patient; // Replace with actual Patient type

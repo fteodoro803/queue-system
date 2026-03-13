@@ -3,11 +3,11 @@ import { MODAL_SIZES } from "/imports/utils/modalSizes";
 import { Service } from "/imports/api/service";
 import { Patient } from "/imports/api/patient";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { Steps } from "../components/Steps";
-import { SelectService } from "../bookingSteps/SelectService";
-import { SelectPatient } from "../bookingSteps/SelectPatient";
-import { QueueConfirmation } from "../bookingSteps/QueueConfirmation";
-import { QueueDetails } from "../bookingSteps/QueueDetails";
+import { Steps } from "/imports/ui/components/Steps";
+import { SelectService } from "/imports/ui/bookingSteps/SelectService";
+import { SelectPatient } from "/imports/ui/bookingSteps/SelectPatient";
+import { QueueConfirmation } from "/imports/ui/bookingSteps/QueueConfirmation";
+import { QueueDetails } from "/imports/ui/bookingSteps/QueueDetails";
 import { QueueEntry } from "/imports/api/queueEntry";
 
 export const MakeQueueEntryModal = ({

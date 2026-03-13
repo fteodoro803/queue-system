@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { DashboardCard } from "../../components/DashboardCard";
+import { DashboardCard } from "/imports/ui/components/DashboardCard";
 import { TEST_SETTINGS } from "/imports/dev/settings";
-import { Clock } from "../../components/Clock";
+import { Clock } from "/imports/ui/components/Clock";
 import {
   BriefcaseIcon,
   ChartBarIcon,
@@ -16,14 +16,14 @@ import {
 } from "/imports/utils/utils";
 import { AppointmentsCollection } from "/imports/api/appointment";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
-import { Loading } from "../../components/Loading";
-import { useDateTime } from "../../../contexts/DateTimeContext";
+import { Loading } from "/imports/ui/components/Loading";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
-import { QueueList } from "../../queue/QueueList";
-import { AppointmentList } from "../../appointment/AppointmentList";
+import { QueueList } from "/imports/ui/queue/QueueList";
+import { AppointmentList } from "/imports/ui/appointment/AppointmentList";
 import { ServicesCollection } from "/imports/api/service";
 import { SettingsCollection } from "/imports/api/settings";
-import { WorkdayModal } from "../../dashboard/WorkdayModal";
+import { WorkdayModal } from "/imports/ui/dashboard/WorkdayModal";
 import { ProviderCollection } from "/imports/api/provider";
 
 export const AdminDashboard = () => {

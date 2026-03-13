@@ -1,6 +1,6 @@
 import { Mongo } from "meteor/mongo";
-import { Patient } from "./patient";
-import { Service } from "./service";
+import { Patient } from "/imports/api/patient";
+import { Service } from "/imports/api/service";
 
 export const QUEUE_STATES = [
   "waiting",

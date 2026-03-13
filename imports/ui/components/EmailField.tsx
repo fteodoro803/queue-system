@@ -1,6 +1,6 @@
 import React from "react";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
-import { GenericField, GenericFieldProps } from "./GenericField";
+import { GenericField, GenericFieldProps } from "/imports/ui/components/GenericField";
 
 type EmailFieldProps = Omit<GenericFieldProps, "icon">;
 

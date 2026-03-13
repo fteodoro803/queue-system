@@ -1,17 +1,17 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Home } from "./pages/Home";
-import { PatientManagement } from "./pages/admin/PatientManagement";
+import { Home } from "/imports/ui/navigation/pages/Home";
+import { PatientManagement } from "/imports/ui/navigation/pages/admin/PatientManagement";
 import { Sidebar } from "/imports/ui/navigation/Sidebar";
-import { AdminDashboard } from "./pages/admin/AdminDashboard";
-import { ServiceManagement } from "./pages/admin/ServiceManagement";
-import { AppointmentManagement } from "./pages/admin/AppointmentManagement";
-import { TestPage } from "./pages/TestPage";
-import { DateTimeProvider } from "../contexts/DateTimeContext";
-import { QueueManagement } from "./pages/admin/QueueManagement";
-import { Queue } from "./pages/patient/Queue";
-import { Settings } from "./pages/admin/Settings";
-import { ProviderManagement } from "./pages/admin/ProviderManagement";
+import { AdminDashboard } from "/imports/ui/navigation/pages/admin/AdminDashboard";
+import { ServiceManagement } from "/imports/ui/navigation/pages/admin/ServiceManagement";
+import { AppointmentManagement } from "/imports/ui/navigation/pages/admin/AppointmentManagement";
+import { TestPage } from "/imports/ui/navigation/pages/TestPage";
+import { DateTimeProvider } from "/imports/contexts/DateTimeContext";
+import { QueueManagement } from "/imports/ui/navigation/pages/admin/QueueManagement";
+import { Queue } from "/imports/ui/navigation/pages/patient/Queue";
+import { Settings } from "/imports/ui/navigation/pages/admin/Settings";
+import { ProviderManagement } from "/imports/ui/navigation/pages/admin/ProviderManagement";
 
 export const App = () => (
   <DateTimeProvider>

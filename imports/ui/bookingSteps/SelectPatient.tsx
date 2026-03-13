@@ -1,8 +1,8 @@
 import React from "react";
-import { Loading } from "../components/Loading";
+import { Loading } from "/imports/ui/components/Loading";
 import { useSubscribe, useTracker } from "meteor/react-meteor-data";
 import { Patient, PatientsCollection } from "/imports/api/patient";
-import { AddPatientForm } from "../patient/AddPatientForm";
+import { AddPatientForm } from "/imports/ui/patient/AddPatientForm";
 import { TEST_SETTINGS } from "/imports/dev/settings";
 
 export const SelectPatient = ({

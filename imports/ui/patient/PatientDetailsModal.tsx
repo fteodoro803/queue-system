@@ -5,7 +5,7 @@ import { NumberField } from "/imports/ui/components/NumberField";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { NameField } from "/imports/ui/components/NameField";
 import { updatePatient } from "/imports/api/patientsMethods";
-import { ModalButtons } from "../components/ModalButtons";
+import { ModalButtons } from "/imports/ui/components/ModalButtons";
 
 export const PatientDetailsModal = ({
   patient,

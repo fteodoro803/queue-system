@@ -1,5 +1,5 @@
 import { Meteor } from "meteor/meteor";
-import { ProviderCollection, ProviderService } from "./provider";
+import { ProviderCollection, ProviderService } from "/imports/api/provider";
 
 // Interfaces
 export interface providerData {

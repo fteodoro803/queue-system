@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Calendar } from "../components/Calendar";
+import { Calendar } from "/imports/ui/components/Calendar";
 import { Service } from "/imports/api/service";
 import {
   convertStrToHrs,

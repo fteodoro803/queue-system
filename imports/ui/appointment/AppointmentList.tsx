@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Appointment } from "/imports/api/appointment";
-import { AppointmentListItem } from "./AppointmentListItem";
-import { AppointmentDetailsModal } from "./AppointmentDetailsModal";
+import { AppointmentListItem } from "/imports/ui/appointment/AppointmentListItem";
+import { AppointmentDetailsModal } from "/imports/ui/appointment/AppointmentDetailsModal";
 
 export const AppointmentList = ({
   appointments,

@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { TEST_DATE, TEST_SETTINGS, TIME_MULTIPLIER } from "../dev/settings";
+import { TEST_DATE, TEST_SETTINGS, TIME_MULTIPLIER } from "/imports/dev/settings";
 
 export const DateTimeContext = createContext<Date | null>(null);
 

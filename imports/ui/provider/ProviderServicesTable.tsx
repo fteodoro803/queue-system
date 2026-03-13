@@ -1,7 +1,7 @@
 import React from "react";
 import { Provider, ProviderService } from "/imports/api/provider";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
-import { Loading } from "../components/Loading";
+import { Loading } from "/imports/ui/components/Loading";
 import { Service, ServicesCollection } from "/imports/api/service";
 import { updateProviderService } from "/imports/api/providerMethods";
 

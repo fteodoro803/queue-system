@@ -1,6 +1,6 @@
 import React from "react";
 import { DevicePhoneMobileIcon } from "@heroicons/react/24/outline";
-import { GenericField, GenericFieldProps } from "./GenericField";
+import { GenericField, GenericFieldProps } from "/imports/ui/components/GenericField";
 
 type NumberFieldProps = Omit<GenericFieldProps, "icon">;
 

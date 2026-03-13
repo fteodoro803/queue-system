@@ -1,7 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import { check } from "meteor/check";
-import { SettingsCollection, Settings, EMERGENCY_OPTION } from "./settings";
-import { isValidTimeStr } from "../utils/utils";
+import { SettingsCollection, Settings, EMERGENCY_OPTION } from "/imports/api/settings";
+import { isValidTimeStr } from "/imports/utils/utils";
 
 // Helper to update a single field
 const updateSetting = <K extends keyof Omit<Settings, "_id">>(

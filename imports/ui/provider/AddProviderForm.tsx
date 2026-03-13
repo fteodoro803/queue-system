@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { EmailField } from "/imports/ui/components/EmailField";
 import { NumberField } from "/imports/ui/components/NumberField";
 import { NameField } from "/imports/ui/components/NameField";
-import { insertProvider } from "../../api/providerMethods";
+import { insertProvider } from "/imports/api/providerMethods";
 
 export const AddProviderForm = () => {
   const [name, setName] = useState("");

@@ -17,7 +17,7 @@ import {
   ClockIcon,
   IdentificationIcon,
 } from "@heroicons/react/24/outline";
-import { QueueIcon } from "../components/QueueIcon";
+import { QueueIcon } from "/imports/ui/components/QueueIcon";
 import { formatDateToLocale } from "/imports/utils/utils";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 
