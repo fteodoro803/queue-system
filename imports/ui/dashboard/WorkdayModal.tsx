@@ -1,5 +1,4 @@
 import React from "react";
-import { MODAL_SIZES } from "/imports/utils/modalSizes";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { SettingsCollection } from "/imports/api/settings";
 import { Loading } from "../components/Loading";
