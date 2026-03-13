@@ -47,7 +47,9 @@ export const QueueManagement = () => {
     const ongoing = queueEntries.filter(
       (entry) => entry.status === "in-progress",
     );
-    const waiting = queueEntries.filter((entry) => entry.status === "waiting");
+    const waiting = queueEntries.filter(
+      (entry) => entry.status === "waiting" || entry.status === "ready",
+    );
     const cancelled = queueEntries.filter(
       (entry) => entry.status === "cancelled",
     );
@@ -194,7 +196,9 @@ export const QueueManagement = () => {
                 <div key={service._id} className="mb-6">
                   <h2 className="text-2xl font-bold">{service.name}</h2>
                   <QueueList
-                    queue={finished.filter((entry) => entry.serviceId === service._id)}
+                    queue={finished.filter(
+                      (entry) => entry.serviceId === service._id,
+                    )}
                     service={service}
                     adminView={true}
                   />
@@ -218,7 +222,9 @@ export const QueueManagement = () => {
                 <div key={service._id} className="mb-6">
                   <h2 className="text-2xl font-bold">{service.name}</h2>
                   <QueueList
-                    queue={cancelled.filter((entry) => entry.serviceId === service._id)}
+                    queue={cancelled.filter(
+                      (entry) => entry.serviceId === service._id,
+                    )}
                     service={service}
                     adminView={true}
                   />

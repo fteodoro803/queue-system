@@ -130,7 +130,7 @@ export const QueueListItemAdmin = ({
           {/* Buttons */}
           <div>
             {/* Start Button */}
-            {entry.status === "waiting" && (
+            {(entry.status === "waiting" || entry.status === "ready") && (
               <button
                 className="btn btn-square btn-ghost"
                 onClick={() => {
