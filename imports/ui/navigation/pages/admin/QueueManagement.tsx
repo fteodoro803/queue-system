@@ -19,6 +19,7 @@ import {
 } from "/imports/utils/utils";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { SettingsCollection } from "/imports/api/settings";
+import { resetCounter } from "/imports/api/countersMethods";
 
 export const QueueManagement = () => {
   const isQueueEntryLoading = useSubscribe("queue");
@@ -91,14 +92,15 @@ export const QueueManagement = () => {
       <div className="flex justify-between">
         <h1 className="text-3xl font-bold">Queue Management</h1>
         <div className="flex gap-1">
-          {/* <button
+          {/* TODO: move this to queue management settings later? */}
+          <button
             className="btn btn-primary"
             onClick={async () => {
               await resetCounter();
             }}
           >
             - Clear Counter
-          </button> */}
+          </button>
           <button
             className="btn btn-primary"
             onClick={() => setQueueEntryModalOpen(true)}
