@@ -1,6 +1,14 @@
 import { QueueEntry } from "/imports/api/queueEntry";
 import { Service } from "/imports/api/service";
 
+export const statusBadgeMap: Record<string, string> = {
+  ready: "badge-success",
+  waiting: "badge-info",
+  "in-progress": "badge-warning",
+  completed: "badge-success",
+  cancelled: "badge-error",
+};
+
 export function calculateEstimatedWaitTime(
   queueEntry: QueueEntry,
   queue: QueueEntry[],
