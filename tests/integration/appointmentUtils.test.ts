@@ -12,7 +12,7 @@ import {
 import { Patient } from "/imports/api/patient";
 
 if (Meteor.isServer) {
-  describe("[INTEGRATION] appointmentUtils - findEarliestSlot()", function () {
+  describe("[INTEGRATION] appointmentUtils", function () {
     // Mocha default timeout is 2000ms — async DB tests need more
     this.timeout(10000);
 
@@ -68,127 +68,129 @@ if (Meteor.isServer) {
       }
     }
 
-    it("returns 9am on the first day when no appointments exist", async () => {
-      const result = await findEarliestSlot(
-        testService,
-        testProvider._id,
-        from,
-        until,
-      );
-      expect(result).to.deep.equal(new Date(2026, 1, 18, 9, 0));
-    });
+    describe("findEarliestSlot()", function () {
+      it("returns 9am on the first day when no appointments exist", async () => {
+        const result = await findEarliestSlot(
+          testService,
+          testProvider._id,
+          from,
+          until,
+        );
+        expect(result).to.deep.equal(new Date(2026, 1, 18, 9, 0));
+      });
 
-    it("slides past a single appointment at 9am", async () => {
-      await seedAppointment(2026, 1, 18, 9, 0, 9, 30);
-      const result = await findEarliestSlot(
-        testService,
-        testProvider._id,
-        from,
-        until,
-      );
-      expect(result).to.deep.equal(new Date(2026, 1, 18, 9, 30));
-    });
+      it("slides past a single appointment at 9am", async () => {
+        await seedAppointment(2026, 1, 18, 9, 0, 9, 30);
+        const result = await findEarliestSlot(
+          testService,
+          testProvider._id,
+          from,
+          until,
+        );
+        expect(result).to.deep.equal(new Date(2026, 1, 18, 9, 30));
+      });
 
-    it("slides past multiple back-to-back appointments", async () => {
-      await seedAppointment(2026, 1, 18, 9, 0, 9, 30);
-      await seedAppointment(2026, 1, 18, 9, 30, 10, 0);
-      await seedAppointment(2026, 1, 18, 10, 0, 10, 30);
-      const result = await findEarliestSlot(
-        testService,
-        testProvider._id,
-        from,
-        until,
-      );
-      expect(result).to.deep.equal(new Date(2026, 1, 18, 10, 30));
-    });
+      it("slides past multiple back-to-back appointments", async () => {
+        await seedAppointment(2026, 1, 18, 9, 0, 9, 30);
+        await seedAppointment(2026, 1, 18, 9, 30, 10, 0);
+        await seedAppointment(2026, 1, 18, 10, 0, 10, 30);
+        const result = await findEarliestSlot(
+          testService,
+          testProvider._id,
+          from,
+          until,
+        );
+        expect(result).to.deep.equal(new Date(2026, 1, 18, 10, 30));
+      });
 
-    it("skips to next weekday when today is fully booked", async () => {
-      await fillDay(2026, 1, 18); // fill Wednesday Feb 18
-      const result = await findEarliestSlot(
-        testService,
-        testProvider._id,
-        from,
-        until,
-      );
-      // Next day is Thursday Feb 19
-      expect(result).to.deep.equal(new Date(2026, 1, 19, 9, 0));
-    });
+      it("skips to next weekday when today is fully booked", async () => {
+        await fillDay(2026, 1, 18); // fill Wednesday Feb 18
+        const result = await findEarliestSlot(
+          testService,
+          testProvider._id,
+          from,
+          until,
+        );
+        // Next day is Thursday Feb 19
+        expect(result).to.deep.equal(new Date(2026, 1, 19, 9, 0));
+      });
 
-    it("returns undefined when no slot exists in the entire range", async () => {
-      // Fill every weekday in the search window
-      await fillDay(2026, 1, 18); // Wed
-      await fillDay(2026, 1, 19); // Thu
-      await fillDay(2026, 1, 20); // Fri
-      await fillDay(2026, 1, 23); // Mon
-      await fillDay(2026, 1, 24); // Tue
-      const result = await findEarliestSlot(
-        testService,
-        testProvider._id,
-        from,
-        until,
-      );
-      expect(result).to.be.undefined;
-    });
+      it("returns undefined when no slot exists in the entire range", async () => {
+        // Fill every weekday in the search window
+        await fillDay(2026, 1, 18); // Wed
+        await fillDay(2026, 1, 19); // Thu
+        await fillDay(2026, 1, 20); // Fri
+        await fillDay(2026, 1, 23); // Mon
+        await fillDay(2026, 1, 24); // Tue
+        const result = await findEarliestSlot(
+          testService,
+          testProvider._id,
+          from,
+          until,
+        );
+        expect(result).to.be.undefined;
+      });
 
-    it("only considers appointments for the given provider", async () => {
-      // Appointment for a different provider at 9am — should not affect result
-      const otherProvider = { _id: "different-provider" } as Provider;
+      it("only considers appointments for the given provider", async () => {
+        // Appointment for a different provider at 9am — should not affect result
+        const otherProvider = { _id: "different-provider" } as Provider;
 
-      const data = {
-        service: testService,
-        serviceId: testService._id,
-        provider: otherProvider,
-        providerId: otherProvider._id,
-        patient: { _id: "patient1" } as Patient, // patient details not relevant for this test
-        date: new Date(2026, 1, 18, 9, 0),
-        endDate: new Date(2026, 1, 18, 9, 30),
-        status: "scheduled",
-      } as AppointmentData;
+        const data = {
+          service: testService,
+          serviceId: testService._id,
+          provider: otherProvider,
+          providerId: otherProvider._id,
+          patient: { _id: "patient1" } as Patient, // patient details not relevant for this test
+          date: new Date(2026, 1, 18, 9, 0),
+          endDate: new Date(2026, 1, 18, 9, 30),
+          status: "scheduled",
+        } as AppointmentData;
 
-      await insertAppointment(data);
+        await insertAppointment(data);
 
-      const result = await findEarliestSlot(
-        testService,
-        testProvider._id,
-        from,
-        until,
-      );
-      // Our provider is free — should still return 9am
-      expect(result).to.deep.equal(new Date(2026, 1, 18, 9, 0));
-    });
+        const result = await findEarliestSlot(
+          testService,
+          testProvider._id,
+          from,
+          until,
+        );
+        // Our provider is free — should still return 9am
+        expect(result).to.deep.equal(new Date(2026, 1, 18, 9, 0));
+      });
 
-    it("ignores cancelled appointments", async () => {
-      // Cancelled appointment at 9am — should not block the slot
-      const data = {
-        service: testService,
-        serviceId: testService._id,
-        provider: testProvider,
-        providerId: testProvider._id,
-        patient: { _id: "patient1" } as Patient,
-        date: new Date(2026, 1, 18, 9, 0),
-        endDate: new Date(2026, 1, 18, 9, 30),
-        status: "cancelled",
-      } as AppointmentData;
+      it("ignores cancelled appointments", async () => {
+        // Cancelled appointment at 9am — should not block the slot
+        const data = {
+          service: testService,
+          serviceId: testService._id,
+          provider: testProvider,
+          providerId: testProvider._id,
+          patient: { _id: "patient1" } as Patient,
+          date: new Date(2026, 1, 18, 9, 0),
+          endDate: new Date(2026, 1, 18, 9, 30),
+          status: "cancelled",
+        } as AppointmentData;
 
-      await insertAppointment(data);
+        await insertAppointment(data);
 
-      const result = await findEarliestSlot(
-        testService,
-        testProvider._id,
-        from,
-        until,
-      );
-      expect(result).to.deep.equal(new Date(2026, 1, 18, 9, 0));
-    });
+        const result = await findEarliestSlot(
+          testService,
+          testProvider._id,
+          from,
+          until,
+        );
+        expect(result).to.deep.equal(new Date(2026, 1, 18, 9, 0));
+      });
 
-    it("returns undefined when from is after until", async () => {
-      const result = await findEarliestSlot(
-        testService,
-        testProvider._id,
-        until,
-        from,
-      );
-      expect(result).to.be.undefined;
+      it("returns undefined when from is after until", async () => {
+        const result = await findEarliestSlot(
+          testService,
+          testProvider._id,
+          until,
+          from,
+        );
+        expect(result).to.be.undefined;
+      });
     });
   });
 }

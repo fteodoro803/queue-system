@@ -42,7 +42,7 @@ if (Meteor.isServer) {
     // -------------------------
     // enqueue
     // -------------------------
-    describe("enqueue", function () {
+    describe("enqueue()", function () {
       it("should add a patient to the queue with position 1 when queue is empty", async () => {
         const id = await enqueue(
           { patient: mockPatient, service: mockService },
@@ -88,7 +88,7 @@ if (Meteor.isServer) {
     // -------------------------
     // startService
     // -------------------------
-    describe("startService", function () {
+    describe("startService()", function () {
       it("should set status to in-progress and position to null", async () => {
         const id = await enqueue(
           { patient: mockPatient, service: mockService },
@@ -131,7 +131,7 @@ if (Meteor.isServer) {
     // -------------------------
     // completeService
     // -------------------------
-    describe("completeService", function () {
+    describe("completeService()", function () {
       it("should set status to completed and clear position", async () => {
         const id = await enqueue(
           { patient: mockPatient, service: mockService },
@@ -166,7 +166,7 @@ if (Meteor.isServer) {
     // -------------------------
     // cancelService
     // -------------------------
-    describe("cancelService", function () {
+    describe("cancelService()", function () {
       it("should set status to cancelled and clear position", async () => {
         const id = await enqueue(
           { patient: mockPatient, service: mockService },
