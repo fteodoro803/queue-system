@@ -22,6 +22,7 @@ import { SettingsCollection } from "/imports/api/settings";
 import { resetCounter } from "/imports/api/countersMethods";
 
 export const QueueManagement = () => {
+  const now = useDateTime();
   const isQueueEntryLoading = useSubscribe("queue");
   const queueEntries = useFind(() =>
     QueueEntryCollection.find({}, { sort: { serviceId: 1, position: 1 } }),
@@ -75,7 +76,6 @@ export const QueueManagement = () => {
   }
 
   // Data for Queue Time dashboard Card
-  const now = useDateTime();
   const endOfDay = getEndOfWorkDay(now, settings.end_of_day);
   const timeRemainingMs = endOfDay.getTime() - now.getTime(); // in milliseconds
   const formattedTimeRemaining = convertMillisecondsToTime(timeRemainingMs);
