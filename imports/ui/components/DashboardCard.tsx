@@ -29,7 +29,9 @@ export const DashboardCard = ({
 
           {/* Footer */}
           {footer && (
-            <p className="text-sm text-primary mt-2 font-semibold">{footer}</p>
+            <div className="text-sm text-primary mt-2 font-semibold">
+              {footer}
+            </div>
           )}
         </div>
         <div className="p-3 bg-primary/10 rounded-lg text-primary">
