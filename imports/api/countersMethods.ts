@@ -1,5 +1,5 @@
 import { Meteor } from "meteor/meteor";
-import { CountersCollection } from "./counters";
+import { CountersCollection } from "/imports/api/counters";
 
 Meteor.methods({
   // Resets the counter for a specific service

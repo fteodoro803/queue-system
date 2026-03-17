@@ -1,12 +1,12 @@
 import { Meteor } from "meteor/meteor";
 import { AppointmentsCollection } from "/imports/api/appointment";
-import { Service, ServicesCollection } from "./service";
-import { Patient } from "./patient";
-import { Provider } from "./provider";
-import { findEarliestSlot } from "../utils/appointmentUtils";
-import { TEST_DATE } from "../dev/settings";
-import { addMonths } from "../utils/utils";
-import { updateServiceAnalytics } from "./serviceMethods";
+import { Service, ServicesCollection } from "/imports/api/service";
+import { Patient } from "/imports/api/patient";
+import { Provider } from "/imports/api/provider";
+import { findEarliestSlot } from "/imports/utils/appointmentUtils";
+import { TEST_DATE } from "/imports/dev/settings";
+import { addMonths } from "/imports/utils/utils";
+import { updateServiceAnalytics } from "/imports/api/serviceMethods";
 
 export const APPOINTMENT_STATES = [
   "scheduled",

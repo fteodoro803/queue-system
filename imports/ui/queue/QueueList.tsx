@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
 import { QueueEntry } from "/imports/api/queueEntry";
-import { QueueListItemAdmin } from "./QueueListItemAdmin";
+import { QueueListItemAdmin } from "/imports/ui/queue/QueueListItemAdmin";
 import { Service } from "/imports/api/service";
-import { QueueListItemPatient } from "./QueueListItemPatient";
+import { QueueListItemPatient } from "/imports/ui/queue/QueueListItemPatient";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { calculateEstimatedWaitTime } from "/imports/utils/queueUtils";
 import { useFind, useSubscribe, useTracker } from "meteor/react-meteor-data";
 import { ProviderCollection } from "/imports/api/provider";
-import { Loading } from "../components/Loading";
+import { Loading } from "/imports/ui/components/Loading";
 import { Session } from "meteor/session";
 
 export const QueueList = ({

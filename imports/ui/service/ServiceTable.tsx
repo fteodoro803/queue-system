@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "/imports/ui/components/Loading";
 import { Service, ServicesCollection } from "/imports/api/service";
-import { ServiceDetailsModal } from "./ServiceDetailsModal";
+import { ServiceDetailsModal } from "/imports/ui/service/ServiceDetailsModal";
 
 export const ServiceTable = () => {
   const isLoading = useSubscribe("services");

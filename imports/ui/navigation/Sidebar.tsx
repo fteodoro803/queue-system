@@ -12,7 +12,7 @@ import {
   IdentificationIcon,
 } from "@heroicons/react/24/solid";
 import { Outlet, useLocation } from "react-router-dom";
-import { NavLinkItem } from "./NavLinkItem";
+import { NavLinkItem } from "/imports/ui/navigation/NavLinkItem";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { formatDateToLocale } from "/imports/utils/utils";
 import { TEST_SETTINGS } from "/imports/dev/settings";

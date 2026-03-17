@@ -1,7 +1,7 @@
-import { Appointment, AppointmentsCollection } from "../api/appointment";
-import { Service } from "../api/service";
-import { WORKING_HOURS } from "../dev/settings";
-import { convertStrToHrs } from "./utils";
+import { Appointment, AppointmentsCollection } from "/imports/api/appointment";
+import { Service } from "/imports/api/service";
+import { WORKING_HOURS } from "/imports/dev/settings";
+import { convertStrToHrs } from "/imports/utils/utils";
 
 interface AppointmentQuery {
   providerId: string;

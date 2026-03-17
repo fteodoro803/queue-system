@@ -1,5 +1,5 @@
 import React from "react";
-import { AddProviderForm } from "./AddProviderForm";
+import { AddProviderForm } from "/imports/ui/provider/AddProviderForm";
 
 export const AddProviderModal = ({
   open,

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useDateTime } from "../../contexts/DateTimeContext";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
 
 export const Home = () => {
   const now = useDateTime();

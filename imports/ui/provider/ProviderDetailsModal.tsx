@@ -3,10 +3,10 @@ import { EmailField } from "/imports/ui/components/EmailField";
 import { NumberField } from "/imports/ui/components/NumberField";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { NameField } from "/imports/ui/components/NameField";
-import { Provider } from "../../api/provider";
-import { updateProvider } from "../../api/providerMethods";
-import { ProviderServicesTable } from "./ProviderServicesTable";
-import { ModalButtons } from "../components/ModalButtons";
+import { Provider } from "/imports/api/provider";
+import { updateProvider } from "/imports/api/providerMethods";
+import { ProviderServicesTable } from "/imports/ui/provider/ProviderServicesTable";
+import { ModalButtons } from "/imports/ui/components/ModalButtons";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 
 export const ProviderDetailsModal = ({

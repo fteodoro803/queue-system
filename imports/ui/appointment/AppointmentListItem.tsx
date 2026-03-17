@@ -5,7 +5,7 @@ import {
   ClipboardDocumentListIcon,
   ClockIcon,
 } from "@heroicons/react/24/outline";
-import { DateIcon } from "../components/DateIcon";
+import { DateIcon } from "/imports/ui/components/DateIcon";
 import { formatDateToLocale } from "/imports/utils/utils";
 
 export const AppointmentListItem = ({

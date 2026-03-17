@@ -1,6 +1,6 @@
 import React from "react";
 import { UserIcon } from "@heroicons/react/24/outline";
-import { GenericField, GenericFieldProps } from "./GenericField";
+import { GenericField, GenericFieldProps } from "/imports/ui/components/GenericField";
 
 type NameFieldProps = Omit<GenericFieldProps, "icon">;
 

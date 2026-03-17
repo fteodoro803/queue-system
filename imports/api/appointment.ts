@@ -1,7 +1,7 @@
 import { Mongo } from "meteor/mongo";
 import { Patient } from "/imports/api/patient";
-import { Service } from "./service";
-import { Provider } from "./provider";
+import { Service } from "/imports/api/service";
+import { Provider } from "/imports/api/provider";
 
 export interface Appointment {
   _id: string;

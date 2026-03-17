@@ -1,4 +1,4 @@
-import { convertStrToHrs } from "../utils/utils";
+import { convertStrToHrs } from "/imports/utils/utils";
 
 // Test Settings (all should be false in production)
 export const TEST_SETTINGS = {

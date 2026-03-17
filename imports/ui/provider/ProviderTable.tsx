@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { Loading } from "/imports/ui/components/Loading";
-import { Provider, ProviderCollection } from "../../api/provider";
-import { ProviderDetailsModal } from "./ProviderDetailsModal";
+import { Provider, ProviderCollection } from "/imports/api/provider";
+import { ProviderDetailsModal } from "/imports/ui/provider/ProviderDetailsModal";
 
 export const ProviderTable = () => {
   const isLoading = useSubscribe("providers");

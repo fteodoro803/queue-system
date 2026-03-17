@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Service } from "/imports/api/service";
-import { GenericField } from "../components/GenericField";
+import { GenericField } from "/imports/ui/components/GenericField";
 import {
   BanknotesIcon,
   ChartBarIcon,
@@ -8,7 +8,7 @@ import {
   ClockIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
-import { ModalButtons } from "../components/ModalButtons";
+import { ModalButtons } from "/imports/ui/components/ModalButtons";
 
 export const ServiceDetailsModal = ({
   service,

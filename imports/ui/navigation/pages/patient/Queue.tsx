@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { MakeQueueEntryModal } from "../../queue/MakeQueueEntryModal";
-import { QueueList } from "../../queue/QueueList";
-import { Loading } from "../../components/Loading";
+import { MakeQueueEntryModal } from "/imports/ui/queue/MakeQueueEntryModal";
+import { QueueList } from "/imports/ui/queue/QueueList";
+import { Loading } from "/imports/ui/components/Loading";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { ServicesCollection } from "/imports/api/service";
 import { QueueEntryCollection } from "/imports/api/queueEntry";

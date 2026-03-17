@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Steps } from "../components/Steps";
-import { SelectService } from "../bookingSteps/SelectService";
+import { Steps } from "/imports/ui/components/Steps";
+import { SelectService } from "/imports/ui/bookingSteps/SelectService";
 import { Service } from "/imports/api/service";
 import { Provider } from "/imports/api/provider";
-import { SelectProvider } from "../bookingSteps/SelectProvider";
-import { SelectDateTime } from "../bookingSteps/SelectDateTime";
-import { AppointmentConfirmation } from "../bookingSteps/AppointmentConfirmation";
+import { SelectProvider } from "/imports/ui/bookingSteps/SelectProvider";
+import { SelectDateTime } from "/imports/ui/bookingSteps/SelectDateTime";
+import { AppointmentConfirmation } from "/imports/ui/bookingSteps/AppointmentConfirmation";
 import { MODAL_SIZES } from "/imports/utils/modalSizes";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { SelectPatient } from "../bookingSteps/SelectPatient";
+import { SelectPatient } from "/imports/ui/bookingSteps/SelectPatient";
 import { Patient } from "/imports/api/patient";
 
 export const MakeAppointmentModal = ({

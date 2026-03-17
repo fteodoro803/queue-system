@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from "react";
-import { MakeQueueEntryModal } from "../queue/MakeQueueEntryModal";
+import { MakeQueueEntryModal } from "/imports/ui/queue/MakeQueueEntryModal";
 import { useFind, useSubscribe, useTracker } from "meteor/react-meteor-data";
-import { Loading } from "../components/Loading";
+import { Loading } from "/imports/ui/components/Loading";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
-import { QueueList } from "../queue/QueueList";
+import { QueueList } from "/imports/ui/queue/QueueList";
 import { ServicesCollection } from "/imports/api/service";
-import { DashboardCard } from "../components/DashboardCard";
+import { DashboardCard } from "/imports/ui/components/DashboardCard";
 import {
   ClockIcon,
   IdentificationIcon,
@@ -19,8 +19,10 @@ import {
 } from "/imports/utils/utils";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { SettingsCollection } from "/imports/api/settings";
+import { resetCounter } from "/imports/api/countersMethods";
 
 export const QueueManagement = () => {
+  const now = useDateTime();
   const isQueueEntryLoading = useSubscribe("queue");
   const queueEntries = useFind(() =>
     QueueEntryCollection.find({}, { sort: { serviceId: 1, position: 1 } }),
@@ -74,7 +76,6 @@ export const QueueManagement = () => {
   }
 
   // Data for Queue Time dashboard Card
-  const now = useDateTime();
   const endOfDay = getEndOfWorkDay(now, settings.end_of_day);
   const timeRemainingMs = endOfDay.getTime() - now.getTime(); // in milliseconds
   const formattedTimeRemaining = convertMillisecondsToTime(timeRemainingMs);
@@ -91,14 +92,15 @@ export const QueueManagement = () => {
       <div className="flex justify-between">
         <h1 className="text-3xl font-bold">Queue Management</h1>
         <div className="flex gap-1">
-          {/* <button
+          {/* TODO: move this to queue management settings later? */}
+          <button
             className="btn btn-primary"
             onClick={async () => {
               await resetCounter();
             }}
           >
             - Clear Counter
-          </button> */}
+          </button>
           <button
             className="btn btn-primary"
             onClick={() => setQueueEntryModalOpen(true)}
