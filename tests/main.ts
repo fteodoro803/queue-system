@@ -2,6 +2,7 @@ import { Meteor } from "meteor/meteor";
 import assert from "assert";
 import "./unit/appointmentUtils.test";
 import "./integration/appointmentUtils.test";
+import "./integration/queueMethods.test";
 import { TEST_SETTINGS } from "/imports/dev/settings";
 
 describe("queue-system", function () {
