@@ -3,9 +3,9 @@ import { Patient } from "/imports/api/patient";
 import { Service } from "/imports/api/service";
 
 export const QUEUE_STATES = [
-  "waiting",
-  "ready",
-  "in-progress",
+  "waiting",  // waiting but not yet ready to be served (e.g., patient hasn't checked in)
+  "ready",  // waiting but checked-in and ready to be served
+  "in-progress",  // TODO: change to ongoing or active later
   "completed",
   "cancelled",
 ] as const;

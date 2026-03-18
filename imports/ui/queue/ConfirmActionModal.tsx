@@ -16,13 +16,14 @@ import {
   cancelService,
   completeService,
   startService,
+  checkIn,
 } from "/imports/api/queueEntryMethods";
 
 /**
  * Action modals for queue entry management.
  *
- * Provides a reusable `ConfirmActionModal` base component and three
- * pre-configured variants: `CancelModal`, `StartModal`, and `EndModal`.
+ * Provides a reusable `ConfirmActionModal` base component and four
+ * pre-configured variants: `CancelModal`, `StartModal`, `EndModal`, and `CheckInModal`.
  */
 
 /**
@@ -241,6 +242,28 @@ export const EndModal = ({
       confirmLabel="Complete Service"
       confirmClass="btn-success"
       onConfirm={() => completeService(entry._id, now)}
+    />
+  );
+};
+
+export const CheckInModal = ({
+  setOpen,
+  entry,
+  now,
+}: {
+  setOpen: (value: boolean) => void;
+  entry: QueueEntry;
+  now: Date;
+}) => {
+  return (
+    <ConfirmActionModal
+      setOpen={setOpen}
+      entry={entry}
+      title="Check-In Appointment"
+      message="This will mark the patient as checked in and ready for service."
+      confirmLabel="Check-In"
+      confirmClass="btn-success"
+      onConfirm={() => checkIn(entry._id, now)}
     />
   );
 };

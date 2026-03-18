@@ -1,5 +1,9 @@
 import { Meteor } from "meteor/meteor";
-import { QUEUE_STATES, QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
+import {
+  QUEUE_STATES,
+  QueueEntry,
+  QueueEntryCollection,
+} from "/imports/api/queueEntry";
 import { Patient } from "/imports/api/patient";
 import { Service } from "/imports/api/service";
 import { updateServiceAnalytics } from "/imports/api/serviceMethods";
@@ -27,7 +31,7 @@ Meteor.methods({
         {
           position: { $ne: null },
           serviceId: data.service._id,
-          status: "waiting",
+          status: { $in: ["waiting", "ready"] },
         },
         { sort: { position: -1 } },
       );
@@ -94,6 +98,16 @@ Meteor.methods({
     }
   },
 
+  // Check in
+  async "queueEntry.markAsReady"(id: string, time: Date) {
+    await QueueEntryCollection.updateAsync(id, {
+      $set: {
+        readyAt: time,
+        status: "ready",
+      },
+    });
+  },
+
   // Starts a Service
   async "queueEntry.startService"(id: string, time: Date) {
     const entry: QueueEntry | undefined =
@@ -129,6 +143,11 @@ export async function enqueue(
   return await Meteor.callAsync("queueEntry.enqueue", data, time);
 }
 
+// Checks-in a Patient, and marks them as Ready
+export async function checkIn(id: string, time: Date): Promise<void> {
+  await Meteor.callAsync("queueEntry.markAsReady", id, time);
+}
+
 // Starts a service for a queue entry
 export async function startService(id: string, time: Date): Promise<void> {
   await Meteor.callAsync("queueEntry.startService", id, time);
@@ -162,17 +181,6 @@ async function updatePositions(entry: QueueEntry, time: Date): Promise<void> {
     // 3. all matches
     { multi: true },
   );
-
-  // 2. Find whoever just moved to position 1
-  const newPositionOne = await QueueEntryCollection.findOneAsync({
-    serviceId: entry.serviceId,
-    position: 1,
-  });
-
-  // 3. Mark them as ready
-  if (newPositionOne) {
-    await markAsReady(newPositionOne._id, time);
-  }
 }
 
 // Generate Display ID
@@ -202,14 +210,4 @@ async function generateDisplayId(service: Service): Promise<string> {
   const displayId = `${serviceStr}-${numStr}`;
 
   return displayId;
-}
-
-// Marks a queue entry as ready (used for timing)
-async function markAsReady(id: string, time: Date): Promise<void> {
-  await QueueEntryCollection.updateAsync(id, {
-    $set: {
-      readyAt: time,
-      status: "ready",
-    },
-  });
 }

@@ -7,6 +7,7 @@ import {
   XMarkIcon,
   ClockIcon,
   IdentificationIcon,
+  CheckIcon,
 } from "@heroicons/react/24/outline";
 import { QueueIcon } from "/imports/ui/components/QueueIcon";
 import { formatDateToLocale } from "/imports/utils/utils";
@@ -14,6 +15,7 @@ import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { statusBadgeMap } from "/imports/utils/queueUtils";
 import {
   CancelModal,
+  CheckInModal,
   EndModal,
   StartModal,
 } from "/imports/ui/queue/ConfirmActionModal";
@@ -37,9 +39,12 @@ export const QueueListItem = ({
   const [openCancelModal, setOpenCancelModal] = useState(false);
   const [openStartModal, setOpenStartModal] = useState(false);
   const [openEndModal, setOpenEndModal] = useState(false);
+  const [openCheckInModal, setOpenCheckInModal] = useState(false);
 
   const position = entry.position;
-  const ready =
+
+  // Ready if position is 1 or less than there are available providers
+  const isProviderAvailable =
     position && availableProviders && position <= availableProviders;
 
   return (
@@ -113,17 +118,29 @@ export const QueueListItem = ({
         <div className="flex items-center gap-4">
           {/* Status */}
           <div
-            className={`badge badge-soft ml-auto ${statusBadgeMap[ready ? "ready" : entry.status]}`}
+            className={`badge badge-soft ml-auto ${statusBadgeMap[entry.status]}`}
           >
-            {ready ? "ready" : entry.status}
+            {entry.status}
           </div>
 
           {/* Buttons */}
           <div>
-            {/* Start Button */}
-            {(entry.status === "waiting" || entry.status === "ready") && (
+            {/* Check-in Button */}
+            {entry.status === "waiting" && (
               <button
                 className="btn btn-square btn-ghost"
+                onClick={() => {
+                  setOpenCheckInModal(true);
+                }}
+              >
+                <CheckIcon className="w-6" />
+              </button>
+            )}
+            {/* Start Button */}
+            {entry.status === "ready" && (
+              <button
+                className="btn btn-square btn-ghost"
+                disabled={!isProviderAvailable}
                 onClick={() => {
                   setOpenStartModal(true);
                 }}
@@ -158,6 +175,9 @@ export const QueueListItem = ({
       )}
       {openEndModal && (
         <EndModal setOpen={setOpenEndModal} entry={entry} now={now} />
+      )}
+      {openCheckInModal && (
+        <CheckInModal setOpen={setOpenCheckInModal} entry={entry} now={now} />
       )}
     </>
   );
