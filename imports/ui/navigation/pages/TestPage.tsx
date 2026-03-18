@@ -15,7 +15,7 @@ import { HomeIcon } from "@heroicons/react/24/outline";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { QueueIcon } from "/imports/ui/components/QueueIcon";
 import { QueueEntry } from "/imports/api/queueEntry";
-import { QueueListItemAdmin } from "/imports/ui/queue/QueueListItemAdmin";
+import { QueueListItem } from "../../queue/QueueListItem";
 import { getEndOfDay, getStartOfDay } from "/imports/utils/utils";
 import { AppointmentList } from "/imports/ui/appointment/AppointmentList";
 
@@ -307,10 +307,10 @@ export const TestPage = () => {
       <div className="mt-4">
         <p className="text-xl font-semibold">Queue List Item (Admin)</p>
         <ul className="list bg-base-100 rounded-box shadow-md">
-          <QueueListItemAdmin entry={queueEntry1} admin={true} />
-          <QueueListItemAdmin entry={queueEntry2} admin={true} />
-          <QueueListItemAdmin entry={queueEntry3} admin={true} />
-          <QueueListItemAdmin entry={queueEntry4} admin={true} />
+          <QueueListItem entry={queueEntry1} admin={true} />
+          <QueueListItem entry={queueEntry2} admin={true} />
+          <QueueListItem entry={queueEntry3} admin={true} />
+          <QueueListItem entry={queueEntry4} admin={true} />
         </ul>
       </div>
 
@@ -318,8 +318,8 @@ export const TestPage = () => {
       <div className="mt-4">
         <p className="text-xl font-semibold">Queue List Item (Patient)</p>
         <ul className="list bg-base-100 rounded-box shadow-md">
-          <QueueListItemAdmin entry={queueEntry1} admin={false} />
-          <QueueListItemAdmin entry={queueEntry2} admin={false} />
+          <QueueListItem entry={queueEntry1} admin={false} />
+          <QueueListItem entry={queueEntry2} admin={false} />
         </ul>
       </div>
     </>

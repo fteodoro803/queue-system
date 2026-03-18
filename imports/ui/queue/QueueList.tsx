@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { QueueEntry } from "/imports/api/queueEntry";
-import { QueueListItemAdmin } from "/imports/ui/queue/QueueListItemAdmin";
+import { QueueListItem } from "./QueueListItem";
 import { Service } from "/imports/api/service";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { calculateEstimatedWaitTime } from "/imports/utils/queueUtils";
@@ -77,7 +77,7 @@ export const QueueList = ({
 
           if (adminView)
             return (
-              <QueueListItemAdmin
+              <QueueListItem
                 key={entry._id}
                 entry={entry}
                 timeUntil={estimatedWaitTime}
@@ -88,7 +88,7 @@ export const QueueList = ({
           else
             return (
               // TODO: Match this later with admin one, or merge it
-              <QueueListItemAdmin
+              <QueueListItem
                 key={entry._id}
                 entry={entry}
                 timeUntil={estimatedWaitTime}

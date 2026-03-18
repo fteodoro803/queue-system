@@ -18,11 +18,11 @@ import {
   StartModal,
 } from "/imports/ui/queue/ConfirmActionModal";
 
-export const QueueListItemAdmin = ({
+export const QueueListItem = ({
   entry,
   timeUntil,
   availableProviders,
-  admin,    // TODO: do this later
+  admin, // TODO: do this later
 }: {
   entry: QueueEntry;
   timeUntil?: number;
