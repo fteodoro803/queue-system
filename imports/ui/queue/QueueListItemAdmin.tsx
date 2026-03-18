@@ -22,10 +22,12 @@ export const QueueListItemAdmin = ({
   entry,
   timeUntil,
   availableProviders,
+  admin,    // TODO: do this later
 }: {
   entry: QueueEntry;
   timeUntil?: number;
   availableProviders?: number;
+  admin?: boolean;
 }) => {
   const now = useDateTime();
   const iconSize: string = "size-6";

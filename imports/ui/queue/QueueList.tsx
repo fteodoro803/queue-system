@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { QueueEntry } from "/imports/api/queueEntry";
 import { QueueListItemAdmin } from "/imports/ui/queue/QueueListItemAdmin";
 import { Service } from "/imports/api/service";
-import { QueueListItemPatient } from "/imports/ui/queue/QueueListItemPatient";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { calculateEstimatedWaitTime } from "/imports/utils/queueUtils";
 import { useFind, useSubscribe, useTracker } from "meteor/react-meteor-data";
@@ -83,15 +82,17 @@ export const QueueList = ({
                 entry={entry}
                 timeUntil={estimatedWaitTime}
                 availableProviders={availableProviders}
+                admin={true}
               />
             );
           else
             return (
               // TODO: Match this later with admin one, or merge it
-              <QueueListItemPatient
+              <QueueListItemAdmin
                 key={entry._id}
                 entry={entry}
                 timeUntil={estimatedWaitTime}
+                availableProviders={availableProviders}
               />
             );
         })
