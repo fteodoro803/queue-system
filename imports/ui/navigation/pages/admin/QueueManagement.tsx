@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { MakeQueueEntryModal } from "/imports/ui/queue/MakeQueueEntryModal";
-import { useFind, useSubscribe, useTracker } from "meteor/react-meteor-data";
+import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "/imports/ui/components/Loading";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { QueueList } from "/imports/ui/queue/QueueList";
@@ -11,7 +11,6 @@ import {
   IdentificationIcon,
   NumberedListIcon,
 } from "@heroicons/react/24/outline";
-import { Session } from "meteor/session";
 import {
   convertMillisecondsToTime,
   convertMinutesToTime,
@@ -20,6 +19,8 @@ import {
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { SettingsCollection } from "/imports/api/settings";
 import { resetCounter } from "/imports/api/countersMethods";
+import { ProviderCollection } from "/imports/api/provider";
+import { calculateQueueTime } from "/imports/utils/queueUtils";
 
 export const QueueManagement = () => {
   const now = useDateTime();
@@ -33,17 +34,10 @@ export const QueueManagement = () => {
   const demoService = services[0];
 
   const isProvidersLoading = useSubscribe("providers");
-  // const providers = useFind(() => ProviderCollection.find({}));
+  const providers = useFind(() => ProviderCollection.find({}));
 
   const [queueEntryModalOpen, setQueueEntryModalOpen] =
     useState<boolean>(false);
-
-  // TODO: temporary? probably should be calculated on the server and stored somewhere
-  const maxQueueLength = useTracker(
-    () => Session.get("maxQueueLength") || null,
-  );
-
-  const TOTAL_PROVIDERS = 2;
 
   const [ongoing, waiting, cancelled, finished] = useMemo(() => {
     const ongoing = queueEntries.filter(
@@ -61,7 +55,17 @@ export const QueueManagement = () => {
     return [ongoing, waiting, cancelled, finished];
   }, [queueEntries]);
 
+  // TODO: Currently doesnt account for specific services, this is just assuming 1 service
+  const totalProviders = providers.length;
   const unavailableProviders = ongoing?.length;
+  const availableProviders = totalProviders - unavailableProviders;
+
+  const maxQueueLength = calculateQueueTime({
+    activeProviders: totalProviders,
+    currentTime: now,
+    queue: queueEntries,
+    service: demoService,
+  });
 
   const isSettingsLoading = useSubscribe("settings");
   const settings = useFind(() => SettingsCollection.find({}))[0];
@@ -79,11 +83,15 @@ export const QueueManagement = () => {
   const endOfDay = getEndOfWorkDay(now, settings.end_of_day);
   const timeRemainingMs = endOfDay.getTime() - now.getTime(); // in milliseconds
   const formattedTimeRemaining = convertMillisecondsToTime(timeRemainingMs);
-  const maxQueueLengthMs = maxQueueLength * 60 * 1000; // convert mins to ms
+  const maxQueueLengthMs: number | undefined = maxQueueLength
+    ? maxQueueLength * 60 * 1000
+    : undefined; // convert mins to ms
 
   const getQueueTimeColor = () => {
-    if (maxQueueLengthMs >= timeRemainingMs) return "text-error";
-    if (maxQueueLengthMs >= timeRemainingMs * 0.5) return "text-warning";
+    if (maxQueueLengthMs && maxQueueLengthMs >= timeRemainingMs)
+      return "text-error";
+    if (maxQueueLengthMs && maxQueueLengthMs >= timeRemainingMs * 0.5)
+      return "text-warning";
     return "";
   };
 
@@ -124,17 +132,18 @@ export const QueueManagement = () => {
         <div className="my-4">
           <DashboardCard
             header="Available Providers"
-            body={TOTAL_PROVIDERS - unavailableProviders}
+            body={totalProviders - unavailableProviders}
             footer={`Unavailable: ${unavailableProviders}`}
             icon={IdentificationIcon}
           />
         </div>
 
+        {/* Queue Time Card */}
+        {/* Total Service time is total queue time + service duration for last entry in queue */}
         <div className="my-4">
           <DashboardCard
-            header="Total Queue Time"
-            body={convertMinutesToTime(maxQueueLength)}
-            // footer={`${formattedTimeRemaining} remaining`}
+            header="Total Service Time"
+            body={maxQueueLength ? convertMinutesToTime(maxQueueLength) : "N/A"}
             footer={
               <p className={getQueueTimeColor()}>
                 {formattedTimeRemaining} left in day
@@ -175,7 +184,7 @@ export const QueueManagement = () => {
             <div key={demoService._id} className="mb-6">
               <h2 className="text-2xl font-bold">Waiting</h2>
               <QueueList
-                availableProviders={TOTAL_PROVIDERS - unavailableProviders}
+                availableProviders={availableProviders}
                 queue={waiting}
                 service={demoService}
                 adminView={true}

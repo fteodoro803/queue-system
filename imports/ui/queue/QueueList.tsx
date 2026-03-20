@@ -1,13 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { QueueEntry } from "/imports/api/queueEntry";
 import { QueueListItem } from "./QueueListItem";
 import { Service } from "/imports/api/service";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { calculateQueueTime } from "/imports/utils/queueUtils";
-import { useFind, useSubscribe, useTracker } from "meteor/react-meteor-data";
+import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { ProviderCollection } from "/imports/api/provider";
 import { Loading } from "/imports/ui/components/Loading";
-import { Session } from "meteor/session";
 
 export const QueueList = ({
   queue,
@@ -29,25 +28,6 @@ export const QueueList = ({
       services: { $elemMatch: { id: service._id, enabled: true } },
     }),
   );
-
-  const maxQueueLength = useTracker(
-    () => Session.get("maxQueueLength") || null,
-  );
-
-  // Update maxQueueLength in Session for testing purposes (to show the max wait time in the UI, can be removed later)
-  useEffect(() => {
-    if (queue.length === 0) Session.set("maxQueueLength", null);
-    else {
-      const estimatedWaitTime = calculateQueueTime({
-        queue: queue,
-        service: service,
-        activeProviders: providers.length,
-        currentTime: now,
-      });
-      if (estimatedWaitTime && estimatedWaitTime > maxQueueLength)
-        Session.set("maxQueueLength", estimatedWaitTime);
-    }
-  }, [queue.length, providers.length, now]);
 
   if (providersIsLoading()) return <Loading />;
 
@@ -71,8 +51,6 @@ export const QueueList = ({
             activeProviders: providers.length,
             currentTime: now,
           });
-          if (estimatedWaitTime && estimatedWaitTime > maxQueueLength)
-            Session.set("maxQueueLength", estimatedWaitTime);
 
           if (adminView)
             return (

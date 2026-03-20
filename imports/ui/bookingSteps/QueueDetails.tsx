@@ -6,10 +6,12 @@ import {
   ExclamationTriangleIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
-import { QueueEntry } from "/imports/api/queueEntry";
-import { Session } from "meteor/session";
-import { useTracker } from "meteor/react-meteor-data";
+import { QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
+import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { convertMinutesToTime } from "/imports/utils/utils";
+import { calculateQueueTime } from "/imports/utils/queueUtils";
+import { ProviderCollection } from "/imports/api/provider";
+import { Loading } from "../components/Loading";
 
 export const QueueDetails = ({
   entry,
@@ -19,13 +21,29 @@ export const QueueDetails = ({
   setOpen: (value: boolean) => void;
 }) => {
   const now = useDateTime();
-
-  // TODO: temporary? probably should be calculated on the server and stored somewhere
-  const maxQueueLength = useTracker(
-    () => Session.get("maxQueueLength") || null,
+  const isProvidersLoading = useSubscribe("providers");
+  const providers = useFind(() => ProviderCollection.find({}));
+  const isQueueLoading = useSubscribe("queue");
+  const queue = useFind(() =>
+    QueueEntryCollection.find({ serviceId: entry?.service._id }),
   );
 
-  if (!entry) return null;
+  // Calculate the number of active providers for the selected service
+  const activeProviders = providers.filter((p) =>
+    p.services.some((s) => s.id === entry?.service._id && s.enabled),
+  ).length;
+
+  const maxQueueLength = calculateQueueTime({
+    queueEntry: entry,
+    queue: queue,
+    service: entry!.service,
+    activeProviders: activeProviders,
+    currentTime: now,
+  });
+
+  if (isProvidersLoading() || isQueueLoading()) return <Loading />;
+
+  if (!entry || activeProviders === undefined) return null;
   const isPriority = entry.service.priority > 1;
 
   return (
@@ -50,7 +68,9 @@ export const QueueDetails = ({
           <span className="text-sm">
             Est. wait:{" "}
             <span className="font-semibold text-base-content">
-              {convertMinutesToTime(maxQueueLength)}
+              {maxQueueLength !== undefined
+                ? convertMinutesToTime(maxQueueLength)
+                : "N/A (QueueLength undefined)"}
             </span>
           </span>
         </div>
