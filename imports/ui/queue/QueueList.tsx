@@ -3,7 +3,7 @@ import { QueueEntry } from "/imports/api/queueEntry";
 import { QueueListItem } from "./QueueListItem";
 import { Service } from "/imports/api/service";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
-import { calculateEstimatedWaitTime } from "/imports/utils/queueUtils";
+import { calculateQueueTime } from "/imports/utils/queueUtils";
 import { useFind, useSubscribe, useTracker } from "meteor/react-meteor-data";
 import { ProviderCollection } from "/imports/api/provider";
 import { Loading } from "/imports/ui/components/Loading";
@@ -38,13 +38,12 @@ export const QueueList = ({
   useEffect(() => {
     if (queue.length === 0) Session.set("maxQueueLength", null);
     else {
-      const estimatedWaitTime = calculateEstimatedWaitTime(
-        queue[queue.length - 1],
-        queue,
-        service,
-        providers.length,
-        now,
-      );
+      const estimatedWaitTime = calculateQueueTime({
+        queue: queue,
+        service: service,
+        activeProviders: providers.length,
+        currentTime: now,
+      });
       if (estimatedWaitTime && estimatedWaitTime > maxQueueLength)
         Session.set("maxQueueLength", estimatedWaitTime);
     }
@@ -65,13 +64,13 @@ export const QueueList = ({
       {/* List of Queue Entries */}
       {queue.length > 0 ? (
         queue.map((entry) => {
-          const estimatedWaitTime = calculateEstimatedWaitTime(
-            entry,
-            queue,
-            service,
-            providers.length,
-            now,
-          );
+          const estimatedWaitTime = calculateQueueTime({
+            queue: queue,
+            queueEntry: entry,
+            service: service,
+            activeProviders: providers.length,
+            currentTime: now,
+          });
           if (estimatedWaitTime && estimatedWaitTime > maxQueueLength)
             Session.set("maxQueueLength", estimatedWaitTime);
 

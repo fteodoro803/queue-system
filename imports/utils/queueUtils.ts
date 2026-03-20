@@ -9,56 +9,98 @@ export const statusBadgeMap: Record<string, string> = {
   cancelled: "badge-error",
 };
 
-export function calculateEstimatedWaitTime(
-  queueEntry: QueueEntry,
-  queue: QueueEntry[],
-  service: Service,
-  activeProviders: number,
-  currentTime: Date,
-): number | undefined {
-  if (queueEntry.position === undefined || queueEntry.position === null) {
+// Calculates the estimated total service time for a queue
+// If an entry is supplied, calculates the estimated wait time for that entry.
+export function calculateQueueTime({
+  queue,
+  queueEntry,
+  service,
+  activeProviders,
+  currentTime,
+}: {
+  queue: QueueEntry[];
+  queueEntry?: QueueEntry;
+  service: Service;
+  activeProviders: number;
+  currentTime: Date;
+}): number | undefined {
+  // If entry has no position, we can't calculate wait time
+  if (
+    queueEntry &&
+    (queueEntry.position === null || queueEntry.position === undefined)
+  ) {
     return undefined;
   }
 
+  // If no active providers, we can't estimate wait time
   if (!activeProviders || activeProviders <= 0) return undefined;
 
+  // If entry is supplied but not in the queue or for a different service, return undefined
+  if (queueEntry && queueEntry.serviceId !== service._id) return undefined;
+
+  // Service duration in minutes
   const serviceDuration = service.avgDuration ?? service.duration;
 
-  // Find the currently in-progress entry for this service
-  const inProgress = queue.find(
-    (e) => e.serviceId === queueEntry.serviceId && e.position === 0,
+  // 1. Get the time remaining for people being served ("in-progress")
+  let remainingTime = 0;
+  const inProgressEntries = queue.filter(
+    (e) => e.serviceId === service._id && e.status === "in-progress",
+  );
+  for (const entry of inProgressEntries) {
+    if (entry.start) {
+      const timeElapsed =
+        (currentTime.getTime() - entry.start.getTime()) / 60000;
+      const timeLeft = Math.max(0, serviceDuration - timeElapsed);
+      remainingTime += timeLeft;
+    } else {
+      // If start time is missing, assume full duration left
+      remainingTime += serviceDuration;
+    }
+  }
+
+  // 2a. Get waiting time for people "waiting"/"ready" ahead of the entry
+  let timeOfWaitingAhead: number = 0;
+  // People ahead of entry excluding the in-progress ones
+  if (queueEntry) {
+    const peopleAhead = queue.filter(
+      (e) =>
+        e.serviceId === service._id &&
+        (e.status === "waiting" || e.status === "ready") &&
+        e.position != null &&
+        queueEntry.position != null &&
+        e.position < queueEntry.position,
+    ).length;
+    timeOfWaitingAhead = peopleAhead * serviceDuration;
+  }
+
+  // 2b. If no entry supplied, calculate based on the full queue length for the service
+  else {
+    const numPeopleWaiting = queue.filter(
+      (e) =>
+        e.serviceId === service._id &&
+        (e.status === "waiting" || e.status === "ready") &&
+        e.position != null,
+    ).length;
+
+    timeOfWaitingAhead = numPeopleWaiting * serviceDuration;
+  }
+
+  // 3. Take into account the number of active providers for the service
+  // Count active queue entries for this service (waiting, ready, in-progress)
+  const activeQueueLength = queue.filter(
+    (e) =>
+      e.serviceId === service._id &&
+      (e.status === "waiting" ||
+        e.status === "in-progress" ||
+        e.status === "ready"),
+  ).length;
+
+  // Min used because if there are more providers than patients, it doesnt shorten the wait time
+  const effectiveProviders = Math.min(
+    Math.max(1, activeProviders),
+    activeQueueLength,
   );
 
-  // Find position 1 entry — they're probably being served even if not marked in-progress
-  const positionOne = queue.find(
-    (e) => e.serviceId === queueEntry.serviceId && e.position === 1,
-  );
-
-  const remainingTime = inProgress?.start
-    ? // In-progress entry exists — count down from actual start time
-      Math.max(
-        0,
-        serviceDuration -
-          (currentTime.getTime() - inProgress.start.getTime()) / 60000,
-      )
-    : positionOne?.createdAt
-      ? // No in-progress but someone is at position 1 — use their createdAt as proxy
-        Math.max(
-          0,
-          serviceDuration -
-            (currentTime.getTime() - positionOne.createdAt.getTime()) / 60000,
-        )
-      : // Nobody in queue ahead — full duration
-        serviceDuration;
-
-  // People ahead excluding the in-progress one (position 0)
-  const peopleAhead = queueEntry.position - 1;
-
-  // TODO: implement better doctor tracking later
-  const effectiveProviders = Math.max(1, activeProviders); // Avoid division by zero
-
-  // remaining time for current + full duration for everyone else ahead
-  return Math.ceil(
-    (remainingTime + peopleAhead * serviceDuration) / effectiveProviders,
-  );
+  // 4. Calculate total wait time
+  return Math.ceil((remainingTime + timeOfWaitingAhead) / effectiveProviders);
 }
