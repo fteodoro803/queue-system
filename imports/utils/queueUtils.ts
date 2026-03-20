@@ -94,6 +94,7 @@ export function calculateQueueTime({
         e.status === "in-progress" ||
         e.status === "ready"),
   ).length;
+  if (activeQueueLength === 0) return 0; // If no one in queue, wait time is 0
 
   // Min used because if there are more providers than patients, it doesnt shorten the wait time
   const effectiveProviders = Math.min(
