@@ -132,7 +132,7 @@ export const QueueManagement = () => {
         <div className="my-4">
           <DashboardCard
             header="Available Providers"
-            body={totalProviders - unavailableProviders}
+            body={availableProviders}
             footer={`Unavailable: ${unavailableProviders}`}
             icon={IdentificationIcon}
           />

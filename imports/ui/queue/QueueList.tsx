@@ -20,6 +20,10 @@ export const QueueList = ({
   availableProviders?: number;
 }) => {
   const now = useDateTime();
+  // Filter queue for entries of this service
+  const filteredQueue = queue.filter(
+    (entry) => entry.serviceId === service._id,
+  );
 
   // Get number of Providers for this service to calculate wait times
   const providersIsLoading = useSubscribe("providers");
@@ -42,10 +46,10 @@ export const QueueList = ({
       </li>
 
       {/* List of Queue Entries */}
-      {queue.length > 0 ? (
-        queue.map((entry) => {
+      {filteredQueue.length > 0 ? (
+        filteredQueue.map((entry) => {
           const estimatedWaitTime = calculateQueueTime({
-            queue: queue,
+            queue: filteredQueue,
             queueEntry: entry,
             service: service,
             activeProviders: providers.length,
