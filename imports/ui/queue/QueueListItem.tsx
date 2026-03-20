@@ -79,14 +79,15 @@ export const QueueListItem = ({
             </div>
 
             {/* Estimated Time Until */}
-            {entry.status === "waiting" && timeUntil != undefined && (
-              <div className="flex items-center gap-1">
-                <ClockIcon className={iconSize} />
-                <p className={textSize}>
-                  {timeUntil > 0 ? `est. ${timeUntil} min` : "est. 0 min"}
-                </p>
-              </div>
-            )}
+            {(entry.status === "waiting" || entry.status === "ready") &&
+              timeUntil != undefined && (
+                <div className="flex items-center gap-1">
+                  <ClockIcon className={iconSize} />
+                  <p className={textSize}>
+                    {timeUntil > 0 ? `est. ${timeUntil} min` : "est. 0 min"}
+                  </p>
+                </div>
+              )}
 
             {/* Started */}
             {entry.start && !entry.end && (

@@ -10,10 +10,8 @@ import { updateServiceAnalytics } from "/imports/api/serviceMethods";
 import { CountersCollection } from "/imports/api/counters";
 
 export interface QueueEntryData {
-  patient: Patient; // Replace with actual Patient type
-  service: Service; // Replace with actual Service type
-  // initialExpectedWaitTime?: number; // in minutes, optional field for expected wait time at the moment of enqueueing
-  // currentExpectedWaitTime?: number; // in minutes, optional field for current expected wait time, can be updated over time based on queue dynamics
+  patient: Patient;
+  service: Service;
 }
 
 type DequeueReason = Extract<
@@ -24,7 +22,11 @@ type DequeueReason = Extract<
 // Client-Called methods
 Meteor.methods({
   // Inserts queue entry to database and calculates position
-  async "queueEntry.enqueue"(data: QueueEntryData, time: Date) {
+  async "queueEntry.enqueue"(
+    data: QueueEntryData,
+    estimatedWaitTime: number | undefined,
+    time: Date,
+  ) {
     // 1. Get the current max position in the queue, for respective service
     const maxPositionEntry: QueueEntry | undefined =
       await QueueEntryCollection.findOneAsync(
@@ -52,8 +54,7 @@ Meteor.methods({
       service: data.service,
       position: newPosition,
       status: "waiting",
-      // initialExpectedWaitTime: data.initialExpectedWaitTime ?? null,
-      // currentExpectedWaitTime: data.currentExpectedWaitTime ?? null,
+      initialEstimatedWaitTime: estimatedWaitTime ?? null,
       readyAt: null,
       start: null, // Start time will be set once the service is started
       end: null, // End time will be set after the service is completed
@@ -86,7 +87,7 @@ Meteor.methods({
     });
 
     // 2. Update positions of entries behind the dequeued entry
-    await updatePositions(entry, time);
+    await updatePositions(entry);
 
     // 3. Update Service Analytics if completed
     if (reason === "completed" && entry.start) {
@@ -131,16 +132,22 @@ Meteor.methods({
     });
 
     // 2. Update positions of entries behind the dequeued entry
-    await updatePositions(entry, time);
+    await updatePositions(entry);
   },
 });
 
 // Enqueues a patient to a service queue
 export async function enqueue(
   data: QueueEntryData,
+  estimatedWaitTime: number | undefined,
   time: Date,
 ): Promise<string> {
-  return await Meteor.callAsync("queueEntry.enqueue", data, time);
+  return await Meteor.callAsync(
+    "queueEntry.enqueue",
+    data,
+    estimatedWaitTime,
+    time,
+  );
 }
 
 // Checks-in a Patient, and marks them as Ready
@@ -164,7 +171,7 @@ export async function cancelService(id: string, time: Date): Promise<void> {
 }
 
 // Updates positions of next queue entries for a service
-async function updatePositions(entry: QueueEntry, time: Date): Promise<void> {
+async function updatePositions(entry: QueueEntry): Promise<void> {
   // If the entry is not in the queue, no need to update positions
   if (entry.position === null || entry.position <= 0) return;
 

@@ -1,13 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { QueueEntry } from "/imports/api/queueEntry";
 import { QueueListItem } from "./QueueListItem";
 import { Service } from "/imports/api/service";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
-import { calculateEstimatedWaitTime } from "/imports/utils/queueUtils";
-import { useFind, useSubscribe, useTracker } from "meteor/react-meteor-data";
+import { calculateQueueTime } from "/imports/utils/queueUtils";
+import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { ProviderCollection } from "/imports/api/provider";
 import { Loading } from "/imports/ui/components/Loading";
-import { Session } from "meteor/session";
 
 export const QueueList = ({
   queue,
@@ -21,6 +20,10 @@ export const QueueList = ({
   availableProviders?: number;
 }) => {
   const now = useDateTime();
+  // Filter queue for entries of this service
+  const filteredQueue = queue.filter(
+    (entry) => entry.serviceId === service._id,
+  );
 
   // Get number of Providers for this service to calculate wait times
   const providersIsLoading = useSubscribe("providers");
@@ -29,26 +32,6 @@ export const QueueList = ({
       services: { $elemMatch: { id: service._id, enabled: true } },
     }),
   );
-
-  const maxQueueLength = useTracker(
-    () => Session.get("maxQueueLength") || null,
-  );
-
-  // Update maxQueueLength in Session for testing purposes (to show the max wait time in the UI, can be removed later)
-  useEffect(() => {
-    if (queue.length === 0) Session.set("maxQueueLength", null);
-    else {
-      const estimatedWaitTime = calculateEstimatedWaitTime(
-        queue[queue.length - 1],
-        queue,
-        service,
-        providers.length,
-        now,
-      );
-      if (estimatedWaitTime && estimatedWaitTime > maxQueueLength)
-        Session.set("maxQueueLength", estimatedWaitTime);
-    }
-  }, [queue.length, providers.length, now]);
 
   if (providersIsLoading()) return <Loading />;
 
@@ -63,17 +46,15 @@ export const QueueList = ({
       </li>
 
       {/* List of Queue Entries */}
-      {queue.length > 0 ? (
-        queue.map((entry) => {
-          const estimatedWaitTime = calculateEstimatedWaitTime(
-            entry,
-            queue,
-            service,
-            providers.length,
-            now,
-          );
-          if (estimatedWaitTime && estimatedWaitTime > maxQueueLength)
-            Session.set("maxQueueLength", estimatedWaitTime);
+      {filteredQueue.length > 0 ? (
+        filteredQueue.map((entry) => {
+          const estimatedWaitTime = calculateQueueTime({
+            queue: filteredQueue,
+            queueEntry: entry,
+            service: service,
+            activeProviders: providers.length,
+            currentTime: now,
+          });
 
           if (adminView)
             return (

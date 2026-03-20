@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import {
   CalendarDaysIcon,
@@ -6,26 +6,88 @@ import {
   ExclamationTriangleIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
-import { QueueEntry } from "/imports/api/queueEntry";
-import { Session } from "meteor/session";
-import { useTracker } from "meteor/react-meteor-data";
+import { QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
+import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { convertMinutesToTime } from "/imports/utils/utils";
+import { calculateQueueTime } from "/imports/utils/queueUtils";
+import { Provider, ProviderCollection } from "/imports/api/provider";
+import { Loading } from "../components/Loading";
+import { enqueue, QueueEntryData } from "/imports/api/queueEntryMethods";
 
+// Parent — only handles loading
 export const QueueDetails = ({
-  entry,
+  entryData,
   setOpen,
 }: {
-  entry: QueueEntry | undefined;
+  entryData: QueueEntryData | undefined;
   setOpen: (value: boolean) => void;
 }) => {
-  const now = useDateTime();
-
-  // TODO: temporary? probably should be calculated on the server and stored somewhere
-  const maxQueueLength = useTracker(
-    () => Session.get("maxQueueLength") || null,
+  const isProvidersLoading = useSubscribe("providers");
+  const providers = useFind(() => ProviderCollection.find({}));
+  const isQueueLoading = useSubscribe("queue");
+  const queue = useFind(() =>
+    QueueEntryCollection.find({ serviceId: entryData?.service?._id }),
   );
 
-  if (!entry) return null;
+  if (isProvidersLoading() || isQueueLoading()) return <Loading />;
+
+  return (
+    <QueueDetailsContent
+      entryData={entryData}
+      setOpen={setOpen}
+      providers={providers}
+      queue={queue}
+    />
+  );
+};
+
+// Child — receives loaded data, safe to use all hooks
+const QueueDetailsContent = ({
+  entryData,
+  setOpen,
+  providers,
+  queue,
+}: {
+  entryData: QueueEntryData | undefined;
+  setOpen: (value: boolean) => void;
+  providers: Provider[];
+  queue: QueueEntry[];
+}) => {
+  const now = useDateTime();
+  const [entry, setEntry] = useState<QueueEntry | undefined>(undefined);
+
+  const activeProviders = providers.filter((p) =>
+    p.services.some((s) => s.id === entryData?.service._id && s.enabled),
+  ).length;
+
+  useEffect(() => {
+    const enqueuePatient = async () => {
+      if (entryData) {
+        const estServiceTime = calculateQueueTime({
+          queue,
+          service: entryData.service,
+          activeProviders,
+          currentTime: now,
+        });
+        const entryId = await enqueue(entryData, estServiceTime, now);
+        const entry = await QueueEntryCollection.findOneAsync(entryId);
+        setEntry(entry);
+      }
+    };
+    enqueuePatient();
+  }, [entryData]);
+
+  const maxQueueLength = entry
+    ? calculateQueueTime({
+        queueEntry: entry,
+        queue: queue,
+        service: entry!.service,
+        activeProviders: activeProviders,
+        currentTime: now,
+      })
+    : undefined;
+
+  if (!entryData || !entry || activeProviders === undefined) return null;
   const isPriority = entry.service.priority > 1;
 
   return (
@@ -35,7 +97,7 @@ export const QueueDetails = ({
         <CheckCircleIcon className="h-6 w-6" />
         <span>
           You have joined the queue in{" "}
-          <strong>position {entry.position}</strong>!
+          <strong>position {entry?.position ?? "ERROR"}</strong>!
         </span>
       </div>
 
@@ -44,13 +106,15 @@ export const QueueDetails = ({
         <p className="text-xs font-semibold text-base-content/40 uppercase tracking-widest">
           Queue ID
         </p>
-        <p className="text-7xl font-black">{entry.displayId ?? "—"}</p>
+        <p className="text-7xl font-black">{entry?.displayId ?? "ERROR"}</p>
         <div className="flex items-center gap-1.5 mt-2 text-base-content/50">
           <CalendarDaysIcon className="h-4 w-4" />
           <span className="text-sm">
             Est. wait:{" "}
             <span className="font-semibold text-base-content">
-              {convertMinutesToTime(maxQueueLength)}
+              {maxQueueLength !== undefined
+                ? convertMinutesToTime(maxQueueLength)
+                : "N/A (QueueLength undefined)"}
             </span>
           </span>
         </div>
@@ -68,7 +132,7 @@ export const QueueDetails = ({
           <span className="text-sm text-base-content/60">Service</span>
           <span className="text-base-content/30">·</span>
           <span className="text-sm font-semibold">
-            {entry.service?.name ?? "None"}
+            {entry?.service?.name ?? "None"}
           </span>
         </div>
 
