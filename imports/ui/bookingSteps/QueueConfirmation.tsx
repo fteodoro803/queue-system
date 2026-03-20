@@ -1,7 +1,7 @@
 import React from "react";
 import { Service } from "/imports/api/service";
 import { Patient } from "/imports/api/patient";
-import { enqueue } from "/imports/api/queueEntryMethods";
+import { QueueEntryData } from "/imports/api/queueEntryMethods";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import {
   CalendarDaysIcon,
@@ -11,18 +11,15 @@ import {
   UserIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
-import { QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
 
 export const QueueConfirmation = ({
   patient,
   service,
   setQueueEntry,
-  setOpen,
 }: {
   patient: Patient | undefined;
   service: Service | undefined;
-  setQueueEntry: (entry: QueueEntry) => void;
-  setOpen: (value: boolean) => void;
+  setQueueEntry: (entry: QueueEntryData) => void;
 }) => {
   const now = useDateTime();
   const isPriority = (service?.priority ?? 0) > 1;
@@ -32,12 +29,13 @@ export const QueueConfirmation = ({
   // Handlers
   const handleSubmit = async () => {
     if (!patient || !service) return;
-    const queueId: string = await enqueue({ patient, service }, now);
 
-    if (queueId) {
-      const newQueueEntry = await QueueEntryCollection.findOneAsync(queueId);
-      if (newQueueEntry) setQueueEntry(newQueueEntry);
-    }
+    const newQueueEntry: QueueEntryData = {
+      patient: patient,
+      service: service,
+    };
+
+    setQueueEntry(newQueueEntry);
   };
 
   return (
@@ -131,38 +129,5 @@ export const QueueConfirmation = ({
         Confirm
       </button>
     </div>
-  );
-
-  // OLD
-  return (
-    <>
-      <p>Confirmation:</p>
-      <p>Patient: {patient?.name ?? "None"}</p>
-      <p>Service: {service?.name ?? "None"}</p>
-      <p>
-        Date:{" "}
-        {now.toLocaleDateString(undefined, {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        })}
-      </p>
-
-      {isPriority && (
-        <div role="alert" className="alert alert-error">
-          <span>This is a high-priority service!</span>
-        </div>
-      )}
-
-      <button
-        className="btn btn-primary"
-        onClick={() => {
-          handleSubmit();
-          setOpen(false);
-        }}
-      >
-        Confirm
-      </button>
-    </>
   );
 };

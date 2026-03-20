@@ -3,9 +3,9 @@ import { Patient } from "/imports/api/patient";
 import { Service } from "/imports/api/service";
 
 export const QUEUE_STATES = [
-  "waiting",  // waiting but not yet ready to be served (e.g., patient hasn't checked in)
-  "ready",  // waiting but checked-in and ready to be served
-  "in-progress",  // TODO: change to ongoing or active later
+  "waiting", // waiting but not yet ready to be served (e.g., patient hasn't checked in)
+  "ready", // waiting but checked-in and ready to be served
+  "in-progress", // TODO: change to ongoing or active later
   "completed",
   "cancelled",
 ] as const;
@@ -19,8 +19,7 @@ export interface QueueEntry {
   service: Service;
   position: number | null;
   status: (typeof QUEUE_STATES)[number];
-  // initialExpectedWaitTime: number | null; // TODO: in minutes, set when patient is added to queue
-  // currentExpectedWaitTime?: number | null; // TODO: in minutes, can be updated over time based on queue dynamics
+  initialEstimatedWaitTime: number | null; // in minutes, set when patient is added to queue
   readyAt: Date | null;
   start: Date | null;
   end: Date | null;

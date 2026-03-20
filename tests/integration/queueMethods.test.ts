@@ -45,7 +45,11 @@ if (Meteor.isServer) {
     describe("enqueue()", function () {
       it("should add a patient to the queue with position 1 when queue is empty", async () => {
         const id = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
 
@@ -59,11 +63,19 @@ if (Meteor.isServer) {
 
       it("should assign incrementing positions for multiple entries", async () => {
         const id1 = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
         const id2 = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
 
@@ -76,7 +88,11 @@ if (Meteor.isServer) {
 
       it("should generate a display ID with the service shortcode", async () => {
         const id = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
         const entry = await QueueEntryCollection.findOneAsync(id);
@@ -91,7 +107,11 @@ if (Meteor.isServer) {
     describe("startService()", function () {
       it("should set status to in-progress and position to null", async () => {
         const id = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
         await startService(id, now);
@@ -104,11 +124,19 @@ if (Meteor.isServer) {
 
       it("should shift the next entry to position 1", async () => {
         const id1 = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
         const id2 = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
 
@@ -134,7 +162,11 @@ if (Meteor.isServer) {
     describe("completeService()", function () {
       it("should set status to completed and clear position", async () => {
         const id = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
         await startService(id, now);
@@ -148,7 +180,11 @@ if (Meteor.isServer) {
 
       it("should throw if entry has no position (already dequeued)", async () => {
         const id = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
         await startService(id, now);
@@ -169,7 +205,11 @@ if (Meteor.isServer) {
     describe("cancelService()", function () {
       it("should set status to cancelled and clear position", async () => {
         const id = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
         await cancelService(id, now);
@@ -181,15 +221,27 @@ if (Meteor.isServer) {
 
       it("should shift positions of entries behind the cancelled one", async () => {
         const id1 = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
         const id2 = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
         const id3 = await enqueue(
-          { patient: mockPatient, service: mockService },
+          {
+            patient: mockPatient,
+            service: mockService,
+            initialExpectedWaitTime: 30,
+          },
           now,
         );
 

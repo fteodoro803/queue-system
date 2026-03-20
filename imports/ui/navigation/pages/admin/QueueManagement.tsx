@@ -142,7 +142,7 @@ export const QueueManagement = () => {
         {/* Total Service time is total queue time + service duration for last entry in queue */}
         <div className="my-4">
           <DashboardCard
-            header="Total Service Time"
+            header="Est. Service Time"
             body={maxQueueLength ? convertMinutesToTime(maxQueueLength) : "N/A"}
             footer={
               <p className={getQueueTimeColor()}>
