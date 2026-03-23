@@ -9,7 +9,7 @@ import {
 import { QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { convertMinutesToTime } from "/imports/utils/utils";
-import { calculateQueueTime } from "/imports/utils/queueUtils";
+import { calculateQueueTime, QueueTimeResult } from "/imports/utils/queueUtils";
 import { Provider, ProviderCollection } from "/imports/api/provider";
 import { Loading } from "../components/Loading";
 import { enqueue, QueueEntryData } from "/imports/api/queueEntryMethods";
@@ -54,42 +54,88 @@ const QueueDetailsContent = ({
   queue: QueueEntry[];
 }) => {
   const now = useDateTime();
+
+  // ---- State & Derived Data ----
   const [entry, setEntry] = useState<QueueEntry | undefined>(undefined);
+  const [queueErrorReason, setQueueErrorReason] =
+    useState<QueueFailureReason>();
 
   const activeProviders = providers.filter((p) =>
     p.services.some((s) => s.id === entryData?.service._id && s.enabled),
   ).length;
 
+  // ---- Effects ----
   useEffect(() => {
     const enqueuePatient = async () => {
       if (entryData) {
-        const estServiceTime = calculateQueueTime({
+        setQueueErrorReason(undefined);
+        const estServiceTime: QueueTimeResult = calculateQueueTime({
           queue,
           service: entryData.service,
           activeProviders,
           currentTime: now,
         });
-        const entryId = await enqueue(entryData, estServiceTime, now);
-        const entry = await QueueEntryCollection.findOneAsync(entryId);
-        setEntry(entry);
+
+        // If an error is calculated, we shouldn't enqueue patient
+        if (!estServiceTime.ok) {
+          console.error("Cannot enqueue patient:", estServiceTime.reason);
+          setQueueErrorReason(estServiceTime.reason);
+          return;
+        }
+
+        const entryId = await enqueue(entryData, estServiceTime.time, now);
+        const newEntry = await QueueEntryCollection.findOneAsync(entryId);
+        setEntry(newEntry);
       }
     };
     enqueuePatient();
   }, [entryData]);
 
-  const maxQueueLength = entry
-    ? calculateQueueTime({
-        queueEntry: entry,
-        queue: queue,
-        service: entry!.service,
-        activeProviders: activeProviders,
-        currentTime: now,
-      })
-    : undefined;
+  // ---- Early Returns ----
+  if (!entryData) return null;
 
-  if (!entryData || !entry || activeProviders === undefined) return null;
+  const maxQueueLength: QueueTimeResult = calculateQueueTime({
+    queueEntry: entry,
+    queue: queue,
+    service: entryData.service,
+    activeProviders: activeProviders,
+    currentTime: now,
+  });
+
+  const effectiveFailureReason =
+    queueErrorReason ||
+    (!maxQueueLength.ok ? maxQueueLength.reason : undefined);
+
+  if (effectiveFailureReason) {
+    return (
+      <div className="flex flex-col gap-4">
+        <div role="alert" className="alert alert-error">
+          <ExclamationTriangleIcon className="h-6 w-6" />
+          <div>
+            <p className="font-semibold">You could not be queued right now.</p>
+            <p className="text-sm">
+              {getQueueFailureMessage(effectiveFailureReason)}
+            </p>
+            <p className="text-sm">
+              Please contact us directly or try again later!
+            </p>
+          </div>
+        </div>
+
+        <button
+          className="btn btn-primary w-full"
+          onClick={() => setOpen(false)}
+        >
+          Close
+        </button>
+      </div>
+    );
+  }
+
+  if (!entry) return null;
   const isPriority = entry.service.priority > 1;
 
+  // ---- Render ----
   return (
     <div className="flex flex-col gap-4">
       {/* Joined Queue Alert */}
@@ -112,9 +158,9 @@ const QueueDetailsContent = ({
           <span className="text-sm">
             Est. wait:{" "}
             <span className="font-semibold text-base-content">
-              {maxQueueLength !== undefined
-                ? convertMinutesToTime(maxQueueLength)
-                : "N/A (QueueLength undefined)"}
+              {maxQueueLength.ok
+                ? convertMinutesToTime(maxQueueLength.time)
+                : "Unavailable"}
             </span>
           </span>
         </div>
@@ -165,4 +211,21 @@ const QueueDetailsContent = ({
       </button>
     </div>
   );
+};
+
+type QueueFailureReason = Exclude<QueueTimeResult, { ok: true }>["reason"];
+
+const getQueueFailureMessage = (reason: QueueFailureReason) => {
+  switch (reason) {
+    case "no_providers":
+      return "No providers are available for this service right now.";
+    case "invalid_position":
+      return "Unable to determine your queue position at the moment.";
+    case "wrong_service":
+      return "This queue entry does not match the selected service.";
+    case "empty_queue":
+      return "The queue information is currently unavailable.";
+    default:
+      return "Queueing is temporarily unavailable.";
+  }
 };

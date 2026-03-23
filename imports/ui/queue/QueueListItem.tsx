@@ -12,7 +12,7 @@ import {
 import { QueueIcon } from "/imports/ui/components/QueueIcon";
 import { formatDateToLocale } from "/imports/utils/utils";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
-import { statusBadgeMap } from "/imports/utils/queueUtils";
+import { QueueTimeResult, statusBadgeMap } from "/imports/utils/queueUtils";
 import {
   CancelModal,
   CheckInModal,
@@ -27,7 +27,7 @@ export const QueueListItem = ({
   admin, // TODO: do this later
 }: {
   entry: QueueEntry;
-  timeUntil?: number;
+  timeUntil?: QueueTimeResult;
   availableProviders?: number;
   admin?: boolean;
 }) => {
@@ -84,7 +84,9 @@ export const QueueListItem = ({
                 <div className="flex items-center gap-1">
                   <ClockIcon className={iconSize} />
                   <p className={textSize}>
-                    {timeUntil > 0 ? `est. ${timeUntil} min` : "est. 0 min"}
+                    {timeUntil.ok
+                      ? `est. ${timeUntil.time} min`
+                      : `ERROR (${timeUntil.reason})`}
                   </p>
                 </div>
               )}

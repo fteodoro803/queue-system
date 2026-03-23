@@ -9,6 +9,17 @@ export const statusBadgeMap: Record<string, string> = {
   cancelled: "badge-error",
 };
 
+export type QueueTimeResult =
+  | { ok: true; time: number } // time in minutes
+  | {
+      ok: false;
+      reason:
+        | "no_providers"
+        | "invalid_position"
+        | "wrong_service"
+        | "empty_queue";
+    };
+
 // Calculates the estimated total service time for a queue
 // If an entry is supplied, calculates the estimated wait time for that entry.
 export function calculateQueueTime({
@@ -23,20 +34,19 @@ export function calculateQueueTime({
   service: Service;
   activeProviders: number;
   currentTime: Date;
-}): number | undefined {
+}): QueueTimeResult {
   // If entry has no position, we can't calculate wait time
-  if (
-    queueEntry &&
-    (queueEntry.position === null || queueEntry.position === undefined)
-  ) {
-    return undefined;
+  if (queueEntry && !queueEntry.position) {
+    return { ok: false, reason: "invalid_position" };
   }
 
   // If no active providers, we can't estimate wait time
-  if (!activeProviders || activeProviders <= 0) return undefined;
+  if (!activeProviders || activeProviders <= 0)
+    return { ok: false, reason: "no_providers" };
 
   // If entry is supplied but not in the queue or for a different service, return undefined
-  if (queueEntry && queueEntry.serviceId !== service._id) return undefined;
+  if (queueEntry && queueEntry.serviceId !== service._id)
+    return { ok: false, reason: "wrong_service" };
 
   // Service duration in minutes
   const serviceDuration = service.avgDuration ?? service.duration;
@@ -94,7 +104,7 @@ export function calculateQueueTime({
         e.status === "in-progress" ||
         e.status === "ready"),
   ).length;
-  if (activeQueueLength === 0) return 0; // If no one in queue, wait time is 0
+  if (activeQueueLength === 0) return { ok: true, time: 0 }; // If no one in queue, wait time is 0
 
   // Min used because if there are more providers than patients, it doesnt shorten the wait time
   const effectiveProviders = Math.min(
@@ -103,5 +113,8 @@ export function calculateQueueTime({
   );
 
   // 4. Calculate total wait time
-  return Math.ceil((remainingTime + timeOfWaitingAhead) / effectiveProviders);
+  const totalWaitTime: number = Math.ceil(
+    (remainingTime + timeOfWaitingAhead) / effectiveProviders,
+  );
+  return { ok: true, time: totalWaitTime };
 }

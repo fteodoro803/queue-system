@@ -26,7 +26,7 @@ import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { SettingsCollection } from "/imports/api/settings";
 import { resetCounter } from "/imports/api/countersMethods";
 import { ProviderCollection } from "/imports/api/provider";
-import { calculateQueueTime } from "/imports/utils/queueUtils";
+import { calculateQueueTime, QueueTimeResult } from "/imports/utils/queueUtils";
 
 export const QueueManagement = () => {
   const now = useDateTime();
@@ -40,11 +40,12 @@ export const QueueManagement = () => {
   const [selectedService, setSelectedService] = useState<Service | undefined>();
 
   const isProvidersLoading = useSubscribe("providers");
-  const providers = useFind(() => ProviderCollection.find({}));
+  let providers = useFind(() => ProviderCollection.find({}));
 
   const [queueEntryModalOpen, setQueueEntryModalOpen] =
     useState<boolean>(false);
 
+  // ---- Effects ----
   // Select the first service by default when services are loaded
   useEffect(() => {
     if (services.length === 0) {
@@ -64,6 +65,15 @@ export const QueueManagement = () => {
     });
   }, [services]);
 
+  // Update providers based on selected service
+  useEffect(() => {
+    if (!selectedService) return;
+
+    providers = providers.filter((provider) =>
+      provider.services.some((service) => service.id === selectedService._id),
+    );
+  }, [selectedService]);
+
   const [ongoing, waiting, cancelled, finished] = useMemo(() => {
     const ongoing = queueEntries.filter(
       (entry) => entry.status === "in-progress",
@@ -81,11 +91,13 @@ export const QueueManagement = () => {
   }, [queueEntries]);
 
   // TODO: Currently doesnt account for specific services, this is just assuming 1 service
-  const totalProviders = providers.length;
+  const totalProviders = providers.filter((p) =>
+    p.services.some((s) => s.id === selectedService?._id && s.enabled),
+  ).length;
   const unavailableProviders = ongoing?.length;
   const availableProviders = totalProviders - unavailableProviders;
 
-  const maxQueueLength = selectedService
+  const maxQueueLength: QueueTimeResult | undefined = selectedService
     ? calculateQueueTime({
         activeProviders: totalProviders,
         currentTime: now,
@@ -110,9 +122,10 @@ export const QueueManagement = () => {
   const endOfDay = getEndOfWorkDay(now, settings.end_of_day);
   const timeRemainingMs = endOfDay.getTime() - now.getTime(); // in milliseconds
   const formattedTimeRemaining = convertMillisecondsToTime(timeRemainingMs);
-  const maxQueueLengthMs: number | undefined = maxQueueLength
-    ? maxQueueLength * 60 * 1000
-    : undefined; // convert mins to ms
+  const maxQueueLengthMs: number | undefined =
+    maxQueueLength && maxQueueLength.ok
+      ? maxQueueLength.time * 60 * 1000
+      : undefined; // convert mins to ms
 
   const getQueueTimeColor = () => {
     if (maxQueueLengthMs && maxQueueLengthMs >= timeRemainingMs)
@@ -145,41 +158,50 @@ export const QueueManagement = () => {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-4 justify-start mt-6">
-        <div className="my-4">
-          <DashboardCard
-            header="In Queue"
-            body={queueEntries.filter((q) => q.status === "waiting").length}
-            footer={`Completed: ${queueEntries.filter((q) => q.status === "completed").length}`}
-            icon={NumberedListIcon}
-          />
-        </div>
+      {selectedService && (
+        <>
+          <div className="flex flex-wrap gap-4 justify-start mt-6">
+            <div className="my-4">
+              <DashboardCard
+                header="In Queue"
+                body={queueEntries.filter((q) => q.status === "waiting").length}
+                footer={`Completed: ${queueEntries.filter((q) => q.status === "completed").length}`}
+                icon={NumberedListIcon}
+              />
+            </div>
 
-        {/* Available Doctors Card */}
-        <div className="my-4">
-          <DashboardCard
-            header="Available Providers"
-            body={availableProviders}
-            footer={`Unavailable: ${unavailableProviders}`}
-            icon={IdentificationIcon}
-          />
-        </div>
+            {/* Available Doctors Card */}
+            <div className="my-4">
+              <DashboardCard
+                header="Available Providers"
+                body={availableProviders}
+                footer={`Unavailable: ${unavailableProviders}`}
+                icon={IdentificationIcon}
+              />
+            </div>
 
-        {/* Queue Time Card */}
-        {/* Total Service time is total queue time + service duration for last entry in queue */}
-        <div className="my-4">
-          <DashboardCard
-            header="Est. Service Time"
-            body={maxQueueLength ? convertMinutesToTime(maxQueueLength) : "N/A"}
-            footer={
-              <p className={getQueueTimeColor()}>
-                {formattedTimeRemaining} left in day
-              </p>
-            }
-            icon={ClockIcon}
-          />
-        </div>
-      </div>
+            {/* Queue Time Card */}
+            {/* Total Service time is total queue time + service duration for last entry in queue */}
+
+            <div className="my-4">
+              <DashboardCard
+                header="Est. Service Time"
+                body={
+                  maxQueueLength && maxQueueLength.ok
+                    ? convertMinutesToTime(maxQueueLength.time)
+                    : `ERROR (${maxQueueLength ? maxQueueLength.reason : "undefined"})`
+                }
+                footer={
+                  <p className={getQueueTimeColor()}>
+                    {formattedTimeRemaining} left in day
+                  </p>
+                }
+                icon={ClockIcon}
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       <ServiceSelector
         services={services}
