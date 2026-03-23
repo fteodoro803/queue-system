@@ -44,7 +44,7 @@ export const Sidebar = () => {
         <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
 
         {/* Main content area */}
-        <div className="drawer-content flex flex-col">
+        <div className="drawer-content flex flex-col bg-base-200">
           <div className="p-6 lg:p-8">
             <Outlet />
           </div>
