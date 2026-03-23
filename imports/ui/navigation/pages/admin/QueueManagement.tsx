@@ -1,10 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { MakeQueueEntryModal } from "/imports/ui/queue/MakeQueueEntryModal";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "/imports/ui/components/Loading";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { QueueList } from "/imports/ui/queue/QueueList";
-import { ServicesCollection } from "/imports/api/service";
+import { Service, ServicesCollection } from "/imports/api/service";
 import { DashboardCard } from "/imports/ui/components/DashboardCard";
 import {
   ClockIcon,
@@ -31,13 +37,32 @@ export const QueueManagement = () => {
 
   const isServicesLoading = useSubscribe("services");
   const services = useFind(() => ServicesCollection.find());
-  const demoService = services[0];
+  const [selectedService, setSelectedService] = useState<Service | undefined>();
 
   const isProvidersLoading = useSubscribe("providers");
   const providers = useFind(() => ProviderCollection.find({}));
 
   const [queueEntryModalOpen, setQueueEntryModalOpen] =
     useState<boolean>(false);
+
+  // Select the first service by default when services are loaded
+  useEffect(() => {
+    if (services.length === 0) {
+      setSelectedService(undefined);
+      return;
+    }
+
+    setSelectedService((currentService) => {
+      if (
+        currentService &&
+        services.some((service) => service._id === currentService._id)
+      ) {
+        return currentService;
+      }
+
+      return services[0];
+    });
+  }, [services]);
 
   const [ongoing, waiting, cancelled, finished] = useMemo(() => {
     const ongoing = queueEntries.filter(
@@ -60,12 +85,14 @@ export const QueueManagement = () => {
   const unavailableProviders = ongoing?.length;
   const availableProviders = totalProviders - unavailableProviders;
 
-  const maxQueueLength = calculateQueueTime({
-    activeProviders: totalProviders,
-    currentTime: now,
-    queue: queueEntries,
-    service: demoService,
-  });
+  const maxQueueLength = selectedService
+    ? calculateQueueTime({
+        activeProviders: totalProviders,
+        currentTime: now,
+        queue: queueEntries,
+        service: selectedService,
+      })
+    : undefined;
 
   const isSettingsLoading = useSubscribe("settings");
   const settings = useFind(() => SettingsCollection.find({}))[0];
@@ -154,6 +181,12 @@ export const QueueManagement = () => {
         </div>
       </div>
 
+      <ServiceSelector
+        services={services}
+        selectedService={selectedService}
+        setService={setSelectedService}
+      />
+
       {/* Tab Groups */}
       {/* name of each tab group should be unique */}
       <div className="tabs tabs-border justify-center">
@@ -166,31 +199,37 @@ export const QueueManagement = () => {
           defaultChecked
         />
 
-        {/* TODO: TEMPORARY CHANGE THIS LATER */}
         <div className="tab-content border-base-300 bg-base-100 p-10">
-          <div className="">
-            <div key={demoService._id} className="mb-6">
-              <h2 className="text-2xl font-bold">Ongoing</h2>
-              <QueueList
-                queue={ongoing}
-                service={demoService}
-                adminView={true}
-              />
-            </div>
-          </div>
+          {selectedService ? (
+            <>
+              <div className="">
+                <div key={selectedService._id} className="mb-6">
+                  <h2 className="text-2xl font-bold">Ongoing</h2>
+                  <QueueList
+                    queue={ongoing}
+                    service={selectedService}
+                    adminView={true}
+                  />
+                </div>
+              </div>
 
-          {/* TODO: TEMPORARY CHANGE THIS LATER */}
-          <div className="">
-            <div key={demoService._id} className="mb-6">
-              <h2 className="text-2xl font-bold">Waiting</h2>
-              <QueueList
-                availableProviders={availableProviders}
-                queue={waiting}
-                service={demoService}
-                adminView={true}
-              />
+              <div className="">
+                <div key={selectedService._id} className="mb-6">
+                  <h2 className="text-2xl font-bold">Waiting</h2>
+                  <QueueList
+                    availableProviders={availableProviders}
+                    queue={waiting}
+                    service={selectedService}
+                    adminView={true}
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="py-8 text-center text-sm opacity-60">
+              No services available.
             </div>
-          </div>
+          )}
         </div>
 
         {/* Finished Queue Entries */}
@@ -201,22 +240,25 @@ export const QueueManagement = () => {
           aria-label="Finished"
         />
         <div className="tab-content border-base-300 bg-base-100 p-10">
-          <div className="">
-            {services.map((service) => {
-              return (
-                <div key={service._id} className="mb-6">
-                  <h2 className="text-2xl font-bold">{service.name}</h2>
+          {selectedService ? (
+            <>
+              <div className="">
+                <div key={selectedService._id} className="mb-6">
+                  <h2 className="text-2xl font-bold">Finished</h2>
                   <QueueList
-                    queue={finished.filter(
-                      (entry) => entry.serviceId === service._id,
-                    )}
-                    service={service}
+                    availableProviders={availableProviders}
+                    queue={finished}
+                    service={selectedService}
                     adminView={true}
                   />
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            </>
+          ) : (
+            <div className="py-8 text-center text-sm opacity-60">
+              No services available.
+            </div>
+          )}
         </div>
 
         {/* Cancelled Queue Entries */}
@@ -227,22 +269,25 @@ export const QueueManagement = () => {
           aria-label="Cancelled"
         />
         <div className="tab-content border-base-300 bg-base-100 p-10">
-          <div className="">
-            {services.map((service) => {
-              return (
-                <div key={service._id} className="mb-6">
-                  <h2 className="text-2xl font-bold">{service.name}</h2>
+          {selectedService ? (
+            <>
+              <div className="">
+                <div key={selectedService._id} className="mb-6">
+                  <h2 className="text-2xl font-bold">Cancelled</h2>
                   <QueueList
-                    queue={cancelled.filter(
-                      (entry) => entry.serviceId === service._id,
-                    )}
-                    service={service}
+                    availableProviders={availableProviders}
+                    queue={cancelled}
+                    service={selectedService}
                     adminView={true}
                   />
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            </>
+          ) : (
+            <div className="py-8 text-center text-sm opacity-60">
+              No services available.
+            </div>
+          )}
         </div>
       </div>
 
@@ -251,5 +296,34 @@ export const QueueManagement = () => {
         <MakeQueueEntryModal setOpen={setQueueEntryModalOpen} />
       )}
     </>
+  );
+};
+
+const ServiceSelector = ({
+  services,
+  selectedService,
+  setService,
+}: {
+  services: Service[];
+  selectedService?: Service;
+  setService: Dispatch<SetStateAction<Service | undefined>>;
+}) => {
+  return (
+    <select
+      value={selectedService?._id ?? ""}
+      className="select"
+      onChange={(e) =>
+        setService(services.find((service) => service._id === e.target.value))
+      }
+    >
+      <option disabled={true} value="">
+        {services.length > 0 ? "Select a Service" : "No services available"}
+      </option>
+      {services.map((service) => (
+        <option key={service._id} value={service._id}>
+          {service.name}
+        </option>
+      ))}
+    </select>
   );
 };
