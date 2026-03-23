@@ -30,7 +30,8 @@ const mockService: Service = {
   createdAt: new Date(),
 };
 
-const now = new Date();
+const waitTime: number = 5;
+const now: Date = new Date();
 
 if (Meteor.isServer) {
   describe("[INTEGRATION] queueEntryMethods", function () {
@@ -48,8 +49,8 @@ if (Meteor.isServer) {
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
 
@@ -66,16 +67,16 @@ if (Meteor.isServer) {
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
         const id2 = await enqueue(
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
 
@@ -91,8 +92,8 @@ if (Meteor.isServer) {
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
         const entry = await QueueEntryCollection.findOneAsync(id);
@@ -110,8 +111,8 @@ if (Meteor.isServer) {
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
         await startService(id, now);
@@ -127,16 +128,16 @@ if (Meteor.isServer) {
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
         const id2 = await enqueue(
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
 
@@ -165,8 +166,8 @@ if (Meteor.isServer) {
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
         await startService(id, now);
@@ -178,13 +179,13 @@ if (Meteor.isServer) {
         assert.exists(entry?.end);
       });
 
-      it("should throw if entry has no position (already dequeued)", async () => {
+      it("should throw if entry is cancelled or completed", async () => {
         const id = await enqueue(
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
         await startService(id, now);
@@ -208,8 +209,8 @@ if (Meteor.isServer) {
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
         await cancelService(id, now);
@@ -224,24 +225,24 @@ if (Meteor.isServer) {
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
         const id2 = await enqueue(
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
         const id3 = await enqueue(
           {
             patient: mockPatient,
             service: mockService,
-            initialExpectedWaitTime: 30,
           },
+          waitTime,
           now,
         );
 

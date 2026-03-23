@@ -70,10 +70,10 @@ Meteor.methods({
       throw new Meteor.Error("Queue entry not found");
     }
 
-    if (entry.position === null) {
+    if (entry.status === "cancelled" || entry.status === "completed") {
       throw new Meteor.Error(
-        "Invalid queue entry position",
-        "Cannot complete/cancel what isn't in queue",
+        "Invalid queue entry status",
+        "Cannot complete/cancel what is already completed/cancelled",
       );
     }
 
@@ -126,7 +126,7 @@ Meteor.methods({
     await QueueEntryCollection.updateAsync(id, {
       $set: {
         status: "in-progress",
-        position: 0, // Set position to 0 to indicate it's being served, maybe temporary?
+        position: null, // Set position to null to indicate it's being served
         start: time,
       },
     });
