@@ -9,7 +9,7 @@ import {
 import { QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { convertMinutesToTime } from "/imports/utils/utils";
-import { calculateQueueTime } from "/imports/utils/queueUtils";
+import { calculateQueueTime, QueueTimeResult } from "/imports/utils/queueUtils";
 import { Provider, ProviderCollection } from "/imports/api/provider";
 import { Loading } from "../components/Loading";
 import { enqueue, QueueEntryData } from "/imports/api/queueEntryMethods";
@@ -63,13 +63,20 @@ const QueueDetailsContent = ({
   useEffect(() => {
     const enqueuePatient = async () => {
       if (entryData) {
-        const estServiceTime = calculateQueueTime({
+        const estServiceTime: QueueTimeResult = calculateQueueTime({
           queue,
           service: entryData.service,
           activeProviders,
           currentTime: now,
         });
-        const entryId = await enqueue(entryData, estServiceTime, now);
+
+        // If an error is calculated, we shouldn't enqueue patient
+        if (!estServiceTime.ok) {
+          console.error("Cannot enqueue patient:", estServiceTime.reason);
+          return;
+        }
+
+        const entryId = await enqueue(entryData, estServiceTime.time, now);
         const entry = await QueueEntryCollection.findOneAsync(entryId);
         setEntry(entry);
       }
@@ -77,15 +84,14 @@ const QueueDetailsContent = ({
     enqueuePatient();
   }, [entryData]);
 
-  const maxQueueLength = entry
-    ? calculateQueueTime({
+  const maxQueueLength: QueueTimeResult = calculateQueueTime({
         queueEntry: entry,
         queue: queue,
-        service: entry!.service,
+        service: entry?.service ?? entryData!.service,  // TODO: fix this, seems hacky and doesnt seem right to need a fallback
         activeProviders: activeProviders,
         currentTime: now,
       })
-    : undefined;
+    ;
 
   if (!entryData || !entry || activeProviders === undefined) return null;
   const isPriority = entry.service.priority > 1;
@@ -112,9 +118,9 @@ const QueueDetailsContent = ({
           <span className="text-sm">
             Est. wait:{" "}
             <span className="font-semibold text-base-content">
-              {maxQueueLength !== undefined
-                ? convertMinutesToTime(maxQueueLength)
-                : "N/A (QueueLength undefined)"}
+              {maxQueueLength.ok
+                ? convertMinutesToTime(maxQueueLength.time)
+                : `ERROR (${maxQueueLength.reason})`}
             </span>
           </span>
         </div>

@@ -26,7 +26,7 @@ import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { SettingsCollection } from "/imports/api/settings";
 import { resetCounter } from "/imports/api/countersMethods";
 import { ProviderCollection } from "/imports/api/provider";
-import { calculateQueueTime } from "/imports/utils/queueUtils";
+import { calculateQueueTime, QueueTimeResult } from "/imports/utils/queueUtils";
 
 export const QueueManagement = () => {
   const now = useDateTime();
@@ -85,7 +85,7 @@ export const QueueManagement = () => {
   const unavailableProviders = ongoing?.length;
   const availableProviders = totalProviders - unavailableProviders;
 
-  const maxQueueLength = selectedService
+  const maxQueueLength: QueueTimeResult | undefined = selectedService
     ? calculateQueueTime({
         activeProviders: totalProviders,
         currentTime: now,
@@ -110,9 +110,10 @@ export const QueueManagement = () => {
   const endOfDay = getEndOfWorkDay(now, settings.end_of_day);
   const timeRemainingMs = endOfDay.getTime() - now.getTime(); // in milliseconds
   const formattedTimeRemaining = convertMillisecondsToTime(timeRemainingMs);
-  const maxQueueLengthMs: number | undefined = maxQueueLength
-    ? maxQueueLength * 60 * 1000
-    : undefined; // convert mins to ms
+  const maxQueueLengthMs: number | undefined =
+    maxQueueLength && maxQueueLength.ok
+      ? maxQueueLength.time * 60 * 1000
+      : undefined; // convert mins to ms
 
   const getQueueTimeColor = () => {
     if (maxQueueLengthMs && maxQueueLengthMs >= timeRemainingMs)
@@ -167,18 +168,24 @@ export const QueueManagement = () => {
 
         {/* Queue Time Card */}
         {/* Total Service time is total queue time + service duration for last entry in queue */}
-        <div className="my-4">
-          <DashboardCard
-            header="Est. Service Time"
-            body={maxQueueLength ? convertMinutesToTime(maxQueueLength) : "N/A"}
-            footer={
-              <p className={getQueueTimeColor()}>
-                {formattedTimeRemaining} left in day
-              </p>
-            }
-            icon={ClockIcon}
-          />
-        </div>
+        {selectedService && (
+          <div className="my-4">
+            <DashboardCard
+              header="Est. Service Time"
+              body={
+                maxQueueLength && maxQueueLength.ok
+                  ? convertMinutesToTime(maxQueueLength.time)
+                  : `ERROR (${maxQueueLength ? maxQueueLength.reason : "undefined"})`
+              }
+              footer={
+                <p className={getQueueTimeColor()}>
+                  {formattedTimeRemaining} left in day
+                </p>
+              }
+              icon={ClockIcon}
+            />
+          </div>
+        )}
       </div>
 
       <ServiceSelector
