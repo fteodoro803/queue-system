@@ -299,6 +299,7 @@ export const QueueManagement = () => {
   );
 };
 
+// Buttons to select a Service
 const ServiceSelector = ({
   services,
   selectedService,
@@ -309,21 +310,20 @@ const ServiceSelector = ({
   setService: Dispatch<SetStateAction<Service | undefined>>;
 }) => {
   return (
-    <select
-      value={selectedService?._id ?? ""}
-      className="select"
-      onChange={(e) =>
-        setService(services.find((service) => service._id === e.target.value))
-      }
-    >
-      <option disabled={true} value="">
-        {services.length > 0 ? "Select a Service" : "No services available"}
-      </option>
-      {services.map((service) => (
-        <option key={service._id} value={service._id}>
-          {service.name}
-        </option>
-      ))}
-    </select>
+    <div className="flex flex-wrap gap-2">
+      {services.length === 0 ? (
+        <span className="text-base-content/50">No services available</span>
+      ) : (
+        services.map((service) => (
+          <button
+            key={service._id}
+            className={`btn ${selectedService?._id === service._id ? "btn-primary" : "btn-outline"}`}
+            onClick={() => setService(service)}
+          >
+            {service.name}
+          </button>
+        ))
+      )}
+    </div>
   );
 };
