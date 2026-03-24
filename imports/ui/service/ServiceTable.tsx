@@ -3,6 +3,7 @@ import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "/imports/ui/components/Loading";
 import { Service, ServicesCollection } from "/imports/api/service";
 import { ServiceDetailsModal } from "/imports/ui/service/ServiceDetailsModal";
+import { styles } from "/imports/utils/styles";
 
 export const ServiceTable = () => {
   const isLoading = useSubscribe("services");
@@ -33,9 +34,9 @@ export const ServiceTable = () => {
 
   return (
     <div className="min-w-2xl max-w-7xl mx-auto px-8 py-8">
-      <table className="table">
+      <table className={`table ${styles.outline} rounded-xl overflow-hidden`}>
         {/* head */}
-        <thead>
+        <thead className="bg-base-300">
           <tr>
             <th>Name</th>
             <th>Duration (mins)</th>
@@ -48,7 +49,7 @@ export const ServiceTable = () => {
             return (
               <tr
                 key={modalId}
-                className="hover:bg-base-300"
+                className="bg-base-100 hover:bg-base-300"
                 onClick={() => handleSelect(s)}
               >
                 {/*Name*/}

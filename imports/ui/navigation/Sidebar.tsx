@@ -44,14 +44,14 @@ export const Sidebar = () => {
         <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
 
         {/* Main content area */}
-        <div className="drawer-content flex flex-col">
+        <div className="drawer-content flex flex-col bg-base-200">
           <div className="p-6 lg:p-8">
             <Outlet />
           </div>
         </div>
 
         {/* Sidebar */}
-        <div className="drawer-side z-40">
+        <div className="drawer-side z-40 shadow-sm">
           <label
             htmlFor="my-drawer-3"
             aria-label="close sidebar"

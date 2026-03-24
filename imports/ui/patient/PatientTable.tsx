@@ -4,6 +4,7 @@ import { Patient, PatientsCollection } from "/imports/api/patient";
 import { PatientDetailsModal } from "/imports/ui/patient/PatientDetailsModal";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { Loading } from "/imports/ui/components/Loading";
+import { styles } from "/imports/utils/styles";
 
 export const PatientTable = () => {
   const isPatientsLoading = useSubscribe("patients");
@@ -31,10 +32,10 @@ export const PatientTable = () => {
   }
 
   return (
-    <div className="min-w-2xl max-w-7xl mx-auto px-8 py-8">
-      <table className="table">
+    <div className={`min-w-2xl max-w-7xl mx-auto px-8 py-8`}>
+      <table className={`table ${styles.outline} rounded-xl overflow-hidden`}>
         {/* head */}
-        <thead>
+        <thead className="bg-base-300">
           <tr>
             <th></th>
             <th>Name</th>
@@ -48,7 +49,7 @@ export const PatientTable = () => {
             return (
               <tr
                 key={modalId}
-                className="hover:bg-base-300"
+                className="bg-base-100 hover:bg-base-300"
                 onClick={() => handleSelect(p)}
               >
                 {/*Avatar*/}

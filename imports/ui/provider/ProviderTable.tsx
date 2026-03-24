@@ -4,6 +4,7 @@ import { Avatar } from "/imports/ui/components/Avatar";
 import { Loading } from "/imports/ui/components/Loading";
 import { Provider, ProviderCollection } from "/imports/api/provider";
 import { ProviderDetailsModal } from "/imports/ui/provider/ProviderDetailsModal";
+import { styles } from "/imports/utils/styles";
 
 export const ProviderTable = () => {
   const isLoading = useSubscribe("providers");
@@ -36,9 +37,9 @@ export const ProviderTable = () => {
 
   return (
     <div className="min-w-2xl max-w-7xl mx-auto px-8 py-8">
-      <table className="table">
+      <table className={`table ${styles.outline} rounded-xl overflow-hidden`}>
         {/* head */}
-        <thead>
+        <thead className="bg-base-300">
           <tr>
             <th></th>
             <th>Name</th>
@@ -52,7 +53,7 @@ export const ProviderTable = () => {
             return (
               <tr
                 key={modalId}
-                className="hover:bg-base-300"
+                className="bg-base-100 hover:bg-base-300"
                 onClick={() => handleSelect(p)}
               >
                 {/*Avatar*/}
