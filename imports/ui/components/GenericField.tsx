@@ -1,5 +1,6 @@
 import {
   CheckIcon,
+  EnvelopeIcon,
   PencilSquareIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -119,6 +120,24 @@ export const GenericField: React.FC<GenericFieldProps> = ({
           </div>
         )}
       </div>
+    </>
+  );
+};
+
+// Email Field
+type EmailFieldProps = Omit<GenericFieldProps, "icon">;
+export const EmailField: React.FC<EmailFieldProps> = (props) => {
+  const baseAttributes: string = "validator";
+
+  return (
+    <>
+      <GenericField
+        {...props}
+        additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
+        type="email"
+        icon={EnvelopeIcon}
+      />
+      <div className="validator-hint hidden">Enter valid email address</div>
     </>
   );
 };

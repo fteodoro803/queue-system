@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Patient } from "/imports/api/patient";
-import { EmailField } from "/imports/ui/components/EmailField";
+import { EmailField } from "/imports/ui/components/GenericField";
 import { NumberField } from "/imports/ui/components/NumberField";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { NameField } from "/imports/ui/components/NameField";

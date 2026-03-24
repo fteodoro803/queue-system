@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { GenericField } from "/imports/ui/components/GenericField";
-import { EmailField } from "/imports/ui/components/EmailField";
+import { GenericField, EmailField } from "/imports/ui/components/GenericField";
 import { NumberField } from "/imports/ui/components/NumberField";
 import { Calendar } from "/imports/ui/components/Calendar";
 import { Steps } from "/imports/ui/components/Steps";
@@ -111,6 +110,7 @@ export const TestPage = () => {
     position: 1,
     readyAt: null,
     status: "waiting",
+    initialEstimatedWaitTime: 15,
     start: null,
     end: null,
     createdAt: date ?? new Date(),
@@ -126,6 +126,7 @@ export const TestPage = () => {
     position: 0,
     readyAt: null,
     status: "in-progress",
+    initialEstimatedWaitTime: 15,
     start: getStartOfDay(date ?? new Date()),
     end: null,
     createdAt: date ?? new Date(),
@@ -141,6 +142,7 @@ export const TestPage = () => {
     position: 1,
     readyAt: null,
     status: "completed",
+    initialEstimatedWaitTime: 15,
     start: getStartOfDay(now),
     end: getEndOfDay(now),
     createdAt: date ?? new Date(),
@@ -156,6 +158,7 @@ export const TestPage = () => {
     position: 1,
     readyAt: null,
     status: "cancelled",
+    initialEstimatedWaitTime: 15,
     start: null,
     end: null,
     createdAt: date ?? new Date(),
