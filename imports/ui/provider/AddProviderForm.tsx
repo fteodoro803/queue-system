@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import { EmailField, NameField } from "/imports/ui/components/GenericField";
-import { NumberField } from "/imports/ui/components/NumberField";
+import {
+  EmailField,
+  NameField,
+  NumberField,
+} from "/imports/ui/components/GenericField";
 import { insertProvider } from "/imports/api/providerMethods";
 
 export const AddProviderForm = () => {

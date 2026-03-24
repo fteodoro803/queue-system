@@ -1,5 +1,6 @@
 import {
   CheckIcon,
+  DevicePhoneMobileIcon,
   EnvelopeIcon,
   PencilSquareIcon,
   UserIcon,
@@ -127,6 +128,7 @@ export const GenericField: React.FC<GenericFieldProps> = ({
 
 // ---- Email Field ----
 type EmailFieldProps = Omit<GenericFieldProps, "icon">;
+
 export const EmailField: React.FC<EmailFieldProps> = (props) => {
   const baseAttributes: string = "validator";
 
@@ -156,6 +158,25 @@ export const NameField: React.FC<NameFieldProps> = (props) => {
         additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
         icon={UserIcon}
       />
+    </>
+  );
+};
+
+// ---- Number Field ----
+type NumberFieldProps = Omit<GenericFieldProps, "icon">;
+
+export const NumberField: React.FC<NumberFieldProps> = (props) => {
+  const baseAttributes: string = "validator";
+
+  return (
+    <>
+      <GenericField
+        {...props}
+        additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
+        icon={DevicePhoneMobileIcon}
+        type="tel"
+      />
+      <div className="validator-hint hidden">Must be 11 digits</div>
     </>
   );
 };

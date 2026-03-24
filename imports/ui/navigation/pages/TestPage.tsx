@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import { GenericField, EmailField } from "/imports/ui/components/GenericField";
-import { NumberField } from "/imports/ui/components/NumberField";
+import {
+  GenericField,
+  EmailField,
+  NumberField,
+} from "/imports/ui/components/GenericField";
 import { Calendar } from "/imports/ui/components/Calendar";
 import { Steps } from "/imports/ui/components/Steps";
 import { DateIcon } from "/imports/ui/components/DateIcon";
