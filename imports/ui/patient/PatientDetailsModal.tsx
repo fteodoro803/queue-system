@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Patient } from "/imports/api/patient";
-import {
-  EmailField,
-  NameField,
-  NumberField,
-} from "/imports/ui/components/GenericField";
+import { EmailField, NameField, NumberField } from "../components/Field";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { updatePatient } from "/imports/api/patientsMethods";
 import { ModalButtons } from "/imports/ui/components/ModalButtons";

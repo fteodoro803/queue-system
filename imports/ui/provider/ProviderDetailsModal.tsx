@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  EmailField,
-  NameField,
-  NumberField,
-} from "/imports/ui/components/GenericField";
+import { EmailField, NameField, NumberField } from "../components/Field";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { Provider } from "/imports/api/provider";
 import { updateProvider } from "/imports/api/providerMethods";

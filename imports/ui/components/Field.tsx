@@ -6,9 +6,9 @@ import {
   UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 
-export interface GenericFieldProps {
+export interface FieldProps {
   value: string;
   onChange?: (val: string) => void;
   disabled?: boolean;
@@ -19,7 +19,7 @@ export interface GenericFieldProps {
   icon?: React.ComponentType<{ className?: string }>;
 }
 
-export const GenericField: React.FC<GenericFieldProps> = ({
+export const Field: FC<FieldProps> = ({
   value,
   onChange,
   placeholder = "",
@@ -127,14 +127,14 @@ export const GenericField: React.FC<GenericFieldProps> = ({
 };
 
 // ---- Email Field ----
-type EmailFieldProps = Omit<GenericFieldProps, "icon">;
+type EmailFieldProps = Omit<FieldProps, "icon">;
 
 export const EmailField: React.FC<EmailFieldProps> = (props) => {
   const baseAttributes: string = "validator";
 
   return (
     <>
-      <GenericField
+      <Field
         {...props}
         additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
         type="email"
@@ -146,14 +146,14 @@ export const EmailField: React.FC<EmailFieldProps> = (props) => {
 };
 
 // ---- Name Field ----
-type NameFieldProps = Omit<GenericFieldProps, "icon">;
+type NameFieldProps = Omit<FieldProps, "icon">;
 
 export const NameField: React.FC<NameFieldProps> = (props) => {
   const baseAttributes: string = "";
 
   return (
     <>
-      <GenericField
+      <Field
         {...props}
         additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
         icon={UserIcon}
@@ -163,14 +163,14 @@ export const NameField: React.FC<NameFieldProps> = (props) => {
 };
 
 // ---- Number Field ----
-type NumberFieldProps = Omit<GenericFieldProps, "icon">;
+type NumberFieldProps = Omit<FieldProps, "icon">;
 
 export const NumberField: React.FC<NumberFieldProps> = (props) => {
   const baseAttributes: string = "validator";
 
   return (
     <>
-      <GenericField
+      <Field
         {...props}
         additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
         icon={DevicePhoneMobileIcon}

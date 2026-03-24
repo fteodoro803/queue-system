@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import {
-  GenericField,
-  EmailField,
-  NumberField,
-} from "/imports/ui/components/GenericField";
+import { Field, EmailField, NumberField } from "../../components/Field";
 import { Calendar } from "/imports/ui/components/Calendar";
 import { Steps } from "/imports/ui/components/Steps";
 import { DateIcon } from "/imports/ui/components/DateIcon";
@@ -188,7 +184,7 @@ export const TestPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <p className="text-sm">Generic Field: mode=write</p>
-            <GenericField
+            <Field
               value={genericFieldValue}
               onChange={setGenericFieldValue}
               mode="write"
@@ -198,7 +194,7 @@ export const TestPage = () => {
 
           <div>
             <p className="text-sm">Generic Field: mode=read</p>
-            <GenericField
+            <Field
               value={genericFieldValue}
               onChange={setGenericFieldValue}
               mode="read"
@@ -207,7 +203,7 @@ export const TestPage = () => {
           </div>
           <div>
             <p className="text-sm">Generic Field: mode=editable</p>
-            <GenericField
+            <Field
               value={genericFieldValue}
               onChange={setGenericFieldValue}
               mode="editable"
@@ -216,7 +212,7 @@ export const TestPage = () => {
           </div>
           <div>
             <p className="text-sm">Generic Field: ghost</p>
-            <GenericField
+            <Field
               value={genericFieldValue}
               onChange={setGenericFieldValue}
               mode="write"
