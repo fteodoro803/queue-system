@@ -1,4 +1,5 @@
 import React, { ComponentType, ReactNode } from "react";
+import { styles } from "/imports/utils/styles";
 
 interface DashboardCardProps {
   header: string;
@@ -17,7 +18,7 @@ export const DashboardCard = ({
 }: DashboardCardProps) => {
   return (
     <div
-      className="card w-3xs h-35 p-6 rounded-xl border shadow-lg hover:-translate-y-1 transition-transform duration-200"
+      className={`card w-3xs h-35 p-6 bg-base-100 rounded-xl ${styles.outline} shadow-lg hover:-translate-y-1 transition-transform duration-200`}
       onClick={onClick}
     >
       <div className="flex items-start justify-between">

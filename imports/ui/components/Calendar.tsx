@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { DayPicker, Matcher } from "react-day-picker";
 import "react-day-picker/src/style.css";
 import { TEST_DATE } from "/imports/dev/settings";
+import { styles } from "/imports/utils/styles";
 
 // TODO: add tagalog localisation
 interface CalendarProps {
@@ -32,7 +33,7 @@ export const Calendar = ({
 
   return (
     <DayPicker
-      className="react-day-picker"
+      className={`react-day-picker ${styles.outline}`}
       /* --- Modifiers --- */
       mode="single"
       selected={date}

@@ -4,6 +4,7 @@ import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { SettingsCollection } from "/imports/api/settings";
 import { Loading } from "/imports/ui/components/Loading";
 import { setAcceptQueueAfterHours } from "/imports/api/settingsMethods";
+import { styles } from "/imports/utils/styles";
 
 // TODO: currently does nothing, implement actual functionality later
 
@@ -28,7 +29,7 @@ export const Settings = () => {
       <h1 className="text-3xl font-bold">Settings</h1>
 
       {/* Notifications */}
-      <div className="card bg-base-100 shadow-sm">
+      <div className={`card bg-base-100 shadow-sm ${styles.outline}`}>
         <div className="card-body gap-6">
           <h2 className="card-title text-lg">Notifications</h2>
 
@@ -62,7 +63,7 @@ export const Settings = () => {
       </div>
 
       {/* Queue Settings */}
-      <div className="card bg-base-100 shadow-sm">
+      <div className={`card bg-base-100 shadow-sm ${styles.outline}`}>
         <div className="card-body gap-6">
           <h2 className="card-title text-lg">Queue</h2>
 
@@ -103,7 +104,7 @@ export const Settings = () => {
       </div>
 
       {/* Appearance */}
-      <div className="card bg-base-100 shadow-sm">
+      <div className={`card bg-base-100 shadow-sm ${styles.outline}`}>
         <div className="card-body gap-4">
           <h2 className="card-title text-lg">Appearance</h2>
           <div className="form-control gap-1">
