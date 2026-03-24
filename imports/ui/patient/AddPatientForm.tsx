@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { EmailField } from "/imports/ui/components/GenericField";
+import { EmailField, NameField } from "/imports/ui/components/GenericField";
 import { NumberField } from "/imports/ui/components/NumberField";
-import { NameField } from "/imports/ui/components/NameField";
 import { insertPatient } from "/imports/api/patientsMethods";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import { Patient, PatientsCollection } from "/imports/api/patient";

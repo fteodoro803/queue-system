@@ -2,6 +2,7 @@ import {
   CheckIcon,
   EnvelopeIcon,
   PencilSquareIcon,
+  UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
@@ -124,7 +125,7 @@ export const GenericField: React.FC<GenericFieldProps> = ({
   );
 };
 
-// Email Field
+// ---- Email Field ----
 type EmailFieldProps = Omit<GenericFieldProps, "icon">;
 export const EmailField: React.FC<EmailFieldProps> = (props) => {
   const baseAttributes: string = "validator";
@@ -138,6 +139,23 @@ export const EmailField: React.FC<EmailFieldProps> = (props) => {
         icon={EnvelopeIcon}
       />
       <div className="validator-hint hidden">Enter valid email address</div>
+    </>
+  );
+};
+
+// ---- Name Field ----
+type NameFieldProps = Omit<GenericFieldProps, "icon">;
+
+export const NameField: React.FC<NameFieldProps> = (props) => {
+  const baseAttributes: string = "";
+
+  return (
+    <>
+      <GenericField
+        {...props}
+        additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
+        icon={UserIcon}
+      />
     </>
   );
 };
