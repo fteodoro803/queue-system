@@ -11,6 +11,7 @@ import {
   formatNumberDisplay,
   isPhilippineNumber,
 } from "/imports/utils/numberUtils";
+import { isValidEmail } from "/imports/utils/utils";
 
 export interface FieldProps {
   value: string;
@@ -146,7 +147,7 @@ export const Field: FC<FieldProps> = ({
 type EmailFieldProps = Omit<FieldProps, "icon">;
 
 export const EmailField: React.FC<EmailFieldProps> = (props) => {
-  const baseAttributes: string = "validator";
+  const baseAttributes: string = "";
 
   return (
     <>
@@ -155,8 +156,8 @@ export const EmailField: React.FC<EmailFieldProps> = (props) => {
         additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
         type="email"
         icon={EnvelopeIcon}
+        validate={isValidEmail}
       />
-      <div className="validator-hint hidden">Enter valid email address</div>
     </>
   );
 };
