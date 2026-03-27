@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { expect } from "chai";
-import { formatNumberDisplay } from "/imports/utils/numberUtils";
+import {
+  formatNumberDisplay,
+  isPhilippineNumber,
+} from "/imports/utils/numberUtils";
 
 describe("[UNIT] NumberUtils", () => {
   describe("formatNumberDisplay()", () => {
@@ -79,6 +82,53 @@ describe("[UNIT] NumberUtils", () => {
         expect(formatNumberDisplay("09991234567")).to.equal("0999 123 4567");
         expect(formatNumberDisplay("0917-123-4567")).to.equal("0917 123 4567");
       });
+    });
+  });
+
+  describe("isPhilippineNumber()", () => {
+    describe("when input starts with +63", () => {
+      it("accepts valid +639 numbers", () => {
+        expect(isPhilippineNumber("+639991234567")).to.equal(true);
+        expect(isPhilippineNumber("+63 999 123 4567")).to.equal(true);
+      });
+
+      it("rejects invalid +63 inputs", () => {
+        expect(isPhilippineNumber("+638991234567")).to.equal(false);
+        expect(isPhilippineNumber("+63999123456")).to.equal(false);
+        expect(isPhilippineNumber("+6399912345678")).to.equal(false);
+      });
+    });
+
+    describe("when input starts with 63", () => {
+      it("accepts valid 639 numbers", () => {
+        expect(isPhilippineNumber("639991234567")).to.equal(true);
+        expect(isPhilippineNumber("63 999 123 4567")).to.equal(true);
+      });
+
+      it("rejects invalid 63 inputs", () => {
+        expect(isPhilippineNumber("638991234567")).to.equal(false);
+        expect(isPhilippineNumber("63999123456")).to.equal(false);
+        expect(isPhilippineNumber("6399912345678")).to.equal(false);
+      });
+    });
+
+    describe("when input starts with 0", () => {
+      it("accepts valid 09 numbers", () => {
+        expect(isPhilippineNumber("09991234567")).to.equal(true);
+        expect(isPhilippineNumber("0999 123 4567")).to.equal(true);
+      });
+
+      it("rejects invalid 0-prefixed inputs", () => {
+        expect(isPhilippineNumber("08991234567")).to.equal(false);
+        expect(isPhilippineNumber("0999123456")).to.equal(false);
+        expect(isPhilippineNumber("099912345678")).to.equal(false);
+      });
+    });
+
+    it("rejects empty and non-numeric-like values", () => {
+      expect(isPhilippineNumber("")).to.equal(false);
+      expect(isPhilippineNumber("   ")).to.equal(false);
+      expect(isPhilippineNumber("abcdefg")).to.equal(false);
     });
   });
 });

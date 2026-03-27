@@ -1,6 +1,6 @@
 // Philippine Number Pattern
 // Matches: 09xx xxx xxxx | +63 9xx xxx xxxx | 63 9xx xxx xxxx
-export const philippinePattern = "^(\\+63 9|639|09)\\d{9}$";
+export const philippinePattern = "^(\\+639|639|09)\\d{9}$";
 
 /**
  *
@@ -13,7 +13,7 @@ export function isPhilippineNumber(value: string): boolean {
 }
 
 /**
- * Formats a string of digits into a Philippine phone number format.
+ * Formats a string of digits into a Philippine phone number format with spaces.
  * @param value The input string containing digits.
  * @returns The formatted phone number string.
  *

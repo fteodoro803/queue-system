@@ -6,8 +6,11 @@ import {
   UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import React, { FC, useState } from "react";
-import { formatNumberDisplay } from "/imports/utils/numberUtils";
+import React, { ComponentType, FC, useEffect, useRef, useState } from "react";
+import {
+  formatNumberDisplay,
+  isPhilippineNumber,
+} from "/imports/utils/numberUtils";
 
 export interface FieldProps {
   value: string;
@@ -17,7 +20,8 @@ export interface FieldProps {
   additionalAttributes?: string;
   type?: string;
   mode: "write" | "read" | "editable";
-  icon?: React.ComponentType<{ className?: string }>;
+  icon?: ComponentType<{ className?: string }>;
+  validate?: (val: string) => boolean;
 }
 
 export const Field: FC<FieldProps> = ({
@@ -29,15 +33,25 @@ export const Field: FC<FieldProps> = ({
   type = "text",
   icon,
   mode,
+  validate,
 }) => {
-  const baseAttributes: string = "input";
+  const baseAttributes: string = `input ${validate ? "validator" : ""}`;
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Update browser validity whenever value changes
+  useEffect(() => {
+    if (inputRef.current && validate) {
+      const isValid = validate(value);
+      inputRef.current.setCustomValidity(isValid ? "" : "Invalid");
+    }
+  }, [value, validate]);
 
   // Edit Mode Values - manages the internal state for editing, separate from the parent value
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [draftValue, setDraftValue] = useState<string>(value);
 
   // Sync with parent value changes while not editing
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isEditing) {
       setDraftValue(value);
     }
@@ -89,6 +103,7 @@ export const Field: FC<FieldProps> = ({
               }
             }}
             disabled={disabled}
+            ref={inputRef}
             readOnly={mode === "read" || (mode === "editable" && !isEditing)} // only allows input when in Edit Mode
           />
         </label>
@@ -167,7 +182,7 @@ export const NameField: React.FC<NameFieldProps> = (props) => {
 type NumberFieldProps = Omit<FieldProps, "icon">;
 
 export const NumberField: React.FC<NumberFieldProps> = (props) => {
-  const baseAttributes: string = "validator";
+  const baseAttributes: string = "";
 
   return (
     <>
@@ -177,8 +192,8 @@ export const NumberField: React.FC<NumberFieldProps> = (props) => {
         additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
         icon={DevicePhoneMobileIcon}
         type="tel"
+        validate={isPhilippineNumber}
       />
-      <div className="validator-hint hidden">Must be 11 digits</div>
     </>
   );
 };
