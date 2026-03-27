@@ -7,6 +7,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import React, { FC, useState } from "react";
+import { formatNumberDisplay } from "/imports/utils/numberUtils";
 
 export interface FieldProps {
   value: string;
@@ -172,6 +173,7 @@ export const NumberField: React.FC<NumberFieldProps> = (props) => {
     <>
       <Field
         {...props}
+        onChange={(val) => props.onChange?.(formatNumberDisplay(val))}
         additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
         icon={DevicePhoneMobileIcon}
         type="tel"

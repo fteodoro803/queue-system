@@ -1,6 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import assert from "assert";
 import "./unit/appointmentUtils.test";
+import "./unit/numberUtils.test";
 import "./unit/queueUtils.test";
 import "./integration/appointmentUtils.test";
 import "./integration/queueMethods.test";
