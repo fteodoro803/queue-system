@@ -1,3 +1,17 @@
+// Philippine Number Pattern
+// Matches: 09xx xxx xxxx | +63 9xx xxx xxxx | 63 9xx xxx xxxx
+export const philippinePattern = "^(\\+63 9|639|09)\\d{9}$";
+
+/**
+ *
+ * @param value
+ * @returns true if the input value matches the Philippine phone number pattern, false otherwise.
+ */
+export function isPhilippineNumber(value: string): boolean {
+  const compact = value.trim().replace(/\s/g, "");
+  return new RegExp(philippinePattern).test(compact);
+}
+
 /**
  * Formats a string of digits into a Philippine phone number format.
  * @param value The input string containing digits.
@@ -11,32 +25,35 @@
 export function formatNumberDisplay(value: string): string {
   if (!value || value.trim() === "") return "";
 
-  const trimmed = value.trim().replace(/\s/g, ""); // strip spaces first
-  const hasLeadingPlus = trimmed.startsWith("+");
-  const digits = trimmed.replace(/\D/g, "");
+  const compact = value.trim().replace(/(?!^\+)\D/g, "");
+  const digits = compact.replace(/\D/g, ""); // pure digits only
 
-  // Keep partial + input stable while typing/backspacing.
-  if (hasLeadingPlus && digits.length === 0) return "+";
-
-  if (hasLeadingPlus && !digits.startsWith("63")) {
-    return `+${digits.slice(0, 11)}`;
+  // Preserve partial '+' states while typing until the +63 formatter can apply.
+  if (compact.startsWith("+") && !compact.startsWith("+63")) {
+    return `+${digits}`;
   }
 
-  if ((hasLeadingPlus && digits.startsWith("63")) || digits.startsWith("63")) {
-    const localDigits = digits.slice(2, 12); // keep up to 10 digits after country code
-    const prefix = hasLeadingPlus ? "+63" : "63";
-
-    if (localDigits.length === 0) return prefix;
-    if (localDigits.length <= 3) return `${prefix} ${localDigits}`;
-    if (localDigits.length <= 6) {
-      return `${prefix} ${localDigits.slice(0, 3)} ${localDigits.slice(3)}`;
-    }
-    return `${prefix} ${localDigits.slice(0, 3)} ${localDigits.slice(3, 6)} ${localDigits.slice(6, 10)}`;
+  // +63 prefix
+  if (compact.startsWith("+63")) {
+    const local = digits.slice(2); // digits after 63
+    if (local.length === 0) return "+63";
+    if (local.length <= 3) return `+63 ${local}`;
+    if (local.length <= 6) return `+63 ${local.slice(0, 3)} ${local.slice(3)}`;
+    return `+63 ${local.slice(0, 3)} ${local.slice(3, 6)} ${local.slice(6, 10)}`;
   }
 
-  const localDigits = digits.slice(0, 11); // strip non-digits, cap at 11
-  if (localDigits.length <= 4) return localDigits;
-  if (localDigits.length <= 7)
-    return `${localDigits.slice(0, 4)} ${localDigits.slice(4)}`;
-  return `${localDigits.slice(0, 4)} ${localDigits.slice(4, 7)} ${localDigits.slice(7, 11)}`;
+  // 63 prefix
+  if (compact.startsWith("63")) {
+    const local = digits.slice(2);
+    if (local.length === 0) return "63";
+    if (local.length <= 3) return `63 ${local}`;
+    if (local.length <= 6) return `63 ${local.slice(0, 3)} ${local.slice(3)}`;
+    return `63 ${local.slice(0, 3)} ${local.slice(3, 6)} ${local.slice(6, 10)}`;
+  }
+
+  // 09 local format
+  const local = digits.slice(0, 11);
+  if (local.length <= 4) return local;
+  if (local.length <= 7) return `${local.slice(0, 4)} ${local.slice(4)}`;
+  return `${local.slice(0, 4)} ${local.slice(4, 7)} ${local.slice(7, 11)}`;
 }

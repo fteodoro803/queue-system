@@ -9,60 +9,76 @@ describe("[UNIT] NumberUtils", () => {
       expect(formatNumberDisplay("   ")).to.equal("");
     });
 
-    it("keeps short inputs (up to 4 digits) ungrouped", () => {
-      expect(formatNumberDisplay("09")).to.equal("09");
-      expect(formatNumberDisplay("0917")).to.equal("0917");
+    describe("when input starts with +63", () => {
+      it("formats values as +63 + 3 + 3 + remaining", () => {
+        expect(formatNumberDisplay("+639991234567")).to.equal(
+          "+63 999 123 4567",
+        );
+        expect(formatNumberDisplay("+63 999-123-4567")).to.equal(
+          "+63 999 123 4567",
+        );
+      });
+
+      it("supports partial +63 input", () => {
+        expect(formatNumberDisplay("+")).to.equal("+");
+        expect(formatNumberDisplay("+6")).to.equal("+6");
+        expect(formatNumberDisplay("+63")).to.equal("+63");
+        expect(formatNumberDisplay("+639")).to.equal("+63 9");
+      });
+
+      it("is idempotent for already formatted +63 values", () => {
+        expect(formatNumberDisplay("+63 999 123 4567")).to.equal(
+          "+63 999 123 4567",
+        );
+      });
     });
 
-    it("groups values with 5 to 7 digits as 4 + remaining", () => {
-      expect(formatNumberDisplay("09171")).to.equal("0917 1");
-      expect(formatNumberDisplay("0917123")).to.equal("0917 123");
+    describe("when input starts with 63", () => {
+      it("formats values as 63 + 3 + 3 + remaining", () => {
+        expect(formatNumberDisplay("639991234567")).to.equal("63 999 123 4567");
+        expect(formatNumberDisplay("63 999 123 4567")).to.equal(
+          "63 999 123 4567",
+        );
+      });
+
+      it("supports partial 63 input", () => {
+        expect(formatNumberDisplay("63")).to.equal("63");
+        expect(formatNumberDisplay("639")).to.equal("63 9");
+        expect(formatNumberDisplay("63999")).to.equal("63 999");
+      });
     });
 
-    it("groups values with 8 to 11 digits as 4 + 3 + remaining", () => {
-      expect(formatNumberDisplay("09171234")).to.equal("0917 123 4");
-      expect(formatNumberDisplay("09171234567")).to.equal("0917 123 4567");
-    });
+    describe("when input starts with 0", () => {
+      it("keeps short inputs (up to 4 digits) ungrouped", () => {
+        expect(formatNumberDisplay("09")).to.equal("09");
+        expect(formatNumberDisplay("0917")).to.equal("0917");
+      });
 
-    it("strips non-digit characters before formatting", () => {
-      expect(formatNumberDisplay("0917-123-4567")).to.equal("0917 123 4567");
-      expect(formatNumberDisplay("09a17 12b3-45c67")).to.equal("0917 123 4567");
-    });
+      it("groups values with 5 to 7 digits as 4 + remaining", () => {
+        expect(formatNumberDisplay("09171")).to.equal("0917 1");
+        expect(formatNumberDisplay("0917123")).to.equal("0917 123");
+      });
 
-    it("caps output to the first 11 digits", () => {
-      expect(formatNumberDisplay("09171234567890")).to.equal("0917 123 4567");
-    });
+      it("groups values with 8 to 11 digits as 4 + 3 + remaining", () => {
+        expect(formatNumberDisplay("09171234")).to.equal("0917 123 4");
+        expect(formatNumberDisplay("09171234567")).to.equal("0917 123 4567");
+      });
 
-    it("keeps existing local behavior for numbers starting with 0", () => {
-      expect(formatNumberDisplay("09991234567")).to.equal("0999 123 4567");
-      expect(formatNumberDisplay("0917-123-4567")).to.equal("0917 123 4567");
-    });
+      it("strips non-digit characters before formatting", () => {
+        expect(formatNumberDisplay("0917-123-4567")).to.equal("0917 123 4567");
+        expect(formatNumberDisplay("09a17 12b3-45c67")).to.equal(
+          "0917 123 4567",
+        );
+      });
 
-    it("formats numbers starting with 63 as country code + grouped local", () => {
-      expect(formatNumberDisplay("639991234567")).to.equal("63 999 123 4567");
-      expect(formatNumberDisplay("63 999 123 4567")).to.equal(
-        "63 999 123 4567",
-      );
-    });
+      it("caps output to the first 11 digits", () => {
+        expect(formatNumberDisplay("09171234567890")).to.equal("0917 123 4567");
+      });
 
-    it("formats numbers starting with +63 and preserves the plus sign", () => {
-      expect(formatNumberDisplay("+639991234567")).to.equal("+63 999 123 4567");
-      expect(formatNumberDisplay("+63 999-123-4567")).to.equal(
-        "+63 999 123 4567",
-      );
-    });
-
-    it("is idempotent for already formatted +63 input", () => {
-      expect(formatNumberDisplay("+63 999 123 4567")).to.equal(
-        "+63 999 123 4567",
-      );
-    });
-
-    it("supports partial + input while typing and deleting", () => {
-      expect(formatNumberDisplay("+")).to.equal("+");
-      expect(formatNumberDisplay("+6")).to.equal("+6");
-      expect(formatNumberDisplay("+63")).to.equal("+63");
-      expect(formatNumberDisplay("+639")).to.equal("+63 9");
+      it("keeps local formatting behavior", () => {
+        expect(formatNumberDisplay("09991234567")).to.equal("0999 123 4567");
+        expect(formatNumberDisplay("0917-123-4567")).to.equal("0917 123 4567");
+      });
     });
   });
 });
