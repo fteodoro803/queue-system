@@ -1,4 +1,7 @@
 // Philippine Number Pattern
+
+import { TEST_SETTINGS } from "/imports/dev/settings";
+
 // Matches: 09xx xxx xxxx | +63 9xx xxx xxxx | 63 9xx xxx xxxx
 export const philippinePattern = "^(\\+639|639|09)\\d{9}$";
 
@@ -8,6 +11,7 @@ export const philippinePattern = "^(\\+639|639|09)\\d{9}$";
  * @returns true if the input value matches the Philippine phone number pattern, false otherwise.
  */
 export function isPhilippineNumber(value: string): boolean {
+  if (TEST_SETTINGS.BYPASS_FORM_VALIDATION) return true;
   const compact = value.trim().replace(/\s/g, "");
   return new RegExp(philippinePattern).test(compact);
 }

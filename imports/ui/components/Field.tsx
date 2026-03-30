@@ -6,7 +6,14 @@ import {
   UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import React, { ComponentType, FC, useEffect, useRef, useState } from "react";
+import React, {
+  ComponentType,
+  createElement,
+  FC,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   formatNumberDisplay,
   isPhilippineNumber,
@@ -84,7 +91,7 @@ export const Field: FC<FieldProps> = ({
         <label className={`${baseAttributes} ${additionalAttributes}`}>
           {/*Icon*/}
           {icon &&
-            React.createElement(icon, {
+            createElement(icon, {
               className: "h-5 w-5 text-base-content/50",
             })}
 
@@ -146,7 +153,7 @@ export const Field: FC<FieldProps> = ({
 // ---- Email Field ----
 type EmailFieldProps = Omit<FieldProps, "icon">;
 
-export const EmailField: React.FC<EmailFieldProps> = (props) => {
+export const EmailField: FC<EmailFieldProps> = (props) => {
   const baseAttributes: string = "";
 
   return (
@@ -154,7 +161,6 @@ export const EmailField: React.FC<EmailFieldProps> = (props) => {
       <Field
         {...props}
         additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
-        type="email"
         icon={EnvelopeIcon}
         validate={isValidEmail}
       />
@@ -165,7 +171,7 @@ export const EmailField: React.FC<EmailFieldProps> = (props) => {
 // ---- Name Field ----
 type NameFieldProps = Omit<FieldProps, "icon">;
 
-export const NameField: React.FC<NameFieldProps> = (props) => {
+export const NameField: FC<NameFieldProps> = (props) => {
   const baseAttributes: string = "";
 
   return (
@@ -182,7 +188,7 @@ export const NameField: React.FC<NameFieldProps> = (props) => {
 // ---- Number Field ----
 type NumberFieldProps = Omit<FieldProps, "icon">;
 
-export const NumberField: React.FC<NumberFieldProps> = (props) => {
+export const NumberField: FC<NumberFieldProps> = (props) => {
   const baseAttributes: string = "";
 
   return (

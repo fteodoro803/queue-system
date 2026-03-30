@@ -1,6 +1,15 @@
+import { TEST_SETTINGS } from "/imports/dev/settings";
+
 // ----- Checks -----
 export function isInteger(str: string): boolean {
   return /^\d+$/.test(str);
+}
+
+// Checks if string is a valid email address
+export function isValidEmail(email: string): boolean {
+  if (TEST_SETTINGS.BYPASS_FORM_VALIDATION) return true; // bypass validation for testing purposes
+  const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+  return emailRegex.test(email);
 }
 
 // ----- Time Utilities -----
@@ -106,10 +115,4 @@ export function convertMinutesToTime(time_min: number): string {
   if (hours === 0) return `${minutes}m`;
   if (minutes === 0) return `${hours}h`;
   return `${hours}h ${minutes}m`;
-}
-
-// Checks if string is a valid email address
-export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-  return emailRegex.test(email);
 }
