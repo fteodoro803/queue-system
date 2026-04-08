@@ -2,7 +2,7 @@ import { Meteor } from "meteor/meteor";
 import { ProviderCollection, ProviderService } from "/imports/api/provider";
 
 // Interfaces
-export interface providerData {
+export interface ProviderData {
   name: string;
   email?: string;
   number?: string;
@@ -10,19 +10,10 @@ export interface providerData {
   services?: ProviderService[];
 }
 
-export interface providerUpdateData {
-  name?: string;
-  email?: string;
-  number?: string;
-  avatar?: string;
-  services?: ProviderService[];
-}
-
-
 // Meteor CRUD methods
 Meteor.methods({
-  // Adds patient to the database
-  "provider.insert"(data: providerData) {
+  // Adds provider to the database
+  "provider.insert"(data: ProviderData) {
     return ProviderCollection.insertAsync({
       name: data.name.trim(),
       email: data.email?.trim() ?? null,
@@ -32,8 +23,10 @@ Meteor.methods({
       createdAt: new Date(),
     });
   },
-  "provider.update"(id: string, data: providerUpdateData) {
-    const updates: Partial<providerUpdateData> = {};
+
+  // Updates provider information
+  async "provider.update"(id: string, data: Partial<ProviderData>) {
+    const updates: Partial<ProviderData> = {};
 
     // Only update fields that are provided
     if (data.name !== undefined) updates.name = data.name.trim();
@@ -42,9 +35,20 @@ Meteor.methods({
     if (data.avatar !== undefined) updates.avatar = data.avatar?.trim() ?? null;
     if (data.services !== undefined) updates.services = data.services;
 
-    return ProviderCollection.updateAsync(id, {
+    // Update the provider document with the specified fields
+    const result = await ProviderCollection.updateAsync(id, {
       $set: updates,
     });
+
+    // Check if the update was successful
+    if (result === 0) {
+      throw new Meteor.Error(
+        "not-found",
+        `Provider with id ${id} does not exist`,
+      );
+    }
+
+    return result;
   },
 
   // Add service to provider's list of services
@@ -84,11 +88,11 @@ Meteor.methods({
 });
 
 // Exports for the Meteor methods
-export async function insertProvider(data: providerData) {
+export async function insertProvider(data: ProviderData) {
   return Meteor.callAsync("provider.insert", data);
 }
 
-export async function updateProvider(id: string, data: providerUpdateData) {
+export async function updateProvider(id: string, data: Partial<ProviderData>) {
   return Meteor.callAsync("provider.update", id, data);
 }
 

@@ -10,15 +10,6 @@ export interface ServiceData {
   priority: number; //
 }
 
-export interface ServiceUpdateData {
-  name?: string;
-  shortcode?: string;
-  cost?: number | null;
-  duration?: number;
-  description?: string;
-  priority?: number;
-}
-
 Meteor.methods({
   // Adds service type to the database
   "services.insert"(data: ServiceData) {
@@ -34,8 +25,8 @@ Meteor.methods({
   },
 
   // Updates service information
-  "services.update"(id: string, data: ServiceUpdateData) {
-    const updates: ServiceUpdateData = {};
+  async "services.update"(id: string, data: Partial<ServiceData>) {
+    const updates: Partial<ServiceData> = {};
 
     if (data.name !== undefined) updates.name = data.name.trim();
     if (data.shortcode !== undefined) updates.shortcode = data.shortcode.trim();
@@ -45,14 +36,23 @@ Meteor.methods({
     if (data.priority !== undefined) updates.priority = data.priority;
     if (data.cost !== undefined) updates.cost = data.cost;
 
-    return ServicesCollection.updateAsync(id, {
+    const result = await ServicesCollection.updateAsync(id, {
       $set: updates,
     });
+
+    if (result === 0) {
+      throw new Meteor.Error(
+        "not-found",
+        `Service with id ${id} does not exist`,
+      );
+    }
+
+    return result;
   },
 
   // Clear analytics data for all services
-  "services.clearAnalytics"() {
-    return ServicesCollection.updateAsync(
+  async "services.clearAnalytics"() {
+    return await ServicesCollection.updateAsync(
       {},
       { $set: { count: 0, totalDuration: null, avgDuration: null } },
       { multi: true },
@@ -68,7 +68,7 @@ export async function insertService(data: ServiceData) {
   return await Meteor.callAsync("services.insert", data);
 }
 
-export async function updateService(id: string, data: ServiceUpdateData) {
+export async function updateService(id: string, data: Partial<ServiceData>) {
   return await Meteor.callAsync("services.update", id, data);
 }
 
