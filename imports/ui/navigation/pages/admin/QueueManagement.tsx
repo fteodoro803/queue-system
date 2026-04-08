@@ -42,6 +42,8 @@ export const QueueManagement = () => {
   const isProvidersLoading = useSubscribe("providers");
   let providers = useFind(() => ProviderCollection.find({}));
 
+  const isPatientsLoading = useSubscribe("patients");
+
   const [queueEntryModalOpen, setQueueEntryModalOpen] =
     useState<boolean>(false);
 
@@ -113,6 +115,7 @@ export const QueueManagement = () => {
     isQueueEntryLoading() ||
     isServicesLoading() ||
     isProvidersLoading() ||
+    isPatientsLoading() ||
     isSettingsLoading()
   ) {
     return <Loading />;

@@ -49,9 +49,7 @@ Meteor.methods({
     return QueueEntryCollection.insertAsync({
       displayId: displayId,
       patientId: data.patient._id,
-      patient: data.patient,
       serviceId: data.service._id,
-      service: data.service,
       position: newPosition,
       status: "waiting",
       initialEstimatedWaitTime: estimatedWaitTime ?? null,
