@@ -3,7 +3,7 @@ import { Profile } from "/imports/api/profile";
 
 export interface ProviderService {
   id: string;
-  name: string; // for display
+  name: string; // for display in DB
   // cost: number;
   enabled: boolean;
 }
