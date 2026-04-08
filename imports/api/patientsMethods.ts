@@ -12,7 +12,8 @@ export interface PatientData {
 // Meteor CRUD methods for Patients
 Meteor.methods({
   // Adds patient to the database
-  "patients.insert"(data: PatientData) {
+  // Returns the new patient's ID
+  "patients.insert"(data: PatientData): Promise<string> {
     return PatientsCollection.insertAsync({
       name: data.name.trim(),
       email: data.email?.trim() ?? null,
@@ -23,7 +24,11 @@ Meteor.methods({
   },
 
   // Updates patient information
-  "patients.update"(id: string, data: PatientData) {
+  // Returns number of documents updated (should be 1 if successful)
+  async "patients.update"(
+    id: string,
+    data: Partial<PatientData>,
+  ): Promise<number> {
     const updates: Partial<PatientData> = {};
 
     // Only update fields that are provided
@@ -32,17 +37,29 @@ Meteor.methods({
     if (data.number !== undefined) updates.number = data.number?.trim() ?? null;
     if (data.avatar !== undefined) updates.avatar = data.avatar?.trim() ?? null;
 
-    return PatientsCollection.updateAsync(id, {
+    const result = await PatientsCollection.updateAsync(id, {
       $set: updates,
     });
+
+    if (result === 0) {
+      throw new Meteor.Error(
+        "not-found",
+        `Patient with id ${id} does not exist`,
+      );
+    }
+
+    return result;
   },
 });
 
 // Exports for the Meteor methods
-export async function insertPatient(data: PatientData) {
+export async function insertPatient(data: PatientData): Promise<string> {
   return Meteor.callAsync("patients.insert", data);
 }
 
-export async function updatePatient(id: string, data: PatientData) {
+export async function updatePatient(
+  id: string,
+  data: Partial<PatientData>,
+): Promise<number> {
   return Meteor.callAsync("patients.update", id, data);
 }

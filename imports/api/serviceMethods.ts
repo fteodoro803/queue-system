@@ -1,6 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import { ServicesCollection } from "/imports/api/service";
 
+// ---- Interfaces ----
 export interface ServiceData {
   name: string;
   shortcode: string;
@@ -10,9 +11,11 @@ export interface ServiceData {
   priority: number; //
 }
 
+// ---- Meteor CRUD methods ----
 Meteor.methods({
   // Adds service type to the database
-  "services.insert"(data: ServiceData) {
+  // Returns the ID of the newly created service document
+  "services.insert"(data: ServiceData): Promise<string> {
     return ServicesCollection.insertAsync({
       name: data.name,
       shortcode: data.shortcode,
@@ -24,9 +27,36 @@ Meteor.methods({
     });
   },
 
+  // Updates service information
+  // Returns the number of documents updated (should be 1 if successful)
+  async "services.update"(id: string, data: Partial<ServiceData>): Promise<number> {
+    const updates: Partial<ServiceData> = {};
+
+    if (data.name !== undefined) updates.name = data.name.trim();
+    if (data.shortcode !== undefined) updates.shortcode = data.shortcode.trim();
+    if (data.description !== undefined)
+      updates.description = data.description.trim();
+    if (data.duration !== undefined) updates.duration = data.duration;
+    if (data.priority !== undefined) updates.priority = data.priority;
+    if (data.cost !== undefined) updates.cost = data.cost;
+
+    const result = await ServicesCollection.updateAsync(id, {
+      $set: updates,
+    });
+
+    if (result === 0) {
+      throw new Meteor.Error(
+        "not-found",
+        `Service with id ${id} does not exist`,
+      );
+    }
+
+    return result;
+  },
+
   // Clear analytics data for all services
-  "services.clearAnalytics"() {
-    return ServicesCollection.updateAsync(
+  async "services.clearAnalytics"() {
+    return await ServicesCollection.updateAsync(
       {},
       { $set: { count: 0, totalDuration: null, avgDuration: null } },
       { multi: true },
@@ -38,8 +68,25 @@ Meteor.methods({
   // }
 });
 
-export async function insertService(data: ServiceData) {
+// ---- Exports for the Meteor methods ----
+
+/**
+ * 
+ * @param data - Service data to insert
+ * @returns The ID of the newly created service document
+ */
+export async function insertService(data: ServiceData): Promise<string> {
   return await Meteor.callAsync("services.insert", data);
+}
+
+/**
+ * @param id - The ID of the service to update
+ * @param data - Partial service data with fields to update
+ * @returns The number of documents updated (should be 1 if successful)
+ * @throws Meteor.Error with error code "not-found" if the service ID does not exist
+ */
+export async function updateService(id: string, data: Partial<ServiceData>): Promise<number> {
+  return await Meteor.callAsync("services.update", id, data);
 }
 
 export async function updateServiceAnalytics(
