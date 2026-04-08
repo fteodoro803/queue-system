@@ -9,6 +9,7 @@ import {
   WrenchIcon,
 } from "@heroicons/react/24/outline";
 import { ModalButtons } from "/imports/ui/components/ModalButtons";
+import { updateService } from "/imports/api/serviceMethods";
 
 export const ServiceDetailsModal = ({
   service,
@@ -49,7 +50,33 @@ export const ServiceDetailsModal = ({
     setHasChanges(hasChanges);
   }, [name, duration, cost, description, service]);
 
-  // todo: implement save and cancel functionality
+  // Save edits functionality
+  const handleSave = async () => {
+    const parsedDuration = Number(duration);
+    const parsedCost = cost.trim() === "" ? null : Number(cost);
+
+    await updateService(service._id, {
+      name,
+      duration: Number.isFinite(parsedDuration)
+        ? parsedDuration
+        : service.duration,
+      cost: Number.isFinite(parsedCost) ? parsedCost : null,
+      description,
+    });
+
+    setHasChanges(false);
+  };
+
+  // Cancel edits functionality
+  const handleCancel = () => {
+    setName(service.name);
+    setDuration(service.duration.toString());
+    setAverageDuration(service.avgDuration?.toString() ?? "N/A");
+    setCost(service.cost?.toString() ?? "");
+    setDescription(service.description);
+
+    setHasChanges(false);
+  };
 
   /* Closed */
   if (!open) return null;
@@ -72,7 +99,10 @@ export const ServiceDetailsModal = ({
           </div>
           <button
             className="btn btn-circle btn-ghost btn-sm absolute top-3 right-3"
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              handleCancel();
+              setOpen(false);
+            }}
           >
             ✕
           </button>
@@ -153,97 +183,20 @@ export const ServiceDetailsModal = ({
           </div>
 
           <div className="pt-1">
-            <ModalButtons setOpen={setOpen} hasChanges={hasChanges} />
+            <ModalButtons
+              setOpen={setOpen}
+              hasChanges={hasChanges}
+              handleSave={handleSave}
+              handleCancel={handleCancel}
+            />
           </div>
         </div>
       </div>
 
-      <div className="modal-backdrop" onClick={() => setOpen(false)} />
-    </div>
-  );
-
-  /* Open OLD */
-  return (
-    <div className="modal modal-open" role={"dialog"}>
-      <div className="modal-box">
-        <fieldset className="fieldset">
-          {/* Name */}
-          <label className="label">Name</label>
-          <Field
-            value={name}
-            onChange={setName}
-            additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100"
-            }
-            mode="editable"
-            type="text"
-            placeholder={"N/A"}
-            icon={WrenchIcon}
-          />
-
-          {/* Duration */}
-          <label className="label">Duration</label>
-          <Field
-            value={duration}
-            onChange={setDuration}
-            additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100"
-            }
-            type="number"
-            placeholder={"N/A"}
-            icon={ClockIcon}
-            mode="editable"
-          />
-
-          {/* Average Duration */}
-          <label className="label">Average Duration</label>
-          <Field
-            value={averageDuration}
-            additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100"
-            }
-            type="number"
-            placeholder={"N/A"}
-            icon={ClockIcon}
-            mode="editable"
-          />
-
-          {/* Cost */}
-          <label className="label">Cost</label>
-          <Field
-            value={cost}
-            onChange={setCost}
-            additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100"
-            }
-            type="number"
-            placeholder={"N/A"}
-            icon={BanknotesIcon}
-            mode="editable"
-          />
-          {/* Description */}
-          <label className="label">Description</label>
-          <Field
-            value={description}
-            onChange={setDescription}
-            additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100"
-            }
-            type="text"
-            placeholder={"N/A"}
-            icon={ChatBubbleBottomCenterIcon}
-            mode="editable"
-          />
-        </fieldset>
-
-        <ModalButtons setOpen={setOpen} hasChanges={hasChanges} />
-      </div>
-
-      {/* Closes modal when clicking outside */}
       <div
         className="modal-backdrop"
         onClick={() => {
-          // handleCancel();
+          handleCancel();
           setOpen(false);
         }}
       />
