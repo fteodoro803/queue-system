@@ -29,6 +29,7 @@ export function isPhilippineNumber(value: string): boolean {
 export function formatNumberDisplay(value: string): string {
   if (!value || value.trim() === "") return "";
 
+  // Remove all non-digit characters except a leading '+' so +63 input is preserved.
   const compact = value.trim().replace(/(?!^\+)\D/g, "");
   const digits = compact.replace(/\D/g, ""); // pure digits only
 
