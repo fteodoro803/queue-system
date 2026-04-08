@@ -10,6 +10,15 @@ export interface providerData {
   services?: ProviderService[];
 }
 
+export interface providerUpdateData {
+  name?: string;
+  email?: string;
+  number?: string;
+  avatar?: string;
+  services?: ProviderService[];
+}
+
+
 // Meteor CRUD methods
 Meteor.methods({
   // Adds patient to the database
@@ -23,8 +32,8 @@ Meteor.methods({
       createdAt: new Date(),
     });
   },
-  "provider.update"(id: string, data: providerData) {
-    const updates: Partial<providerData> = {};
+  "provider.update"(id: string, data: providerUpdateData) {
+    const updates: Partial<providerUpdateData> = {};
 
     // Only update fields that are provided
     if (data.name !== undefined) updates.name = data.name.trim();
@@ -79,7 +88,7 @@ export async function insertProvider(data: providerData) {
   return Meteor.callAsync("provider.insert", data);
 }
 
-export async function updateProvider(id: string, data: providerData) {
+export async function updateProvider(id: string, data: providerUpdateData) {
   return Meteor.callAsync("provider.update", id, data);
 }
 

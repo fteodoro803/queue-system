@@ -9,6 +9,13 @@ export interface PatientData {
   avatar?: string;
 }
 
+export interface PatientUpdateData {
+  name?: string;
+  email?: string;
+  number?: string;
+  avatar?: string;
+}
+
 // Meteor CRUD methods for Patients
 Meteor.methods({
   // Adds patient to the database
@@ -23,8 +30,8 @@ Meteor.methods({
   },
 
   // Updates patient information
-  "patients.update"(id: string, data: PatientData) {
-    const updates: Partial<PatientData> = {};
+  "patients.update"(id: string, data: PatientUpdateData) {
+    const updates: Partial<PatientUpdateData> = {};
 
     // Only update fields that are provided
     if (data.name !== undefined) updates.name = data.name.trim();
@@ -43,6 +50,6 @@ export async function insertPatient(data: PatientData) {
   return Meteor.callAsync("patients.insert", data);
 }
 
-export async function updatePatient(id: string, data: PatientData) {
+export async function updatePatient(id: string, data: PatientUpdateData) {
   return Meteor.callAsync("patients.update", id, data);
 }
