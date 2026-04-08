@@ -1,6 +1,7 @@
 import { Meteor } from "meteor/meteor";
 import { ServicesCollection } from "/imports/api/service";
 
+// ---- Interfaces ----
 export interface ServiceData {
   name: string;
   shortcode: string;
@@ -10,9 +11,11 @@ export interface ServiceData {
   priority: number; //
 }
 
+// ---- Meteor CRUD methods ----
 Meteor.methods({
   // Adds service type to the database
-  "services.insert"(data: ServiceData) {
+  // Returns the ID of the newly created service document
+  "services.insert"(data: ServiceData): Promise<string> {
     return ServicesCollection.insertAsync({
       name: data.name,
       shortcode: data.shortcode,
@@ -25,7 +28,8 @@ Meteor.methods({
   },
 
   // Updates service information
-  async "services.update"(id: string, data: Partial<ServiceData>) {
+  // Returns the number of documents updated (should be 1 if successful)
+  async "services.update"(id: string, data: Partial<ServiceData>): Promise<number> {
     const updates: Partial<ServiceData> = {};
 
     if (data.name !== undefined) updates.name = data.name.trim();
@@ -64,11 +68,24 @@ Meteor.methods({
   // }
 });
 
-export async function insertService(data: ServiceData) {
+// ---- Exports for the Meteor methods ----
+
+/**
+ * 
+ * @param data - Service data to insert
+ * @returns The ID of the newly created service document
+ */
+export async function insertService(data: ServiceData): Promise<string> {
   return await Meteor.callAsync("services.insert", data);
 }
 
-export async function updateService(id: string, data: Partial<ServiceData>) {
+/**
+ * @param id - The ID of the service to update
+ * @param data - Partial service data with fields to update
+ * @returns The number of documents updated (should be 1 if successful)
+ * @throws Meteor.Error with error code "not-found" if the service ID does not exist
+ */
+export async function updateService(id: string, data: Partial<ServiceData>): Promise<number> {
   return await Meteor.callAsync("services.update", id, data);
 }
 

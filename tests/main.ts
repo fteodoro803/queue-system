@@ -4,7 +4,10 @@ import "./unit/appointmentUtils.test";
 import "./unit/numberUtils.test";
 import "./unit/queueUtils.test";
 import "./integration/appointmentUtils.test";
+import "./integration/patient.test";
+import "./integration/provider.test";
 import "./integration/queueMethods.test";
+import "./integration/service.test";
 import { TEST_SETTINGS } from "/imports/dev/settings";
 
 describe("queue-system", function () {
