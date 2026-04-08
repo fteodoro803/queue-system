@@ -1,11 +1,26 @@
 import {
   CheckIcon,
+  DevicePhoneMobileIcon,
+  EnvelopeIcon,
   PencilSquareIcon,
+  UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import React, { useState } from "react";
+import React, {
+  ComponentType,
+  createElement,
+  FC,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  formatNumberDisplay,
+  isPhilippineNumber,
+} from "/imports/utils/numberUtils";
+import { isValidEmail } from "/imports/utils/utils";
 
-export interface GenericFieldProps {
+export interface FieldProps {
   value: string;
   onChange?: (val: string) => void;
   disabled?: boolean;
@@ -13,10 +28,11 @@ export interface GenericFieldProps {
   additionalAttributes?: string;
   type?: string;
   mode: "write" | "read" | "editable";
-  icon?: React.ComponentType<{ className?: string }>;
+  icon?: ComponentType<{ className?: string }>;
+  validate?: (val: string) => boolean;
 }
 
-export const GenericField: React.FC<GenericFieldProps> = ({
+export const Field: FC<FieldProps> = ({
   value,
   onChange,
   placeholder = "",
@@ -25,15 +41,25 @@ export const GenericField: React.FC<GenericFieldProps> = ({
   type = "text",
   icon,
   mode,
+  validate,
 }) => {
-  const baseAttributes: string = "input";
+  const baseAttributes: string = `input ${validate ? "validator" : ""}`;
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Update browser validity whenever value changes
+  useEffect(() => {
+    if (inputRef.current && validate) {
+      const isValid = validate(value);
+      inputRef.current.setCustomValidity(isValid ? "" : "Invalid");
+    }
+  }, [value, validate]);
 
   // Edit Mode Values - manages the internal state for editing, separate from the parent value
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [draftValue, setDraftValue] = useState<string>(value);
 
   // Sync with parent value changes while not editing
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isEditing) {
       setDraftValue(value);
     }
@@ -65,7 +91,7 @@ export const GenericField: React.FC<GenericFieldProps> = ({
         <label className={`${baseAttributes} ${additionalAttributes}`}>
           {/*Icon*/}
           {icon &&
-            React.createElement(icon, {
+            createElement(icon, {
               className: "h-5 w-5 text-base-content/50",
             })}
 
@@ -85,6 +111,7 @@ export const GenericField: React.FC<GenericFieldProps> = ({
               }
             }}
             disabled={disabled}
+            ref={inputRef}
             readOnly={mode === "read" || (mode === "editable" && !isEditing)} // only allows input when in Edit Mode
           />
         </label>
@@ -119,6 +146,61 @@ export const GenericField: React.FC<GenericFieldProps> = ({
           </div>
         )}
       </div>
+    </>
+  );
+};
+
+// ---- Email Field ----
+type EmailFieldProps = Omit<FieldProps, "icon">;
+
+export const EmailField: FC<EmailFieldProps> = (props) => {
+  const baseAttributes: string = "";
+
+  return (
+    <>
+      <Field
+        {...props}
+        additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
+        icon={EnvelopeIcon}
+        validate={isValidEmail}
+      />
+    </>
+  );
+};
+
+// ---- Name Field ----
+type NameFieldProps = Omit<FieldProps, "icon">;
+
+export const NameField: FC<NameFieldProps> = (props) => {
+  const baseAttributes: string = "";
+
+  return (
+    <>
+      <Field
+        {...props}
+        additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
+        icon={UserIcon}
+      />
+    </>
+  );
+};
+
+// ---- Number Field ----
+type NumberFieldProps = Omit<FieldProps, "icon">;
+
+export const NumberField: FC<NumberFieldProps> = (props) => {
+  const baseAttributes: string = "";
+
+  return (
+    <>
+      <Field
+        {...props}
+        onChange={(val) => props.onChange?.(formatNumberDisplay(val))}
+        additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
+        icon={DevicePhoneMobileIcon}
+        type="tel"
+        validate={isPhilippineNumber}
+      />
     </>
   );
 };

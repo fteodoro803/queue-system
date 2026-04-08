@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Service } from "/imports/api/service";
-import { GenericField } from "/imports/ui/components/GenericField";
+import { Field } from "../components/Field";
 import {
   BanknotesIcon,
   ChartBarIcon,
@@ -85,7 +85,7 @@ export const ServiceDetailsModal = ({
             <label className="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-1 block">
               Name
             </label>
-            <GenericField
+            <Field
               value={name}
               onChange={setName}
               additionalAttributes="input input-bordered w-full bg-base-100"
@@ -100,7 +100,7 @@ export const ServiceDetailsModal = ({
             <label className="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-1 block">
               Duration (mins)
             </label>
-            <GenericField
+            <Field
               value={duration}
               onChange={setDuration}
               additionalAttributes="input input-bordered w-full bg-base-100"
@@ -125,7 +125,7 @@ export const ServiceDetailsModal = ({
             <label className="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-1 block">
               Cost ($)
             </label>
-            <GenericField
+            <Field
               value={cost}
               onChange={setCost}
               additionalAttributes="input input-bordered w-full bg-base-100"
@@ -141,7 +141,7 @@ export const ServiceDetailsModal = ({
             <label className="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-1 block">
               Description
             </label>
-            <GenericField
+            <Field
               value={description}
               onChange={setDescription}
               additionalAttributes="input input-bordered w-full bg-base-100"
@@ -169,7 +169,7 @@ export const ServiceDetailsModal = ({
         <fieldset className="fieldset">
           {/* Name */}
           <label className="label">Name</label>
-          <GenericField
+          <Field
             value={name}
             onChange={setName}
             additionalAttributes={
@@ -183,7 +183,7 @@ export const ServiceDetailsModal = ({
 
           {/* Duration */}
           <label className="label">Duration</label>
-          <GenericField
+          <Field
             value={duration}
             onChange={setDuration}
             additionalAttributes={
@@ -197,7 +197,7 @@ export const ServiceDetailsModal = ({
 
           {/* Average Duration */}
           <label className="label">Average Duration</label>
-          <GenericField
+          <Field
             value={averageDuration}
             additionalAttributes={
               "input input-ghost disabled:opacity-100 bg-base-100"
@@ -210,7 +210,7 @@ export const ServiceDetailsModal = ({
 
           {/* Cost */}
           <label className="label">Cost</label>
-          <GenericField
+          <Field
             value={cost}
             onChange={setCost}
             additionalAttributes={
@@ -223,7 +223,7 @@ export const ServiceDetailsModal = ({
           />
           {/* Description */}
           <label className="label">Description</label>
-          <GenericField
+          <Field
             value={description}
             onChange={setDescription}
             additionalAttributes={

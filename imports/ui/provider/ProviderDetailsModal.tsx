@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { EmailField } from "/imports/ui/components/EmailField";
-import { NumberField } from "/imports/ui/components/NumberField";
+import { EmailField, NameField, NumberField } from "../components/Field";
 import { Avatar } from "/imports/ui/components/Avatar";
-import { NameField } from "/imports/ui/components/NameField";
 import { Provider } from "/imports/api/provider";
 import { updateProvider } from "/imports/api/providerMethods";
 import { ProviderServicesTable } from "/imports/ui/provider/ProviderServicesTable";
@@ -162,85 +160,6 @@ export const ProviderDetailsModal = ({
         </div>
       </div>
 
-      <div
-        className="modal-backdrop"
-        onClick={() => {
-          handleCancel();
-          setOpen(false);
-        }}
-      />
-    </div>
-  );
-
-  // Open OLD
-  return (
-    <div className="modal modal-open" role={"dialog"}>
-      <div className="modal-box">
-        {/*Avatar*/}
-        <div className="flex justify-center">
-          <Avatar profile={provider} />
-        </div>
-
-        <fieldset className="fieldset">
-          {/* Name */}
-          <label className="label">Name</label>
-          <NameField
-            value={name}
-            onChange={setName}
-            additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100"
-            }
-            placeholder={"N/A"}
-            mode="editable"
-          />
-
-          {/* Email */}
-          <label className="label">Email</label>
-          <EmailField
-            value={email}
-            onChange={setEmail}
-            additionalAttributes={
-              "input-ghost disabled:opacity-100 bg-base-100"
-            }
-            placeholder={"N/A"}
-            mode="editable"
-          />
-
-          {/* Number */}
-          <label className="label">Number</label>
-          <NumberField
-            value={number}
-            onChange={setNumber}
-            additionalAttributes={
-              "input-ghost disabled:opacity-100 bg-base-100"
-            }
-            placeholder={"N/A"}
-            mode="editable"
-          />
-
-          {/* System ID */}
-          {/* <label className="label">System ID</label>
-          <GenericField
-            value={provider._id}
-            additionalAttributes="input input-ghost disabled:opacity-100 bg-base-100"
-            disabled={true}
-            mode="read"
-          /> */}
-        </fieldset>
-
-        {/* Provider's respective Service Table */}
-        <ProviderServicesTable provider={provider} />
-
-        {/* Buttons */}
-        <ModalButtons
-          setOpen={setOpen}
-          hasChanges={hasChanges}
-          handleSave={handleSave}
-          handleCancel={handleCancel}
-        />
-      </div>
-
-      {/* Closes modal when clicking outside */}
       <div
         className="modal-backdrop"
         onClick={() => {

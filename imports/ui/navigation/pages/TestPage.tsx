@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { GenericField } from "/imports/ui/components/GenericField";
-import { EmailField } from "/imports/ui/components/EmailField";
-import { NumberField } from "/imports/ui/components/NumberField";
+import { Field, EmailField, NumberField } from "../../components/Field";
 import { Calendar } from "/imports/ui/components/Calendar";
 import { Steps } from "/imports/ui/components/Steps";
 import { DateIcon } from "/imports/ui/components/DateIcon";
@@ -111,6 +109,7 @@ export const TestPage = () => {
     position: 1,
     readyAt: null,
     status: "waiting",
+    initialEstimatedWaitTime: 15,
     start: null,
     end: null,
     createdAt: date ?? new Date(),
@@ -126,6 +125,7 @@ export const TestPage = () => {
     position: 0,
     readyAt: null,
     status: "in-progress",
+    initialEstimatedWaitTime: 15,
     start: getStartOfDay(date ?? new Date()),
     end: null,
     createdAt: date ?? new Date(),
@@ -141,6 +141,7 @@ export const TestPage = () => {
     position: 1,
     readyAt: null,
     status: "completed",
+    initialEstimatedWaitTime: 15,
     start: getStartOfDay(now),
     end: getEndOfDay(now),
     createdAt: date ?? new Date(),
@@ -156,6 +157,7 @@ export const TestPage = () => {
     position: 1,
     readyAt: null,
     status: "cancelled",
+    initialEstimatedWaitTime: 15,
     start: null,
     end: null,
     createdAt: date ?? new Date(),
@@ -182,7 +184,7 @@ export const TestPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <p className="text-sm">Generic Field: mode=write</p>
-            <GenericField
+            <Field
               value={genericFieldValue}
               onChange={setGenericFieldValue}
               mode="write"
@@ -192,7 +194,7 @@ export const TestPage = () => {
 
           <div>
             <p className="text-sm">Generic Field: mode=read</p>
-            <GenericField
+            <Field
               value={genericFieldValue}
               onChange={setGenericFieldValue}
               mode="read"
@@ -201,7 +203,7 @@ export const TestPage = () => {
           </div>
           <div>
             <p className="text-sm">Generic Field: mode=editable</p>
-            <GenericField
+            <Field
               value={genericFieldValue}
               onChange={setGenericFieldValue}
               mode="editable"
@@ -210,7 +212,7 @@ export const TestPage = () => {
           </div>
           <div>
             <p className="text-sm">Generic Field: ghost</p>
-            <GenericField
+            <Field
               value={genericFieldValue}
               onChange={setGenericFieldValue}
               mode="write"

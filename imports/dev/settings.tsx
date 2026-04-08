@@ -1,11 +1,10 @@
-import { convertStrToHrs } from "/imports/utils/utils";
-
 // Test Settings (all should be false in production)
 export const TEST_SETTINGS = {
   ENABLE_TEST_PAGES: true,
   USE_TEST_DATE: false,
   FREEZE_TIME: false, // if true, clock won't update time
   USE_TIME_MULTIPLIER: false, // if true, time will pass faster than real time (for testing long appointments), only works when USE_TEST_DATE is true
+  BYPASS_FORM_VALIDATION: false, // if true, form validation will be skipped
 };
 
 // Test Time for Development
@@ -24,3 +23,9 @@ export const WORKING_HOURS = {
   startTime,
   endTime,
 };
+
+// TEMP DELETE THIS LATER
+export function convertStrToHrs(timeStr: string): [number, number, number] {
+  const [hour = "0", minute = "0", second = "0"] = timeStr.split(":");
+  return [parseInt(hour, 10), parseInt(minute, 10), parseInt(second, 10)];
+}

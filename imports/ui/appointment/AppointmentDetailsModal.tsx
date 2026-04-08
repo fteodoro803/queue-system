@@ -14,7 +14,7 @@ import {
   UserIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
-import { GenericField } from "/imports/ui/components/GenericField";
+import { Field } from "../components/Field";
 
 export const AppointmentDetailsModal = ({
   appointment,
@@ -55,37 +55,37 @@ export const AppointmentDetailsModal = ({
 
         {/* Details */}
         <p className="font-bold">Appointment Details</p>
-        <GenericField
+        <Field
           value={appointment.patient.name}
           mode="read"
           additionalAttributes="input-ghost"
           icon={UserIcon}
         />
-        <GenericField
+        <Field
           value={appointment.service.name}
           mode="read"
           additionalAttributes="input-ghost"
           icon={WrenchScrewdriverIcon}
         />
-        <GenericField
+        <Field
           value={appointment.provider.name}
           mode="read"
           additionalAttributes="input-ghost"
           icon={AcademicCapIcon}
         />
-        <GenericField
+        <Field
           value={appointment.scheduled_start.toLocaleDateString()}
           mode="read"
           additionalAttributes="input-ghost"
           icon={CalendarDaysIcon}
         />
-        <GenericField
+        <Field
           value={`${appointment.scheduled_start.toLocaleTimeString()} || ${appointment.actual_start ? `${appointment.actual_start.toLocaleTimeString()}` : "N/A"} - ${appointment.actual_end ? `${appointment.actual_end.toLocaleTimeString()}` : "N/A"}`}
           mode="read"
           additionalAttributes="input-ghost"
           icon={ClockIcon}
         />
-        <GenericField
+        <Field
           value={appointment.status}
           mode="read"
           additionalAttributes="input-ghost"
