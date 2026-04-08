@@ -29,7 +29,10 @@ Meteor.methods({
 
   // Updates service information
   // Returns the number of documents updated (should be 1 if successful)
-  async "services.update"(id: string, data: Partial<ServiceData>): Promise<number> {
+  async "services.update"(
+    id: string,
+    data: Partial<ServiceData>,
+  ): Promise<number> {
     const updates: Partial<ServiceData> = {};
 
     if (data.name !== undefined) updates.name = data.name.trim();
@@ -71,7 +74,7 @@ Meteor.methods({
 // ---- Exports for the Meteor methods ----
 
 /**
- * 
+ *
  * @param data - Service data to insert
  * @returns The ID of the newly created service document
  */
@@ -85,7 +88,10 @@ export async function insertService(data: ServiceData): Promise<string> {
  * @returns The number of documents updated (should be 1 if successful)
  * @throws Meteor.Error with error code "not-found" if the service ID does not exist
  */
-export async function updateService(id: string, data: Partial<ServiceData>): Promise<number> {
+export async function updateService(
+  id: string,
+  data: Partial<ServiceData>,
+): Promise<number> {
   return await Meteor.callAsync("services.update", id, data);
 }
 
@@ -110,4 +116,8 @@ export async function updateServiceAnalytics(
 
 export async function clearServiceAnalytics() {
   return await Meteor.callAsync("services.clearAnalytics");
+}
+
+export async function getService(id: string) {
+  return await ServicesCollection.findOneAsync(id);
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { QueueEntry } from "/imports/api/queueEntry";
 import {
   CalendarDaysIcon,
@@ -18,6 +18,10 @@ import {
   startService,
   checkIn,
 } from "/imports/api/queueEntryMethods";
+import { Patient } from "/imports/api/patient";
+import { Service } from "/imports/api/service";
+import { getPatient } from "/imports/api/patientsMethods";
+import { getService } from "/imports/api/serviceMethods";
 
 /**
  * Action modals for queue entry management.
@@ -100,13 +104,27 @@ export const ConfirmActionModal = ({
  * @param entry - The queue entry to display details for
  */
 const AppointmentDetails = ({ entry }: { entry: QueueEntry }) => {
+  const [patient, setPatient] = useState<Patient | undefined>(undefined);
+  const [service, setService] = useState<Service | undefined>(undefined);
+
+  useEffect(() => {
+    // Fetch patient and service details for the entry
+    const fetchDetails = async () => {
+      const patientData = await getPatient(entry.patientId);
+      setPatient(patientData ?? undefined);
+      const serviceData = await getService(entry.serviceId);
+      setService(serviceData ?? undefined);
+    };
+    fetchDetails();
+  }, [entry.patientId, entry.serviceId, entry]);
+
   return (
     <div className="rounded-box border border-base-300 bg-base-200/60 p-4">
       <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
         <div className="flex items-center gap-2">
           <UserIcon className="size-4 text-base-content/60" />
           <span className="text-base-content/70">Patient</span>
-          <span className="font-medium">{entry.patient.name}</span>
+          <span className="font-medium">{patient?.name ?? "N/A"}</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -118,7 +136,7 @@ const AppointmentDetails = ({ entry }: { entry: QueueEntry }) => {
         <div className="flex items-center gap-2">
           <ClipboardDocumentListIcon className="size-4 text-base-content/60" />
           <span className="text-base-content/70">Service</span>
-          <span className="font-medium">{entry.service.name ?? "N/A"}</span>
+          <span className="font-medium">{service?.name ?? "N/A"}</span>
         </div>
 
         <div className="flex items-center gap-2">
