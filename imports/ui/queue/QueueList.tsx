@@ -24,10 +24,12 @@ export const QueueList = ({
 
   // Get number of Providers for this service to calculate wait times
   const isProvidersLoading = useSubscribe("providers");
-  const providers = useFind(() =>
-    ProviderCollection.find({
-      services: { $elemMatch: { id: service._id, enabled: true } },
-    }),
+  const providers = useFind(
+    () =>
+      ProviderCollection.find({
+        services: { $elemMatch: { id: service._id, enabled: true } },
+      }),
+    [service._id],
   );
 
   // Get patients in filtered queue
@@ -35,8 +37,9 @@ export const QueueList = ({
   const patientIds = queue
     .filter((entry) => entry.serviceId === service._id)
     .map((entry) => entry.patientId);
-  const patients = useFind(() =>
-    PatientsCollection.find({ _id: { $in: patientIds } }),
+  const patients = useFind(
+    () => PatientsCollection.find({ _id: { $in: patientIds } }),
+    [service._id, queue.length],
   );
   const patientMap: Map<string, Patient> = new Map(
     patients.map((p) => [p._id, p]),
