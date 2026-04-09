@@ -30,14 +30,11 @@ export const QueueList = ({
     }),
   );
 
-  // Filter queue for entries of this service
-  const filteredQueue = queue.filter(
-    (entry) => entry.serviceId === service._id,
-  );
-
   // Get patients in filtered queue
   const isPatientsLoading = useSubscribe("patients");
-  const patientIds = filteredQueue.map((entry) => entry.patientId);
+  const patientIds = queue
+    .filter((entry) => entry.serviceId === service._id)
+    .map((entry) => entry.patientId);
   const patients = useFind(() =>
     PatientsCollection.find({ _id: { $in: patientIds } }),
   );
@@ -45,6 +42,10 @@ export const QueueList = ({
     patients.map((p) => [p._id, p]),
   );
 
+  // Filter queue for entries of this service
+  const filteredQueue = queue
+    .filter((entry) => entry.serviceId === service._id)
+    .filter((entry) => patientMap.has(entry.patientId));
   if (isProvidersLoading() || isPatientsLoading()) return <Loading />;
 
   return (
@@ -68,30 +69,17 @@ export const QueueList = ({
             currentTime: now,
           });
 
-          if (adminView)
-            return (
-              <QueueListItem
-                key={entry._id}
-                entry={entry}
-                patient={patientMap.get(entry.patientId)!}
-                service={service}
-                timeUntil={estimatedWaitTime}
-                availableProviders={availableProviders}
-                admin={true}
-              />
-            );
-          else
-            return (
-              // TODO: Match this later with admin one, or merge it
-              <QueueListItem
-                key={entry._id}
-                entry={entry}
-                patient={patientMap.get(entry.patientId)!}
-                service={service}
-                timeUntil={estimatedWaitTime}
-                availableProviders={availableProviders}
-              />
-            );
+          return (
+            <QueueListItem
+              key={entry._id}
+              entry={entry}
+              patient={patientMap.get(entry.patientId)!}
+              service={service}
+              timeUntil={estimatedWaitTime}
+              availableProviders={availableProviders}
+              admin={adminView}
+            />
+          );
         })
       ) : (
         <li className="p-4 text-center text-sm opacity-60">
