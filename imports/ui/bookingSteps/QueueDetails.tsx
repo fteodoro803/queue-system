@@ -13,7 +13,8 @@ import { calculateQueueTime, QueueTimeResult } from "/imports/utils/queueUtils";
 import { Provider, ProviderCollection } from "/imports/api/provider";
 import { Loading } from "../components/Loading";
 import { enqueue, QueueEntryData } from "/imports/api/queueEntryMethods";
-import { ServicesCollection } from "/imports/api/service";
+import { Service } from "/imports/api/service";
+import { getService } from "/imports/api/serviceMethods";
 
 // Parent — only handles loading
 export const QueueDetails = ({
@@ -58,9 +59,7 @@ const QueueDetailsContent = ({
 
   // ---- State & Derived Data ----
   const [entry, setEntry] = useState<QueueEntry | undefined>(undefined);
-  const service = useFind(() =>
-    ServicesCollection.find({ _id: entry?.serviceId }),
-  )[0];
+  const [service, setService] = useState<Service | undefined>(undefined);
   const [queueErrorReason, setQueueErrorReason] =
     useState<QueueFailureReason>();
 
@@ -90,6 +89,9 @@ const QueueDetailsContent = ({
         const entryId = await enqueue(entryData, estServiceTime.time, now);
         const newEntry = await QueueEntryCollection.findOneAsync(entryId);
         setEntry(newEntry);
+
+        const service = await getService(entryData.service._id);
+        setService(service);
       }
     };
     enqueuePatient();
