@@ -44,14 +44,13 @@ export const QueueListItem = ({
 }: QueueListItemProps) => {
   const now = useDateTime();
 
-  const isHighPriority = (service.priority ?? 0) > 1;
-
   const [openCancelModal, setOpenCancelModal] = useState(false);
   const [openStartModal, setOpenStartModal] = useState(false);
   const [openEndModal, setOpenEndModal] = useState(false);
   const [openCheckInModal, setOpenCheckInModal] = useState(false);
 
   const position = entry.position;
+  const isHighPriority = (service.priority ?? 0) > 1;
 
   // Ready if position is 1 or less than there are available providers
   const isProviderAvailable: boolean =
