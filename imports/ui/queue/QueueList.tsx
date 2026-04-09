@@ -7,6 +7,7 @@ import { calculateQueueTime } from "/imports/utils/queueUtils";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { ProviderCollection } from "/imports/api/provider";
 import { Loading } from "/imports/ui/components/Loading";
+import { Patient, PatientsCollection } from "/imports/api/patient";
 
 export const QueueList = ({
   queue,
@@ -20,18 +21,28 @@ export const QueueList = ({
   availableProviders?: number;
 }) => {
   const now = useDateTime();
+
+  // Get number of Providers for this service to calculate wait times
+  const isProvidersLoading = useSubscribe("providers");
+  const providers = useFind(() =>
+    ProviderCollection.find({
+      services: { $elemMatch: { id: service._id, enabled: true } },
+    }),
+  );
+
   // Filter queue for entries of this service
   const filteredQueue = queue.filter(
     (entry) => entry.serviceId === service._id,
   );
 
-  // Get number of Providers for this service to calculate wait times
-  const isProvidersLoading = useSubscribe("providers");
+  // Get patients in filtered queue
   const isPatientsLoading = useSubscribe("patients");
-  const providers = useFind(() =>
-    ProviderCollection.find({
-      services: { $elemMatch: { id: service._id, enabled: true } },
-    }),
+  const patientIds = filteredQueue.map((entry) => entry.patientId);
+  const patients = useFind(() =>
+    PatientsCollection.find({ _id: { $in: patientIds } }),
+  );
+  const patientMap: Map<string, Patient> = new Map(
+    patients.map((p) => [p._id, p]),
   );
 
   if (isProvidersLoading() || isPatientsLoading()) return <Loading />;
@@ -62,6 +73,8 @@ export const QueueList = ({
               <QueueListItem
                 key={entry._id}
                 entry={entry}
+                patient={patientMap.get(entry.patientId)!}
+                service={service}
                 timeUntil={estimatedWaitTime}
                 availableProviders={availableProviders}
                 admin={true}
@@ -73,6 +86,8 @@ export const QueueList = ({
               <QueueListItem
                 key={entry._id}
                 entry={entry}
+                patient={patientMap.get(entry.patientId)!}
+                service={service}
                 timeUntil={estimatedWaitTime}
                 availableProviders={availableProviders}
               />

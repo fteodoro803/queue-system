@@ -19,32 +19,24 @@ import {
   EndModal,
   StartModal,
 } from "/imports/ui/queue/ConfirmActionModal";
-import { useFind } from "meteor/react-meteor-data";
-import { PatientsCollection } from "/imports/api/patient";
-import { ServicesCollection } from "/imports/api/service";
+import { Patient } from "/imports/api/patient";
+import { Service} from "/imports/api/service";
 
-export const QueueListItem = ({
-  entry,
-  timeUntil,
-  availableProviders,
-  admin: _admin, // TODO: do this later
-}: {
+interface QueueListItemProps {
   entry: QueueEntry;
+  patient: Patient;
+  service: Service;
   timeUntil?: QueueTimeResult;
   availableProviders?: number;
   admin?: boolean;
-}) => {
+};
+
+export const QueueListItem = ({ entry, patient, service, timeUntil, availableProviders, admin }: QueueListItemProps) => {
   const now = useDateTime();
   const iconSize: string = "size-6";
   const textSize: string = "text-sm";
 
-  const patient = useFind(() =>
-    PatientsCollection.find({ _id: entry.patientId }, { limit: 1 }),
-  )[0];
-  const service = useFind(() =>
-    ServicesCollection.find({ _id: entry.serviceId }, { limit: 1 }),
-  )[0];
-  const isHighPriority = (service?.priority ?? 0) > 1;
+  const isHighPriority = (service.priority ?? 0) > 1;
 
   const [openCancelModal, setOpenCancelModal] = useState(false);
   const [openStartModal, setOpenStartModal] = useState(false);
@@ -68,7 +60,7 @@ export const QueueListItem = ({
         {/* Details Column */}
         <div className="list-col-grow py-1">
           {/* Patient Name */}
-          <div className="card-title">{patient ? patient.name : "N/A"}</div>
+          <div className="card-title">{patient.name}</div>
 
           {/* Body */}
           <div className="flex items-center gap-4 py-1">
@@ -84,7 +76,7 @@ export const QueueListItem = ({
               <p
                 className={`${textSize} ${isHighPriority ? "text-error animate-pulse" : ""}`}
               >
-                {service ? service.name : "N/A"}
+                {service.name}
               </p>
             </div>
 

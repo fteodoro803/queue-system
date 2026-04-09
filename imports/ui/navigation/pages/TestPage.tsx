@@ -301,10 +301,30 @@ export const TestPage = () => {
       <div className="mt-4">
         <p className="text-xl font-semibold">Queue List Item (Admin)</p>
         <ul className="list bg-base-100 rounded-box shadow-md">
-          <QueueListItem entry={queueEntry1} admin={true} />
-          <QueueListItem entry={queueEntry2} admin={true} />
-          <QueueListItem entry={queueEntry3} admin={true} />
-          <QueueListItem entry={queueEntry4} admin={true} />
+          <QueueListItem
+            entry={queueEntry1}
+            patient={patient}
+            service={service1}
+            admin={true}
+          />
+          <QueueListItem
+            entry={queueEntry2}
+            patient={patient}
+            service={service1}
+            admin={true}
+          />
+          <QueueListItem
+            entry={queueEntry3}
+            patient={patient}
+            service={service1}
+            admin={true}
+          />
+          <QueueListItem
+            entry={queueEntry4}
+            patient={patient}
+            service={service1}
+            admin={true}
+          />
         </ul>
       </div>
 
@@ -312,8 +332,18 @@ export const TestPage = () => {
       <div className="mt-4">
         <p className="text-xl font-semibold">Queue List Item (Patient)</p>
         <ul className="list bg-base-100 rounded-box shadow-md">
-          <QueueListItem entry={queueEntry1} admin={false} />
-          <QueueListItem entry={queueEntry2} admin={false} />
+          <QueueListItem
+            entry={queueEntry1}
+            patient={patient}
+            service={service1}
+            admin={false}
+          />
+          <QueueListItem
+            entry={queueEntry2}
+            patient={patient}
+            service={service1}
+            admin={false}
+          />
         </ul>
       </div>
     </>
