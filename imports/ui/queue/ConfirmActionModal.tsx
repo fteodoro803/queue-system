@@ -111,12 +111,12 @@ const AppointmentDetails = ({ entry }: { entry: QueueEntry }) => {
     // Fetch patient and service details for the entry
     const fetchDetails = async () => {
       const patientData = await getPatient(entry.patientId);
-      setPatient(patientData ?? undefined);
+      setPatient(patientData);
       const serviceData = await getService(entry.serviceId);
       setService(serviceData ?? undefined);
     };
     fetchDetails();
-  }, [entry.patientId, entry.serviceId, entry]);
+  }, [entry.patientId, entry.serviceId]);
 
   return (
     <div className="rounded-box border border-base-300 bg-base-200/60 p-4">

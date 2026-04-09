@@ -39,10 +39,10 @@ export const QueueListItem = ({
   const textSize: string = "text-sm";
 
   const patient = useFind(() =>
-    PatientsCollection.find({ _id: entry.patientId }),
+    PatientsCollection.find({ _id: entry.patientId }, { limit: 1 }),
   )[0];
   const service = useFind(() =>
-    ServicesCollection.find({ _id: entry.serviceId }),
+    ServicesCollection.find({ _id: entry.serviceId }, { limit: 1 }),
   )[0];
   const isHighPriority = (service?.priority ?? 0) > 1;
 

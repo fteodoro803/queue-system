@@ -14,7 +14,6 @@ import { Provider, ProviderCollection } from "/imports/api/provider";
 import { Loading } from "../components/Loading";
 import { enqueue, QueueEntryData } from "/imports/api/queueEntryMethods";
 import { Service } from "/imports/api/service";
-import { getService } from "/imports/api/serviceMethods";
 
 // Parent — only handles loading
 export const QueueDetails = ({
@@ -90,8 +89,7 @@ const QueueDetailsContent = ({
         const newEntry = await QueueEntryCollection.findOneAsync(entryId);
         setEntry(newEntry);
 
-        const service = await getService(entryData.service._id);
-        setService(service);
+        setService(entryData.service);
       }
     };
     enqueuePatient();

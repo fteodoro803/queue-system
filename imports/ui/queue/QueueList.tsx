@@ -26,15 +26,15 @@ export const QueueList = ({
   );
 
   // Get number of Providers for this service to calculate wait times
-  const providersIsLoading = useSubscribe("providers");
-  const patientsIsLoading = useSubscribe("patients");
+  const isProvidersLoading = useSubscribe("providers");
+  const isPatientsLoading = useSubscribe("patients");
   const providers = useFind(() =>
     ProviderCollection.find({
       services: { $elemMatch: { id: service._id, enabled: true } },
     }),
   );
 
-  if (providersIsLoading() || patientsIsLoading()) return <Loading />;
+  if (isProvidersLoading() || isPatientsLoading()) return <Loading />;
 
   return (
     <ul className="list bg-base-100 rounded-box shadow-md">
