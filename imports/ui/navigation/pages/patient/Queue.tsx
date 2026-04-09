@@ -41,7 +41,9 @@ export const Queue = () => {
           const serviceQueue = queueEntries.filter(
             (entry) =>
               entry.serviceId === service._id &&
-              (entry.status === "waiting" || entry.status === "in-progress"),
+              (entry.status === "waiting" ||
+                entry.status === "ready" ||
+                entry.status === "in-progress"),
           );
           return (
             <div key={service._id} className="mb-6">
