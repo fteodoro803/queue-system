@@ -63,3 +63,7 @@ export async function updatePatient(
 ): Promise<number> {
   return Meteor.callAsync("patients.update", id, data);
 }
+
+export async function getPatient(id: string) {
+  return PatientsCollection.findOneAsync(id);
+}

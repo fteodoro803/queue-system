@@ -13,6 +13,7 @@ import { calculateQueueTime, QueueTimeResult } from "/imports/utils/queueUtils";
 import { Provider, ProviderCollection } from "/imports/api/provider";
 import { Loading } from "../components/Loading";
 import { enqueue, QueueEntryData } from "/imports/api/queueEntryMethods";
+import { Service } from "/imports/api/service";
 
 // Parent — only handles loading
 export const QueueDetails = ({
@@ -57,6 +58,7 @@ const QueueDetailsContent = ({
 
   // ---- State & Derived Data ----
   const [entry, setEntry] = useState<QueueEntry | undefined>(undefined);
+  const [service, setService] = useState<Service | undefined>(undefined);
   const [queueErrorReason, setQueueErrorReason] =
     useState<QueueFailureReason>();
 
@@ -86,6 +88,8 @@ const QueueDetailsContent = ({
         const entryId = await enqueue(entryData, estServiceTime.time, now);
         const newEntry = await QueueEntryCollection.findOneAsync(entryId);
         setEntry(newEntry);
+
+        setService(entryData.service);
       }
     };
     enqueuePatient();
@@ -133,7 +137,7 @@ const QueueDetailsContent = ({
   }
 
   if (!entry) return null;
-  const isPriority = entry.service.priority > 1;
+  const isPriority = service && service.priority > 1;
 
   // ---- Render ----
   return (
@@ -178,7 +182,7 @@ const QueueDetailsContent = ({
           <span className="text-sm text-base-content/60">Service</span>
           <span className="text-base-content/30">·</span>
           <span className="text-sm font-semibold">
-            {entry?.service?.name ?? "None"}
+            {service ? service.name : "None"}
           </span>
         </div>
 
