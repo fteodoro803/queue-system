@@ -37,9 +37,23 @@ Meteor.publish("patients", function () {
   return PatientsCollection.find();
 });
 
+// Publish Patients by IDs
+Meteor.publish("patients.byIds", function (patientIds: string[]) {
+  if (!patientIds?.length) {
+    this.ready(); // No patient IDs provided, marks the subscription as ready without return data
+    return;
+  }
+  return PatientsCollection.find({ _id: { $in: patientIds } });
+});
+
 // Publish Queue Entries
 Meteor.publish("queue", function () {
   return QueueEntryCollection.find();
+});
+
+// Publish Queue Entries by Service ID sorted by position
+Meteor.publish("queue.byService", function (serviceId: string) {
+  return QueueEntryCollection.find({ serviceId }, { sort: { position: 1 } });
 });
 
 // Publish Counters

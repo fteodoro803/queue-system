@@ -4,52 +4,29 @@ import { QueueListItem } from "./QueueListItem";
 import { Service } from "/imports/api/service";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { calculateQueueTime } from "/imports/utils/queueUtils";
-import { useFind, useSubscribe } from "meteor/react-meteor-data";
-import { ProviderCollection } from "/imports/api/provider";
-import { Loading } from "/imports/ui/components/Loading";
-import { Patient, PatientsCollection } from "/imports/api/patient";
+import { Patient } from "/imports/api/patient";
 
 export const QueueList = ({
   queue,
   service,
+  activeProviders,
+  patientMap,
   adminView,
   availableProviders,
 }: {
   queue: QueueEntry[];
   service: Service;
+  activeProviders: number;
+  patientMap: Map<string, Patient>;
   adminView?: boolean;
   availableProviders?: number;
 }) => {
   const now = useDateTime();
 
-  // Get number of Providers for this service to calculate wait times
-  const isProvidersLoading = useSubscribe("providers");
-  const providers = useFind(
-    () =>
-      ProviderCollection.find({
-        services: { $elemMatch: { id: service._id, enabled: true } },
-      }),
-    [service._id],
-  );
-
-  // Get patients in filtered queue
-  const isPatientsLoading = useSubscribe("patients");
-  const patientIds = queue
-    .filter((entry) => entry.serviceId === service._id)
-    .map((entry) => entry.patientId);
-  const patients = useFind(
-    () => PatientsCollection.find({ _id: { $in: patientIds } }),
-    [service._id, queue.length],
-  );
-  const patientMap: Map<string, Patient> = new Map(
-    patients.map((p) => [p._id, p]),
-  );
-
   // Filter queue for entries of this service
   const filteredQueue = queue
     .filter((entry) => entry.serviceId === service._id)
     .filter((entry) => patientMap.has(entry.patientId));
-  if (isProvidersLoading() || isPatientsLoading()) return <Loading />;
 
   return (
     <ul className="list bg-base-100 rounded-box shadow-md">
@@ -68,7 +45,7 @@ export const QueueList = ({
             queue: filteredQueue,
             queueEntry: entry,
             service: service,
-            activeProviders: providers.length,
+            activeProviders: activeProviders,
             currentTime: now,
           });
 
