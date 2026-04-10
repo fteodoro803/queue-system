@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   HomeIcon,
-  EllipsisVerticalIcon,
   UserGroupIcon,
   PresentationChartLineIcon,
   CalendarDaysIcon,
@@ -16,6 +15,7 @@ import { NavLinkItem } from "/imports/ui/navigation/NavLinkItem";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { formatDateToLocale } from "/imports/utils/utils";
 import { TEST_SETTINGS } from "/imports/dev/settings";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 export const Sidebar = () => {
   const location = useLocation();
@@ -23,6 +23,7 @@ export const Sidebar = () => {
   const isAdmin = location.pathname.startsWith("/admin");
   const isPatient = location.pathname.startsWith("/patient");
   const now = useDateTime();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Home Screen - don't show dashboard
   if (isHome) return <Outlet />;
@@ -33,15 +34,31 @@ export const Sidebar = () => {
       <div className="fixed bottom-4 left-4 lg:hidden z-50">
         <label
           htmlFor="my-drawer-3"
-          className="btn btn-circle btn-xl shadow-lg"
+          className="btn btn-circle btn-xl swap swap-rotate shadow-lg"
         >
-          <EllipsisVerticalIcon className="h-6 w-6 text-base" />
+          <input
+            type="checkbox"
+            checked={drawerOpen}
+            onChange={() => setDrawerOpen(!drawerOpen)}
+          />
+
+          {/* hamburger icon */}
+          <Bars3Icon className="swap-off fill-current h-6 w-6" />
+
+          {/* close icon */}
+          <XMarkIcon className="swap-on fill-current h-6 w-6" />
         </label>
       </div>
 
       {/* Drawer - sidebar hidden on small, always visible on large */}
       <div className="drawer lg:drawer-open">
-        <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
+        <input
+          id="my-drawer-3"
+          type="checkbox"
+          className="drawer-toggle"
+          checked={drawerOpen}
+          onChange={() => setDrawerOpen(!drawerOpen)}
+        />
 
         {/* Main content area */}
         <div className="drawer-content flex flex-col bg-base-200">
