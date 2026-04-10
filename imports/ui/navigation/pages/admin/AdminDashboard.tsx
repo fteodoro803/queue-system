@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { DashboardCard } from "/imports/ui/components/DashboardCard";
-import { TEST_SETTINGS } from "/imports/dev/settings";
 import { Clock } from "/imports/ui/components/Clock";
 import {
   BriefcaseIcon,
@@ -14,13 +13,10 @@ import {
   getStartOfDay,
   timeStrToLocaleTime,
 } from "/imports/utils/utils";
-import { AppointmentsCollection } from "/imports/api/appointment";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "/imports/ui/components/Loading";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
-import { QueueList } from "/imports/ui/queue/QueueList";
-import { AppointmentList } from "/imports/ui/appointment/AppointmentList";
 import { ServicesCollection } from "/imports/api/service";
 import { SettingsCollection } from "/imports/api/settings";
 import { WorkdayModal } from "/imports/ui/dashboard/WorkdayModal";
@@ -40,20 +36,6 @@ export const AdminDashboard = () => {
   const startOfDay: string = settings?.start_of_day;
   const endOfDay: string = settings?.end_of_day;
   const [isWorkdayModalOpen, setWorkdayModalOpen] = useState(false);
-
-  // Find appointments for the current day
-  const appointments = useFind(() =>
-    AppointmentsCollection.find(
-      {
-        // find appointments where date is between start and end of current day
-        scheduled_start: {
-          $gte: getStartOfDay(now),
-          $lte: getEndOfDay(now),
-        },
-      },
-      { sort: { date: 1 } },
-    ),
-  );
 
   // Services
   const services = useFind(() => ServicesCollection.find({}));
@@ -144,16 +126,6 @@ export const AdminDashboard = () => {
             />
           </div>
 
-          {/* Appointment Dashboard Card */}
-          {/* <div className="my-4">
-          <DashboardCard
-            header="Appointments"
-            body={appointments.length}
-            footer={`Completed: ${appointments.filter((a) => a.status === "completed").length}`}
-            icon={CalendarDaysIcon}
-          />
-        </div> */}
-
           {/* Queue Dashboard Card */}
           {dayStarted && (
             <>
@@ -197,49 +169,6 @@ export const AdminDashboard = () => {
             </>
           )}
         </div>
-
-        {/* Appointments */}
-        {TEST_SETTINGS.ENABLE_TEST_PAGES && (
-          <div className="py-4">
-            <h1 className="text-l font-semibold">
-              Upcoming and Ongoing Appointments:
-            </h1>
-            <AppointmentList
-              appointments={appointments
-                .filter(
-                  (a) =>
-                    a.scheduled_start.getDate() === now.getDate() &&
-                    (a.status === "scheduled" || a.status === "in-progress"),
-                )
-                .sort(
-                  (a, b) =>
-                    a.scheduled_start.getTime() - b.scheduled_start.getTime(),
-                )}
-            />
-          </div>
-        )}
-
-        {/* Queue */}
-        {dayStarted && (
-          <div className="py-4">
-            <h1 className="text-l font-semibold">Queue:</h1>
-            {/* <QueueList queue={queue} /> */}
-            {services.map((service) => {
-              const serviceQueue = queue.filter(
-                (entry) => entry.serviceId === service._id,
-              );
-              return (
-                <div key={service._id} className="mb-2">
-                  <QueueList
-                    queue={serviceQueue}
-                    service={service}
-                    adminView={true}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        )}
       </div>
 
       {/* Workday Modal */}
