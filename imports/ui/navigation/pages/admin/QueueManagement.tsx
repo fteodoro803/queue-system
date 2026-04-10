@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import { MakeQueueEntryModal } from "/imports/ui/queue/MakeQueueEntryModal";
+import { ProviderAvailabilityModal } from "/imports/ui/provider/ProviderAvailabilityModal";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "/imports/ui/components/Loading";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
@@ -50,6 +51,8 @@ export const QueueManagement = () => {
   );
 
   const [queueEntryModalOpen, setQueueEntryModalOpen] =
+    useState<boolean>(false);
+  const [providerAvailabilityModalOpen, setProviderAvailabilityModalOpen] =
     useState<boolean>(false);
 
   // ---- Effects ----
@@ -178,7 +181,7 @@ export const QueueManagement = () => {
             </div>
 
             {/* Available Doctors Card */}
-            <div className="my-4">
+            <div className="my-4 cursor-pointer" onClick={() => setProviderAvailabilityModalOpen(true)}>
               <DashboardCard
                 header="Available Providers"
                 body={availableProviders}
@@ -332,6 +335,11 @@ export const QueueManagement = () => {
       {queueEntryModalOpen && (
         <MakeQueueEntryModal setOpen={setQueueEntryModalOpen} />
       )}
+
+      <ProviderAvailabilityModal
+        open={providerAvailabilityModalOpen}
+        setOpen={setProviderAvailabilityModalOpen}
+      />
     </>
   );
 };
