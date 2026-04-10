@@ -86,7 +86,7 @@ export const ProviderAvailabilityModal = ({
                     {/* Availability Toggle */}
                     <input
                       type="checkbox"
-                      className="toggle toggle-success toggle-sm"
+                      className="toggle toggle-success toggle-sm ml-auto"
                       checked={provider.available}
                       onChange={() => handleToggleAvailability(provider._id)}
                     />

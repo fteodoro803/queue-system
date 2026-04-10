@@ -70,11 +70,9 @@ Meteor.methods({
     const currentAvailability = provider.available;
 
     // 2. Flip the availability status
-    const result = await ProviderCollection.updateAsync(id, {
+    return await ProviderCollection.updateAsync(id, {
       $set: { available: !currentAvailability },
     });
-
-    return result;
   },
 
   // Add service to provider's list of services
