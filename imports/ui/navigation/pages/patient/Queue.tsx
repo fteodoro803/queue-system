@@ -5,6 +5,8 @@ import { Loading } from "/imports/ui/components/Loading";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { ServicesCollection } from "/imports/api/service";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
+import { ProviderCollection } from "/imports/api/provider";
+import { Patient, PatientsCollection } from "/imports/api/patient";
 
 export const Queue = () => {
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
@@ -17,7 +19,25 @@ export const Queue = () => {
   const isServicesLoading = useSubscribe("services");
   const services = useFind(() => ServicesCollection.find());
 
-  if (isQueueEntryLoading() || isServicesLoading()) {
+  const isProvidersLoading = useSubscribe("providers");
+  const providers = useFind(() => ProviderCollection.find({}));
+
+  const patientIds = queueEntries.map((e) => e.patientId);
+  const isPatientsLoading = useSubscribe("patients.byIds", patientIds);
+  const patients = useFind(
+    () => PatientsCollection.find({ _id: { $in: patientIds } }),
+    [queueEntries.length],
+  );
+  const patientMap: Map<string, Patient> = new Map(
+    patients.map((p) => [p._id, p]),
+  );
+
+  if (
+    isQueueEntryLoading() ||
+    isServicesLoading() ||
+    isProvidersLoading() ||
+    isPatientsLoading()
+  ) {
     return <Loading />;
   }
 
@@ -45,10 +65,18 @@ export const Queue = () => {
                 entry.status === "ready" ||
                 entry.status === "in-progress"),
           );
+          const activeProviders = providers.filter((p) =>
+            p.services.some((s) => s.id === service._id && s.enabled),
+          ).length;
           return (
             <div key={service._id} className="mb-6">
               <h2 className="text-2xl font-bold">{service.name}</h2>
-              <QueueList queue={serviceQueue} service={service} />
+              <QueueList
+                queue={serviceQueue}
+                service={service}
+                activeProviders={activeProviders}
+                patientMap={patientMap}
+              />
             </div>
           );
         })}

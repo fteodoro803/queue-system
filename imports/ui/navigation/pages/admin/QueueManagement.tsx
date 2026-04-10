@@ -26,6 +26,7 @@ import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { SettingsCollection } from "/imports/api/settings";
 import { resetCounter } from "/imports/api/countersMethods";
 import { ProviderCollection } from "/imports/api/provider";
+import { Patient, PatientsCollection } from "/imports/api/patient";
 import { calculateQueueTime, QueueTimeResult } from "/imports/utils/queueUtils";
 
 export const QueueManagement = () => {
@@ -43,6 +44,10 @@ export const QueueManagement = () => {
   let providers = useFind(() => ProviderCollection.find({}));
 
   const isPatientsLoading = useSubscribe("patients");
+  const patients = useFind(() => PatientsCollection.find({}));
+  const patientMap: Map<string, Patient> = new Map(
+    patients.map((p) => [p._id, p]),
+  );
 
   const [queueEntryModalOpen, setQueueEntryModalOpen] =
     useState<boolean>(false);
@@ -56,14 +61,13 @@ export const QueueManagement = () => {
     }
 
     setSelectedService((currentService) => {
-      if (
-        currentService &&
-        services.some((service) => service._id === currentService._id)
-      ) {
-        return currentService;
-      }
+      if (!currentService) return services[0];
 
-      return services[0];
+      // Keep selection by id, but return the latest reactive object
+      const updatedService = services.find(
+        (service) => service._id === currentService._id,
+      );
+      return updatedService ?? services[0];
     });
   }, [services]);
 
@@ -233,6 +237,8 @@ export const QueueManagement = () => {
                   <QueueList
                     queue={ongoing}
                     service={selectedService}
+                    activeProviders={totalProviders}
+                    patientMap={patientMap}
                     adminView={true}
                   />
                 </div>
@@ -245,6 +251,8 @@ export const QueueManagement = () => {
                     availableProviders={availableProviders}
                     queue={waiting}
                     service={selectedService}
+                    activeProviders={totalProviders}
+                    patientMap={patientMap}
                     adminView={true}
                   />
                 </div>
@@ -274,6 +282,8 @@ export const QueueManagement = () => {
                     availableProviders={availableProviders}
                     queue={finished}
                     service={selectedService}
+                    activeProviders={totalProviders}
+                    patientMap={patientMap}
                     adminView={true}
                   />
                 </div>
@@ -303,6 +313,8 @@ export const QueueManagement = () => {
                     availableProviders={availableProviders}
                     queue={cancelled}
                     service={selectedService}
+                    activeProviders={totalProviders}
+                    patientMap={patientMap}
                     adminView={true}
                   />
                 </div>
