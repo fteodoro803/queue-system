@@ -5,10 +5,11 @@ export interface ProviderService {
   id: string;
   name: string; // for display in DB
   // cost: number;
-  enabled: boolean;
+  enabled: boolean; // Whether the provider currently offers this service
 }
 
 export interface Provider extends Profile {
+  available: boolean;
   services: ProviderService[]; // Services offered by the provider
 }
 

@@ -5,7 +5,13 @@ import { Loading } from "/imports/ui/components/Loading";
 import { Service, ServicesCollection } from "/imports/api/service";
 import { updateProviderService } from "/imports/api/providerMethods";
 
-export const ProviderServicesTable = ({ provider }: { provider: Provider }) => {
+export const ProviderServicesTable = ({
+  provider,
+  displayCost,
+}: {
+  provider: Provider;
+  displayCost?: boolean;
+}) => {
   const isLoadingProvider = useSubscribe("providers");
   const isLoadingServices = useSubscribe("services");
   const services = useFind(() => ServicesCollection.find());
@@ -40,7 +46,7 @@ export const ProviderServicesTable = ({ provider }: { provider: Provider }) => {
         <thead>
           <tr>
             <th className="w-1/6 text-center">Name</th>
-            <th className="w-1/6 text-center">Cost (PHP)</th>
+            {displayCost && <th className="w-1/6 text-center">Cost (PHP)</th>}
             <th className="w-1/6 text-center">Enabled</th>
           </tr>
         </thead>
@@ -53,7 +59,7 @@ export const ProviderServicesTable = ({ provider }: { provider: Provider }) => {
                 <td>{service.name}</td>
 
                 {/* Cost */}
-                <td>{service.cost ?? "-"}</td>
+                {displayCost && <td>{service.cost ?? "-"}</td>}
 
                 {/* Toggle Button */}
                 <td>

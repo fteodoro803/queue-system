@@ -79,6 +79,7 @@ export const TestPage = () => {
   const provider: Provider = {
     _id: "54321",
     name: "Dr. Smith",
+    available: true,
     services: providerServices,
     createdAt: date ?? new Date(),
   };

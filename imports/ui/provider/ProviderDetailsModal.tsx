@@ -145,7 +145,7 @@ export const ProviderDetailsModal = ({
               Services
             </label>
             <div className="rounded-lg overflow-hidden ring-1 ring-base-300">
-              <ProviderServicesTable provider={provider} />
+              <ProviderServicesTable provider={provider} displayCost={true} />
             </div>
           </div>
 

@@ -21,6 +21,7 @@ Meteor.methods({
       number: data.number?.trim() ?? null,
       avatar: data.avatar?.trim() ?? null,
       services: data.services ?? [],
+      available: false, // Default to unavailable
       createdAt: new Date(),
     });
   },
@@ -54,6 +55,24 @@ Meteor.methods({
     }
 
     return result;
+  },
+
+  // Updates availability of a Provider
+  async "provider.toggleAvailability"(id: string): Promise<number> {
+    // 1. Get the current availability
+    const provider = await ProviderCollection.findOneAsync(id);
+    if (!provider) {
+      throw new Meteor.Error(
+        "not-found",
+        `Provider with id ${id} does not exist`,
+      );
+    }
+    const currentAvailability = provider.available;
+
+    // 2. Flip the availability status
+    return await ProviderCollection.updateAsync(id, {
+      $set: { available: !currentAvailability },
+    });
   },
 
   // Add service to provider's list of services
@@ -130,4 +149,13 @@ export async function updateProviderService(
   service: ProviderService,
 ): Promise<number> {
   return Meteor.callAsync("provider.updateService", id, service);
+}
+
+/**
+ * Toggles the availability status of a provider
+ * @param id - The ID of the provider
+ * @returns The number of documents updated (should be 1 if successful)
+ */
+export async function toggleProviderAvailability(id: string): Promise<number> {
+  return Meteor.callAsync("provider.toggleAvailability", id);
 }
