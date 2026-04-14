@@ -1,6 +1,7 @@
 substitutions:
-  _REGION: us-central1
+  _REGION: australia-southeast2
   _SERVICE_NAME: queue-system
+  _REPO: queue-system  # your Artifact Registry repo name
 
 steps:
   # ── 1. Build the Docker image ──────────────────────────────────────────────
@@ -9,20 +10,20 @@ steps:
     args:
       - build
       - --cache-from
-      - gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE_NAME}:latest
       - -t
-      - gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE_NAME}:$COMMIT_SHA
       - -t
-      - gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE_NAME}:latest
       - .
 
-  # ── 2. Push image to Artifact Registry / Container Registry ───────────────
+  # ── 2. Push image to Artifact Registry ────────────────────────────────────
   - name: gcr.io/cloud-builders/docker
     id: push
     args:
       - push
       - --all-tags
-      - gcr.io/$PROJECT_ID/${_SERVICE_NAME}
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE_NAME}
 
   # ── 3. Deploy to Cloud Run ─────────────────────────────────────────────────
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
@@ -33,12 +34,12 @@ steps:
       - deploy
       - ${_SERVICE_NAME}
       - --image
-      - gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE_NAME}:$COMMIT_SHA
       - --region
       - ${_REGION}
       - --platform
       - managed
-      - --allow-unauthenticated   # remove this if you want auth-protected access
+      - --allow-unauthenticated     # remove this if you want auth-protected access
       - --memory
       - 512Mi
       - --cpu
@@ -47,14 +48,10 @@ steps:
       - "0"
       - --max-instances
       - "3"
-      # Secrets are injected as env vars — configure these in Cloud Run or Secret Manager
-      # --set-env-vars ROOT_URL=https://YOUR_CLOUD_RUN_URL
-      # --set-secrets MONGO_URL=MONGO_URL:latest
 
 images:
-  - gcr.io/$PROJECT_ID/${_SERVICE_NAME}:$COMMIT_SHA
-  - gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE_NAME}:$COMMIT_SHA
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE_NAME}:latest
 
 options:
   logging: CLOUD_LOGGING_ONLY
-
