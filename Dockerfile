@@ -13,6 +13,8 @@ ENV HOME=/root
 RUN curl https://install.meteor.com/?release=3.3.2 | sh
 ENV PATH="$PATH:/root/.meteor"
 
+ENV METEOR_ALLOW_SUPERUSER=true
+
 WORKDIR /app
 
 # Copy the full project (node_modules and .meteor/local are excluded by .dockerignore)
