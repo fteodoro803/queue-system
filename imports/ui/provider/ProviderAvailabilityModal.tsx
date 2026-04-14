@@ -82,14 +82,16 @@ export const ProviderAvailabilityModal = ({
                         </p>
                       )}
                     </div>
-
                     {/* Availability Toggle */}
-                    <input
-                      type="checkbox"
-                      className="toggle toggle-success toggle-sm ml-auto"
-                      checked={provider.available}
-                      onChange={() => handleToggleAvailability(provider._id)}
-                    />
+                    <div className="flex items-center gap-2 ml-auto">
+                      <p>Available</p>
+                      <input
+                        type="checkbox"
+                        className="toggle toggle-success toggle-sm "
+                        checked={provider.available}
+                        onChange={() => handleToggleAvailability(provider._id)}
+                      />
+                    </div>
                   </div>
 
                   {/* Services Table */}
