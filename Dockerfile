@@ -21,7 +21,7 @@ WORKDIR /app
 COPY . .
 
 # Remove Meteor testModule from package.json
-RUN node remove-test-module.js
+RUN node scripts/remove-test-module.js
 
 # Install npm dependencies inside the Meteor toolchain
 RUN meteor npm ci
