@@ -102,7 +102,7 @@ export const AdminDashboard = () => {
           </div>
 
           {/* Workday Dashboard Card */}
-          <div className="my-4">
+          <div className="my-4 cursor-pointer">
             <DashboardCard
               header="Workday"
               body={

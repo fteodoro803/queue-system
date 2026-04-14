@@ -49,7 +49,7 @@ export const PatientTable = () => {
             return (
               <tr
                 key={modalId}
-                className="bg-base-100 hover:bg-base-300"
+                className="bg-base-100 hover:bg-base-300 cursor-pointer"
                 onClick={() => handleSelect(p)}
               >
                 {/*Avatar*/}
