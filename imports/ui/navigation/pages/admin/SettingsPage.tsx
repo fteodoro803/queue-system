@@ -14,10 +14,17 @@ import {
   setBypassFormValidation,
   setEnableTestPages,
   setFreezeTime,
+  setTestDateDate,
+  setTestDateTime,
   setUseTestDate,
   setUseTimeMultiplier,
 } from "/imports/api/settingsMethods";
 import { styles } from "/imports/utils/styles";
+
+type BooleanFlagKey = Exclude<
+  keyof Omit<Flags, "_id">,
+  "TEST_DATE_DATE" | "TEST_DATE_TIME"
+>;
 
 export const SettingsPage = () => {
   const isSettingsLoading = useSubscribe("settings");
@@ -32,6 +39,8 @@ export const SettingsPage = () => {
   const [developerFlags, setDeveloperFlags] =
     useState<Omit<Flags, "_id">>(DEFAULT_FLAGS);
 
+  // ---- Effects ----
+  // Update Settings
   useEffect(() => {
     if (settings) {
       setAcceptAfterHours(settings.accept_queue_after_hours);
@@ -39,6 +48,7 @@ export const SettingsPage = () => {
     }
   }, [settings]);
 
+  // Update Flags
   useEffect(() => {
     if (flags) {
       setDeveloperFlags({
@@ -47,10 +57,13 @@ export const SettingsPage = () => {
         FREEZE_TIME: flags.FREEZE_TIME,
         USE_TIME_MULTIPLIER: flags.USE_TIME_MULTIPLIER,
         BYPASS_FORM_VALIDATION: flags.BYPASS_FORM_VALIDATION,
+        TEST_DATE_DATE: flags.TEST_DATE_DATE,
+        TEST_DATE_TIME: flags.TEST_DATE_TIME,
       });
     }
   }, [flags]);
 
+  // --- Handlers ---
   const handleAcceptAfterHoursChange = async (value: boolean) => {
     setAcceptAfterHours(value);
     await setAcceptQueueAfterHours(value);
@@ -61,10 +74,7 @@ export const SettingsPage = () => {
     await setAppTheme(value);
   };
 
-  const handleFlagChange = async (
-    key: keyof Omit<Flags, "_id">,
-    value: boolean,
-  ) => {
+  const handleFlagChange = async (key: BooleanFlagKey, value: boolean) => {
     setDeveloperFlags((prev) => {
       if (key === "USE_TEST_DATE" && !value) {
         return {
@@ -79,7 +89,7 @@ export const SettingsPage = () => {
     });
 
     const updates: Record<
-      keyof Omit<Flags, "_id">,
+      BooleanFlagKey,
       (enabled: boolean) => Promise<unknown>
     > = {
       ENABLE_TEST_PAGES: setEnableTestPages,
@@ -90,6 +100,16 @@ export const SettingsPage = () => {
     };
 
     await updates[key](value);
+  };
+
+  const handleTestDateDateChange = async (date: string) => {
+    setDeveloperFlags((prev) => ({ ...prev, TEST_DATE_DATE: date }));
+    await setTestDateDate(date);
+  };
+
+  const handleTestDateTimeChange = async (time: string) => {
+    setDeveloperFlags((prev) => ({ ...prev, TEST_DATE_TIME: time }));
+    await setTestDateTime(time);
   };
 
   const isUseTestDateEnabled = developerFlags.USE_TEST_DATE;
@@ -195,6 +215,7 @@ export const SettingsPage = () => {
         <div className="card-body gap-4">
           <h2 className="card-title text-lg text-warning">Developer Flags</h2>
 
+          {/* Enable Test Pages */}
           <label className={developerFlagRowClass}>
             <div>
               <span className="label-text font-medium">Enable Test Pages</span>
@@ -212,6 +233,7 @@ export const SettingsPage = () => {
             />
           </label>
 
+          {/* Use Test Date */}
           <label className={developerFlagRowClass}>
             <div>
               <span className="label-text font-medium">Use Test Date</span>
@@ -229,7 +251,38 @@ export const SettingsPage = () => {
             />
           </label>
 
+          {/* Test Date and Time */}
           <div className="ml-6 border-l border-base-300 pl-4">
+            {/* Test Date */}
+            <div className="form-control mb-2">
+              <label className="label py-1">
+                <span className="label-text font-medium">Date</span>
+              </label>
+              <input
+                type="date"
+                value={developerFlags.TEST_DATE_DATE}
+                disabled={!isUseTestDateEnabled}
+                onChange={(e) => handleTestDateDateChange(e.target.value)}
+                className="input input-bordered w-full max-w-xs"
+              />
+            </div>
+
+            {/* Test Time */}
+            <div className="form-control mb-2">
+              <label className="label py-1">
+                <span className="label-text font-medium">Time (24-hour)</span>
+              </label>
+              <input
+                type="time"
+                value={developerFlags.TEST_DATE_TIME}
+                disabled={!isUseTestDateEnabled}
+                onChange={(e) => handleTestDateTimeChange(e.target.value)}
+                className="input input-bordered w-full max-w-xs"
+                step={60}
+              />
+            </div>
+
+            {/* Freeze Time */}
             <label className={developerFlagRowClass}>
               <div>
                 <span className="label-text font-medium">Freeze Time</span>
@@ -248,6 +301,7 @@ export const SettingsPage = () => {
               />
             </label>
 
+            {/* Use Time Multiplier */}
             <label className={developerFlagRowClass}>
               <div>
                 <span className="label-text font-medium">
@@ -269,6 +323,7 @@ export const SettingsPage = () => {
             </label>
           </div>
 
+          {/* Bypass Form Validation */}
           <label className={developerFlagRowClass}>
             <div>
               <span className="label-text font-medium">

@@ -22,6 +22,24 @@ export interface Settings {
   theme: string;
 }
 
+export interface Flags {
+  _id: "app_flags";
+
+  ENABLE_TEST_PAGES: boolean;
+  USE_TEST_DATE: boolean;
+  FREEZE_TIME: boolean; // if true, clock won't update time
+  USE_TIME_MULTIPLIER: boolean; // if true, time will pass faster than real time (for testing long appointments), only works when USE_TEST_DATE is true
+  BYPASS_FORM_VALIDATION: boolean; // if true, form validation will be skipped
+
+  // Test date values in separate fields for admin settings controls
+  TEST_DATE_DATE: string; // DD-MM-YYYY
+  TEST_DATE_TIME: string; // HH:mm (24-hour)
+}
+
+export const SettingsCollection = new Mongo.Collection<Settings | Flags>(
+  "settings",
+);
+
 export const DEFAULT_SETTINGS: Omit<Settings, "_id"> = {
   day_started: false,
   start_of_day: "09:00",
@@ -34,24 +52,12 @@ export const DEFAULT_SETTINGS: Omit<Settings, "_id"> = {
   theme: "default",
 };
 
-export interface Flags {
-  _id: "app_flags";
-
-  ENABLE_TEST_PAGES: boolean;
-  USE_TEST_DATE: boolean;
-  FREEZE_TIME: boolean; // if true, clock won't update time
-  USE_TIME_MULTIPLIER: boolean; // if true, time will pass faster than real time (for testing long appointments), only works when USE_TEST_DATE is true
-  BYPASS_FORM_VALIDATION: boolean; // if true, form validation will be skipped
-}
-
 export const DEFAULT_FLAGS: Omit<Flags, "_id"> = {
   ENABLE_TEST_PAGES: false,
   USE_TEST_DATE: false,
   FREEZE_TIME: false,
   USE_TIME_MULTIPLIER: false,
   BYPASS_FORM_VALIDATION: false,
+  TEST_DATE_DATE: "27-02-2026",
+  TEST_DATE_TIME: "09:00",
 };
-
-export const SettingsCollection = new Mongo.Collection<Settings | Flags>(
-  "settings",
-);

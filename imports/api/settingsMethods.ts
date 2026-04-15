@@ -9,6 +9,36 @@ import {
 import { isValidTimeStr } from "/imports/utils/utils";
 
 type FlagKey = keyof Omit<Flags, "_id">;
+type BooleanFlagKey = Exclude<FlagKey, "TEST_DATE_DATE" | "TEST_DATE_TIME">;
+
+const normalizeDateStr = (dateStr: string): string | null => {
+  // Accept both DD-MM-YYYY (new) and YYYY-MM-DD (legacy), store as DD-MM-YYYY.
+  if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
+    const [day, month, year] = dateStr.split("-").map(Number);
+    const candidate = new Date(Date.UTC(year, month - 1, day));
+    if (
+      candidate.getUTCFullYear() === year &&
+      candidate.getUTCMonth() === month - 1 &&
+      candidate.getUTCDate() === day
+    ) {
+      return dateStr;
+    }
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    const candidate = new Date(Date.UTC(year, month - 1, day));
+    if (
+      candidate.getUTCFullYear() === year &&
+      candidate.getUTCMonth() === month - 1 &&
+      candidate.getUTCDate() === day
+    ) {
+      return `${String(day).padStart(2, "0")}-${String(month).padStart(2, "0")}-${year}`;
+    }
+  }
+
+  return null;
+};
 
 // Helper to update a single field
 const updateSetting = <K extends keyof Omit<Settings, "_id">>(
@@ -70,11 +100,11 @@ Meteor.methods({
     await updateSetting("theme", theme);
   },
 
-  async "settings.setFlag"(key: FlagKey, value: boolean) {
+  async "settings.setFlag"(key: BooleanFlagKey, value: boolean) {
     check(key, String);
     check(value, Boolean);
 
-    const allowedKeys: FlagKey[] = [
+    const allowedKeys: BooleanFlagKey[] = [
       "ENABLE_TEST_PAGES",
       "USE_TEST_DATE",
       "FREEZE_TIME",
@@ -87,6 +117,23 @@ Meteor.methods({
     }
 
     await updateFlag(key, value);
+  },
+
+  async "settings.setTestDateDate"(date: string) {
+    check(date, String);
+    const normalizedDate = normalizeDateStr(date);
+    if (!normalizedDate) {
+      throw new Meteor.Error("invalid-date", `Invalid date: ${date}`);
+    }
+    await updateFlag("TEST_DATE_DATE", normalizedDate);
+  },
+
+  async "settings.setTestDateTime"(time: string) {
+    check(time, String);
+    if (!isValidTimeStr(time)) {
+      throw new Meteor.Error("invalid-time", `Invalid time: ${time}`);
+    }
+    await updateFlag("TEST_DATE_TIME", time);
   },
 });
 
@@ -140,7 +187,7 @@ export async function getFlags(): Promise<Flags> {
   return (await SettingsCollection.findOneAsync({ _id: "app_flags" })) as Flags;
 }
 
-export async function setFlag(key: FlagKey, value: boolean) {
+export async function setFlag(key: BooleanFlagKey, value: boolean) {
   return Meteor.callAsync("settings.setFlag", key, value);
 }
 
@@ -169,3 +216,15 @@ export async function setUseTimeMultiplier(value: boolean) {
 export async function setBypassFormValidation(value: boolean) {
   return setFlag("BYPASS_FORM_VALIDATION", value);
 }
+
+export async function setTestDateDate(date: string) {
+  const normalizedDate = normalizeDateStr(date);
+  if (!normalizedDate) return;
+  return Meteor.callAsync("settings.setTestDateDate", normalizedDate);
+}
+
+export async function setTestDateTime(time: string) {
+  if (!isValidTimeStr(time)) return;
+  return Meteor.callAsync("settings.setTestDateTime", time);
+}
+

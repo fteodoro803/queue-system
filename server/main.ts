@@ -89,5 +89,27 @@ Meteor.startup(async () => {
     console.log("Initialised default flags");
   }
 
+  // Backfill newly added test-date fields on older app_flags documents.
+  await SettingsCollection.updateAsync(
+    { _id: "app_flags", TEST_DATE_DATE: { $exists: false } },
+    { $set: { TEST_DATE_DATE: DEFAULT_FLAGS.TEST_DATE_DATE } },
+  );
+  await SettingsCollection.updateAsync(
+    { _id: "app_flags", TEST_DATE_TIME: { $exists: false } },
+    { $set: { TEST_DATE_TIME: DEFAULT_FLAGS.TEST_DATE_TIME } },
+  );
+
+  const flags = await SettingsCollection.findOneAsync({ _id: "app_flags" });
+  if (flags && "TEST_DATE_DATE" in flags) {
+    const testDate = flags.TEST_DATE_DATE;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(testDate)) {
+      const [year, month, day] = testDate.split("-");
+      await SettingsCollection.updateAsync(
+        { _id: "app_flags" },
+        { $set: { TEST_DATE_DATE: `${day}-${month}-${year}` } },
+      );
+    }
+  }
+
   console.log("Server started");
 });
