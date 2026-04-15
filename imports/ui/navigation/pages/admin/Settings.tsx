@@ -8,10 +8,13 @@ import {
   setAppTheme,
 } from "/imports/api/settingsMethods";
 import { styles } from "/imports/utils/styles";
+import { Settings as SettingsType } from "/imports/api/settings";
 
 export const Settings = () => {
   const isSettingsLoading = useSubscribe("settings");
-  const settings = useFind(() => SettingsCollection.find({}))[0];
+  const settings = useFind(() =>
+    SettingsCollection.find({}),
+  )[0] as SettingsType;
   const [acceptAfterHours, setAcceptAfterHours] = useState(false);
   const [theme, setTheme] = useState<string>("default");
 
@@ -123,6 +126,13 @@ export const Settings = () => {
             </label>
             <ThemeController theme={theme} onChange={handleThemeChange} />
           </div>
+        </div>
+      </div>
+
+      {/* Dev Settings */}
+      <div className={`card bg-base-100 shadow-sm ${styles.outline}`}>
+        <div className="card-body gap-4">
+          <h2 className="card-title text-lg text-warning">Developer Flags</h2>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import {
   SettingsCollection,
   Settings,
   EMERGENCY_OPTION,
+  Flags,
 } from "/imports/api/settings";
 import { isValidTimeStr } from "/imports/utils/utils";
 
@@ -96,4 +97,14 @@ export async function setAcceptQueueAfterHours(value: boolean) {
 
 export async function setAppTheme(theme: string) {
   return await Meteor.callAsync("settings.setTheme", theme);
+}
+
+export async function getSettings(): Promise<Settings> {
+  return (await SettingsCollection.findOneAsync({
+    _id: "app_settings",
+  })) as Settings;
+}
+
+export async function getFlags(): Promise<Flags> {
+  return (await SettingsCollection.findOneAsync({ _id: "app_flags" })) as Flags;
 }

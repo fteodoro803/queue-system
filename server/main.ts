@@ -11,7 +11,11 @@ import { QueueEntryCollection } from "/imports/api/queueEntry";
 import "/imports/api/queueEntryMethods";
 import { CountersCollection } from "/imports/api/counters";
 import "/imports/api/countersMethods";
-import { DEFAULT_SETTINGS, SettingsCollection } from "/imports/api/settings";
+import {
+  DEFAULT_FLAGS,
+  DEFAULT_SETTINGS,
+  SettingsCollection,
+} from "/imports/api/settings";
 import "/imports/api/settingsMethods";
 
 // TODO: Add userId field to appointments and filter by it in publications and useFind hooks, so that patients only see their own appointments and providers only see appointments assigned to them. For now, we will just return all appointments for simplicity.
@@ -74,6 +78,15 @@ Meteor.startup(async () => {
       ...DEFAULT_SETTINGS,
     });
     console.log("Initialised default settings");
+  }
+
+  // Initialise flags if they don't exist yet
+  if (!(await SettingsCollection.findOneAsync({ _id: "app_flags" }))) {
+    await SettingsCollection.insertAsync({
+      _id: "app_flags",
+      ...DEFAULT_FLAGS,
+    });
+    console.log("Initialised default flags");
   }
 
   console.log("Server started");
