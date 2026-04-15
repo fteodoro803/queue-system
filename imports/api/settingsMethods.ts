@@ -8,6 +8,8 @@ import {
 } from "/imports/api/settings";
 import { isValidTimeStr } from "/imports/utils/utils";
 
+type FlagKey = keyof Omit<Flags, "_id">;
+
 // Helper to update a single field
 const updateSetting = <K extends keyof Omit<Settings, "_id">>(
   key: K,
@@ -15,6 +17,13 @@ const updateSetting = <K extends keyof Omit<Settings, "_id">>(
 ) => {
   return SettingsCollection.updateAsync(
     { _id: "app_settings" },
+    { $set: { [key]: value } },
+  );
+};
+
+const updateFlag = <K extends FlagKey>(key: K, value: Flags[K]) => {
+  return SettingsCollection.updateAsync(
+    { _id: "app_flags" },
     { $set: { [key]: value } },
   );
 };
@@ -59,6 +68,25 @@ Meteor.methods({
   async "settings.setTheme"(theme: string) {
     check(theme, String);
     await updateSetting("theme", theme);
+  },
+
+  async "settings.setFlag"(key: FlagKey, value: boolean) {
+    check(key, String);
+    check(value, Boolean);
+
+    const allowedKeys: FlagKey[] = [
+      "ENABLE_TEST_PAGES",
+      "USE_TEST_DATE",
+      "FREEZE_TIME",
+      "USE_TIME_MULTIPLIER",
+      "BYPASS_FORM_VALIDATION",
+    ];
+
+    if (!allowedKeys.includes(key)) {
+      throw new Meteor.Error("invalid-flag", `Unknown flag: ${key}`);
+    }
+
+    await updateFlag(key, value);
   },
 });
 
@@ -110,4 +138,34 @@ export async function getSettings(): Promise<Settings> {
 
 export async function getFlags(): Promise<Flags> {
   return (await SettingsCollection.findOneAsync({ _id: "app_flags" })) as Flags;
+}
+
+export async function setFlag(key: FlagKey, value: boolean) {
+  return Meteor.callAsync("settings.setFlag", key, value);
+}
+
+export async function setEnableTestPages(value: boolean) {
+  return setFlag("ENABLE_TEST_PAGES", value);
+}
+
+export async function setUseTestDate(value: boolean) {
+  // If disabling test pages, also disable all related flags
+  if (!value) {
+    await setFlag("USE_TEST_DATE", false);
+    await setFlag("FREEZE_TIME", false);
+    await setFlag("USE_TIME_MULTIPLIER", false);
+  }
+  return setFlag("USE_TEST_DATE", value);
+}
+
+export async function setFreezeTime(value: boolean) {
+  return setFlag("FREEZE_TIME", value);
+}
+
+export async function setUseTimeMultiplier(value: boolean) {
+  return setFlag("USE_TIME_MULTIPLIER", value);
+}
+
+export async function setBypassFormValidation(value: boolean) {
+  return setFlag("BYPASS_FORM_VALIDATION", value);
 }
