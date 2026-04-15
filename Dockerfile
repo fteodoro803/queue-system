@@ -1,5 +1,5 @@
 # ─── Stage 1: Build the Meteor bundle ─────────────────────────────────────────
-FROM node:20-bookworm AS builder
+FROM node:22-bookworm AS builder
 
 # Install OS dependencies required by Meteor & its npm packages
 RUN apt-get update && apt-get install -y \
@@ -30,7 +30,7 @@ RUN meteor npm ci
 RUN meteor build /bundle --directory --architecture os.linux.x86_64
 
 # ─── Stage 2: Lightweight production image ────────────────────────────────────
-FROM node:20-slim AS runtime
+FROM node:22-slim AS runtime
 
 WORKDIR /app
 
