@@ -3,23 +3,33 @@ import { ThemeController } from "/imports/ui/components/ThemeController";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { SettingsCollection } from "/imports/api/settings";
 import { Loading } from "/imports/ui/components/Loading";
-import { setAcceptQueueAfterHours } from "/imports/api/settingsMethods";
+import {
+  setAcceptQueueAfterHours,
+  setAppTheme,
+} from "/imports/api/settingsMethods";
 import { styles } from "/imports/utils/styles";
-
-// TODO: currently does nothing, implement actual functionality later
 
 export const Settings = () => {
   const isSettingsLoading = useSubscribe("settings");
   const settings = useFind(() => SettingsCollection.find({}))[0];
   const [acceptAfterHours, setAcceptAfterHours] = useState(false);
+  const [theme, setTheme] = useState<string>("default");
 
   useEffect(() => {
-    if (settings) setAcceptAfterHours(settings.accept_queue_after_hours);
+    if (settings) {
+      setAcceptAfterHours(settings.accept_queue_after_hours);
+      setTheme(settings.theme);
+    }
   }, [settings]);
 
   const handleAcceptAfterHoursChange = async (value: boolean) => {
     setAcceptAfterHours(value);
     await setAcceptQueueAfterHours(value);
+  };
+
+  const handleThemeChange = async (value: string) => {
+    setTheme(value);
+    await setAppTheme(value);
   };
 
   if (isSettingsLoading()) return <Loading />;
@@ -111,7 +121,7 @@ export const Settings = () => {
             <label className="label">
               <span className="label-text font-medium mr-2">Theme</span>
             </label>
-            <ThemeController />
+            <ThemeController theme={theme} onChange={handleThemeChange} />
           </div>
         </div>
       </div>

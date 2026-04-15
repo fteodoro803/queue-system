@@ -14,9 +14,12 @@ export interface Settings {
   text_frequency: number; // how often to send text notifications to patients in queue in minutes
   text_message_template: string; // template for text messages, can include placeholders like {patientName}, {positionInQueue}, {estimatedWaitTime}
 
-  //   Queue
+  // Queue
   emergency_option: (typeof EMERGENCY_OPTION)[number]; // how to handle emergency patients in the queue
   accept_queue_after_hours: boolean;
+
+  // Theme
+  theme: string;
 }
 
 export const SettingsCollection = new Mongo.Collection<Settings>("settings");
@@ -30,4 +33,5 @@ export const DEFAULT_SETTINGS: Omit<Settings, "_id"> = {
     "Hi {patientName}, you are currently number {positionInQueue} in the queue. Estimated wait time: {estimatedWaitTime}. Please check-in with the receptionist when you arrive.",
   emergency_option: EMERGENCY_OPTION[0],
   accept_queue_after_hours: false,
+  theme: "default",
 };

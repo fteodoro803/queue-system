@@ -1,6 +1,10 @@
 import { Meteor } from "meteor/meteor";
 import { check } from "meteor/check";
-import { SettingsCollection, Settings, EMERGENCY_OPTION } from "/imports/api/settings";
+import {
+  SettingsCollection,
+  Settings,
+  EMERGENCY_OPTION,
+} from "/imports/api/settings";
 import { isValidTimeStr } from "/imports/utils/utils";
 
 // Helper to update a single field
@@ -50,6 +54,11 @@ Meteor.methods({
     check(value, Boolean);
     await updateSetting("accept_queue_after_hours", value);
   },
+
+  async "settings.setTheme"(theme: string) {
+    check(theme, String);
+    await updateSetting("theme", theme);
+  },
 });
 
 export async function setDayStarted(started: boolean) {
@@ -83,4 +92,8 @@ export async function setEmergencyOption(
 
 export async function setAcceptQueueAfterHours(value: boolean) {
   return await Meteor.callAsync("settings.setAcceptQueueAfterHours", value);
+}
+
+export async function setAppTheme(theme: string) {
+  return await Meteor.callAsync("settings.setTheme", theme);
 }
