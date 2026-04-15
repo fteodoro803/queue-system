@@ -62,41 +62,42 @@ Meteor.methods({
   },
 });
 
+// ---- Settings Methods ----
 export async function setDayStarted(started: boolean) {
-  return await Meteor.callAsync("settings.setDayStarted", started);
+  return Meteor.callAsync("settings.setDayStarted", started);
 }
 
 // TODO: do tests for the working hours to make sure theyre properly formatted
 export async function setStartOfDay(start: string) {
   if (!isValidTimeStr(start)) return;
-  return await Meteor.callAsync("settings.setStartOfDay", start);
+  return Meteor.callAsync("settings.setStartOfDay", start);
 }
 
 export async function setEndOfDay(end: string) {
   if (!isValidTimeStr(end)) return;
-  return await Meteor.callAsync("settings.setEndOfDay", end);
+  return Meteor.callAsync("settings.setEndOfDay", end);
 }
 
 export async function setTextFrequency(minutes: number) {
-  return await Meteor.callAsync("settings.setTextFrequency", minutes);
+  return Meteor.callAsync("settings.setTextFrequency", minutes);
 }
 
 export async function setTextMessageTemplate(template: string) {
-  return await Meteor.callAsync("settings.setTextMessageTemplate", template);
+  return Meteor.callAsync("settings.setTextMessageTemplate", template);
 }
 
 export async function setEmergencyOption(
   option: (typeof EMERGENCY_OPTION)[number],
 ) {
-  return await Meteor.callAsync("settings.setEmergencyOption", option);
+  return Meteor.callAsync("settings.setEmergencyOption", option);
 }
 
 export async function setAcceptQueueAfterHours(value: boolean) {
-  return await Meteor.callAsync("settings.setAcceptQueueAfterHours", value);
+  return Meteor.callAsync("settings.setAcceptQueueAfterHours", value);
 }
 
 export async function setAppTheme(theme: string) {
-  return await Meteor.callAsync("settings.setTheme", theme);
+  return Meteor.callAsync("settings.setTheme", theme);
 }
 
 export async function getSettings(): Promise<Settings> {
@@ -104,6 +105,8 @@ export async function getSettings(): Promise<Settings> {
     _id: "app_settings",
   })) as Settings;
 }
+
+// ---- Flags Methods ----
 
 export async function getFlags(): Promise<Flags> {
   return (await SettingsCollection.findOneAsync({ _id: "app_flags" })) as Flags;

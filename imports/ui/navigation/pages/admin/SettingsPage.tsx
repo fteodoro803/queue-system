@@ -8,13 +8,11 @@ import {
   setAppTheme,
 } from "/imports/api/settingsMethods";
 import { styles } from "/imports/utils/styles";
-import { Settings as SettingsType } from "/imports/api/settings";
+import { Settings } from "/imports/api/settings";
 
-export const Settings = () => {
+export const SettingsPage = () => {
   const isSettingsLoading = useSubscribe("settings");
-  const settings = useFind(() =>
-    SettingsCollection.find({}),
-  )[0] as SettingsType;
+  const settings = useFind(() => SettingsCollection.find({}))[0] as Settings;
   const [acceptAfterHours, setAcceptAfterHours] = useState(false);
   const [theme, setTheme] = useState<string>("default");
 
