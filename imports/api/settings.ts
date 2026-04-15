@@ -34,6 +34,7 @@ export interface Flags {
   // Test date values in separate fields for admin settings controls
   TEST_DATE_DATE: string; // DD-MM-YYYY
   TEST_DATE_TIME: string; // HH:mm (24-hour)
+  TIME_MULTIPLIER: number; // multiplier for time, only works when USE_TIME_MULTIPLIER is true
 }
 
 export const SettingsCollection = new Mongo.Collection<Settings | Flags>(
@@ -60,4 +61,5 @@ export const DEFAULT_FLAGS: Omit<Flags, "_id"> = {
   BYPASS_FORM_VALIDATION: false,
   TEST_DATE_DATE: "27-02-2026",
   TEST_DATE_TIME: "09:00",
+  TIME_MULTIPLIER: 1,
 };

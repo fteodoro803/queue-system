@@ -9,7 +9,10 @@ import {
 import { isValidTimeStr } from "/imports/utils/utils";
 
 type FlagKey = keyof Omit<Flags, "_id">;
-type BooleanFlagKey = Exclude<FlagKey, "TEST_DATE_DATE" | "TEST_DATE_TIME">;
+type BooleanFlagKey = Exclude<
+  FlagKey,
+  "TEST_DATE_DATE" | "TEST_DATE_TIME" | "TIME_MULTIPLIER"
+>;
 
 // Helper to update a single field
 const updateSetting = <K extends keyof Omit<Settings, "_id">>(
@@ -71,7 +74,7 @@ Meteor.methods({
     await updateSetting("theme", theme);
   },
 
-  async "settings.setFlag"(key: BooleanFlagKey, value: boolean) {
+  async "flags.setFlag"(key: BooleanFlagKey, value: boolean) {
     check(key, String);
     check(value, Boolean);
 
@@ -90,17 +93,28 @@ Meteor.methods({
     await updateFlag(key, value);
   },
 
-  async "settings.setTestDateDate"(date: string) {
+  async "flags.setTestDateDate"(date: string) {
     check(date, String);
     await updateFlag("TEST_DATE_DATE", date);
   },
 
-  async "settings.setTestDateTime"(time: string) {
+  async "flags.setTestDateTime"(time: string) {
     check(time, String);
     if (!isValidTimeStr(time)) {
       throw new Meteor.Error("invalid-time", `Invalid time: ${time}`);
     }
     await updateFlag("TEST_DATE_TIME", time);
+  },
+
+  async "flags.setMultiplier"(multiplier: number) {
+    check(multiplier, Number);
+    if (multiplier <= 0) {
+      throw new Meteor.Error(
+        "invalid-multiplier",
+        `Multiplier must be greater than 0: ${multiplier}`,
+      );
+    }
+    await updateFlag("TIME_MULTIPLIER", multiplier);
   },
 });
 
@@ -154,7 +168,7 @@ export async function getFlags(): Promise<Flags> {
 }
 
 export async function setFlag(key: BooleanFlagKey, value: boolean) {
-  return Meteor.callAsync("settings.setFlag", key, value);
+  return Meteor.callAsync("flags.setFlag", key, value);
 }
 
 export async function setEnableTestPages(value: boolean) {
@@ -184,10 +198,15 @@ export async function setBypassFormValidation(value: boolean) {
 }
 
 export async function setTestDateDate(date: string) {
-  return Meteor.callAsync("settings.setTestDateDate", date);
+  return Meteor.callAsync("flags.setTestDateDate", date);
 }
 
 export async function setTestDateTime(time: string) {
   if (!isValidTimeStr(time)) return;
-  return Meteor.callAsync("settings.setTestDateTime", time);
+  return Meteor.callAsync("flags.setTestDateTime", time);
+}
+
+export async function setMultiplier(multiplier: number) {
+  if (!Number.isFinite(multiplier) || multiplier <= 0) return;
+  return Meteor.callAsync("flags.setMultiplier", multiplier);
 }

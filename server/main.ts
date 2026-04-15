@@ -98,6 +98,10 @@ Meteor.startup(async () => {
     { _id: "app_flags", TEST_DATE_TIME: { $exists: false } },
     { $set: { TEST_DATE_TIME: DEFAULT_FLAGS.TEST_DATE_TIME } },
   );
+  await SettingsCollection.updateAsync(
+    { _id: "app_flags", TIME_MULTIPLIER: { $exists: false } },
+    { $set: { TIME_MULTIPLIER: DEFAULT_FLAGS.TIME_MULTIPLIER } },
+  );
 
   const flags = await SettingsCollection.findOneAsync({ _id: "app_flags" });
   if (flags && "TEST_DATE_DATE" in flags) {

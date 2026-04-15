@@ -18,12 +18,13 @@ import {
   setTestDateTime,
   setUseTestDate,
   setUseTimeMultiplier,
+  setMultiplier,
 } from "/imports/api/settingsMethods";
 import { styles } from "/imports/utils/styles";
 
 type BooleanFlagKey = Exclude<
   keyof Omit<Flags, "_id">,
-  "TEST_DATE_DATE" | "TEST_DATE_TIME"
+  "TEST_DATE_DATE" | "TEST_DATE_TIME" | "TIME_MULTIPLIER"
 >;
 
 export const SettingsPage = () => {
@@ -57,8 +58,9 @@ export const SettingsPage = () => {
         FREEZE_TIME: flags.FREEZE_TIME,
         USE_TIME_MULTIPLIER: flags.USE_TIME_MULTIPLIER,
         BYPASS_FORM_VALIDATION: flags.BYPASS_FORM_VALIDATION,
-        TEST_DATE_DATE: flags.TEST_DATE_DATE,
-        TEST_DATE_TIME: flags.TEST_DATE_TIME,
+        TEST_DATE_DATE: flags.TEST_DATE_DATE ?? DEFAULT_FLAGS.TEST_DATE_DATE,
+        TEST_DATE_TIME: flags.TEST_DATE_TIME ?? DEFAULT_FLAGS.TEST_DATE_TIME,
+        TIME_MULTIPLIER: flags.TIME_MULTIPLIER ?? DEFAULT_FLAGS.TIME_MULTIPLIER,
       });
     }
   }, [flags]);
@@ -110,6 +112,12 @@ export const SettingsPage = () => {
   const handleTestDateTimeChange = async (time: string) => {
     setDeveloperFlags((prev) => ({ ...prev, TEST_DATE_TIME: time }));
     await setTestDateTime(time);
+  };
+
+  const handleMultiplierChange = async (multiplier: number) => {
+    if (!Number.isFinite(multiplier) || multiplier <= 0) return;
+    setDeveloperFlags((prev) => ({ ...prev, TIME_MULTIPLIER: multiplier }));
+    await setMultiplier(multiplier);
   };
 
   const isUseTestDateEnabled = developerFlags.USE_TEST_DATE;
@@ -321,6 +329,24 @@ export const SettingsPage = () => {
                 className="toggle toggle-warning"
               />
             </label>
+
+            <div className="form-control mb-2">
+              <label className="label py-1">
+                <span className="label-text font-medium">Multiplier</span>
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={3}
+                step={0.1}
+                value={developerFlags.TIME_MULTIPLIER}
+                disabled={
+                  !isUseTestDateEnabled || !developerFlags.USE_TIME_MULTIPLIER
+                }
+                onChange={(e) => handleMultiplierChange(Number(e.target.value))}
+                className="input input-bordered w-full max-w-xs"
+              />
+            </div>
           </div>
 
           {/* Bypass Form Validation */}
