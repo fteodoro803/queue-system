@@ -4,6 +4,14 @@ substitutions:
   _REPO: queue-system  # your Artifact Registry repo name
 
 steps:
+  # ── 0. Pull cache image (optional, won't fail if it doesn't exist) ─────────
+  - name: gcr.io/cloud-builders/docker
+    id: pull-cache
+    entrypoint: bash
+    args:
+      - -c
+      - docker pull ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE_NAME}:latest || true
+
   # ── 1. Build the Docker image ──────────────────────────────────────────────
   - name: gcr.io/cloud-builders/docker
     id: build
