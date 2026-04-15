@@ -11,22 +11,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Check out the repository
       - name: Check out repo
         uses: actions/checkout@v4
 
+      # 2. Set up Node.js environment
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
+      # 3. Cache Meteor installation
+      - name: Cache Meteor
+        uses: actions/cache@v4
+        with:
+          path: ~/.meteor
+          key: meteor-${{ runner.os }}-3.3.2
+
+      # 4. Install Meteor
       - name: Install Meteor
         run: |
-          curl "https://install.meteor.com/?release=3.3.2" | sh
+          if [ ! -f ~/.meteor/meteor ]; then
+            curl "https://install.meteor.com/?release=3.3.2" | sh
+          fi
           echo "$HOME/.meteor" >> $GITHUB_PATH
 
+      # 5. Install project dependencies
       - name: Install dependencies
         run: meteor npm ci
 
+      # 6. Run tests
       - name: Run tests
         run: npm test
