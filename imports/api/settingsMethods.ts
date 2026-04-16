@@ -79,7 +79,7 @@ Meteor.methods({
     check(value, Boolean);
 
     const allowedKeys: BooleanFlagKey[] = [
-      "ENABLE_TEST_PAGES",
+      "ENABLE_TEST_FEATURES",
       "USE_TEST_DATE",
       "FREEZE_TIME",
       "USE_TIME_MULTIPLIER",
@@ -172,7 +172,7 @@ export async function setFlag(key: BooleanFlagKey, value: boolean) {
 }
 
 export async function setEnableTestPages(value: boolean) {
-  return setFlag("ENABLE_TEST_PAGES", value);
+  return setFlag("ENABLE_TEST_FEATURES", value);
 }
 
 export async function setUseTestDate(value: boolean) {

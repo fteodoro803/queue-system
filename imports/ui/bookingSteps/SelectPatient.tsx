@@ -1,9 +1,9 @@
 import React from "react";
 import { Loading } from "/imports/ui/components/Loading";
-import { useSubscribe, useTracker } from "meteor/react-meteor-data";
+import { useFind, useSubscribe, useTracker } from "meteor/react-meteor-data";
 import { Patient, PatientsCollection } from "/imports/api/patient";
 import { AddPatientForm } from "/imports/ui/patient/AddPatientForm";
-import { TEST_SETTINGS } from "/imports/dev/settings";
+import { Flags, SettingsCollection } from "/imports/api/settings";
 
 export const SelectPatient = ({
   setPatient,
@@ -14,13 +14,23 @@ export const SelectPatient = ({
   const isLoading = useSubscribe("patients");
   const patients = useTracker(() => PatientsCollection.find({}).fetch());
 
-  if (isLoading()) {
+  const isSettingsLoading = useSubscribe("settings");
+  const flags = useFind(() =>
+    SettingsCollection.find({ _id: "app_flags" }),
+  )[0] as Flags | undefined;
+
+  if (isLoading() || isSettingsLoading()) {
+    return <Loading />;
+  }
+
+  if (!flags) {
+    console.log("Flags not found");
     return <Loading />;
   }
 
   return (
     <div>
-      {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+      {flags.ENABLE_TEST_FEATURES && (
         <ul className="list bg-base-100 rounded-box shadow-md">
           <li className="p-4 pb-2 text-xs opacity-60 tracking-wide flex">
             Patients

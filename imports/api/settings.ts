@@ -25,7 +25,7 @@ export interface Settings {
 export interface Flags {
   _id: "app_flags";
 
-  ENABLE_TEST_PAGES: boolean;
+  ENABLE_TEST_FEATURES: boolean;
   USE_TEST_DATE: boolean;
   FREEZE_TIME: boolean; // if true, clock won't update time
   USE_TIME_MULTIPLIER: boolean; // if true, time will pass faster than real time (for testing long appointments), only works when USE_TEST_DATE is true
@@ -54,7 +54,7 @@ export const DEFAULT_SETTINGS: Omit<Settings, "_id"> = {
 };
 
 export const DEFAULT_FLAGS: Omit<Flags, "_id"> = {
-  ENABLE_TEST_PAGES: false,
+  ENABLE_TEST_FEATURES: false,
   USE_TEST_DATE: false,
   FREEZE_TIME: false,
   USE_TIME_MULTIPLIER: false,

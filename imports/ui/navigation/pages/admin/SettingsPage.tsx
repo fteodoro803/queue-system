@@ -53,7 +53,7 @@ export const SettingsPage = () => {
   useEffect(() => {
     if (settings && flags) {
       const nextFlags: Omit<Flags, "_id"> = {
-        ENABLE_TEST_PAGES: flags.ENABLE_TEST_PAGES,
+        ENABLE_TEST_FEATURES: flags.ENABLE_TEST_FEATURES,
         USE_TEST_DATE: flags.USE_TEST_DATE,
         FREEZE_TIME: flags.FREEZE_TIME,
         USE_TIME_MULTIPLIER: flags.USE_TIME_MULTIPLIER,
@@ -139,7 +139,7 @@ export const SettingsPage = () => {
     try {
       await setAcceptQueueAfterHours(acceptAfterHours);
       await setAppTheme(theme);
-      await setEnableTestPages(developerFlags.ENABLE_TEST_PAGES);
+      await setEnableTestPages(developerFlags.ENABLE_TEST_FEATURES);
       await setUseTestDate(developerFlags.USE_TEST_DATE);
       await setFreezeTime(developerFlags.FREEZE_TIME);
       await setUseTimeMultiplier(developerFlags.USE_TIME_MULTIPLIER);
@@ -266,16 +266,18 @@ export const SettingsPage = () => {
           {/* Enable Test Pages */}
           <label className={developerFlagRowClass}>
             <div>
-              <span className="label-text font-medium">Enable Test Pages</span>
+              <span className="label-text font-medium">
+                Enable Test Features
+              </span>
               <p className="text-xs opacity-60">
-                Shows testing routes in the sidebar and flow entry points.
+                Shows testing features and pages.
               </p>
             </div>
             <input
               type="checkbox"
-              checked={developerFlags.ENABLE_TEST_PAGES}
+              checked={developerFlags.ENABLE_TEST_FEATURES}
               onChange={(e) =>
-                handleFlagChange("ENABLE_TEST_PAGES", e.target.checked)
+                handleFlagChange("ENABLE_TEST_FEATURES", e.target.checked)
               }
               className="toggle toggle-warning"
             />
