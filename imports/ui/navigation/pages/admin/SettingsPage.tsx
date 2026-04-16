@@ -35,7 +35,9 @@ export const SettingsPage = () => {
   )[0] as Flags | undefined;
   const [acceptAfterHours, setAcceptAfterHours] = useState(false);
   const [theme, setTheme] = useState<string>("default");
-  const [developerFlags, setDeveloperFlags] =
+
+  // What user edits in the form before saving to db
+  const [draftFlags, setDraftFlags] =
     useState<Omit<Flags, "_id">>(DEFAULT_FLAGS);
 
   // snapshot of current settings for comparison
@@ -50,7 +52,8 @@ export const SettingsPage = () => {
   // Fill settings from db
   useEffect(() => {
     if (settings && flags) {
-      const nextFlags: Omit<Flags, "_id"> = {
+      // 1. Get flag fields
+      const dbFlags: Omit<Flags, "_id"> = {
         ENABLE_TEST_FEATURES: flags.ENABLE_TEST_FEATURES,
         USE_TEST_DATE: flags.USE_TEST_DATE,
         FREEZE_TIME: flags.FREEZE_TIME,
@@ -59,16 +62,17 @@ export const SettingsPage = () => {
         TIME_MULTIPLIER: flags.TIME_MULTIPLIER ?? DEFAULT_FLAGS.TIME_MULTIPLIER,
       };
 
-      const nextBaseline = {
+      // 2. Copy new settings to state's settings
+      const newSettings = {
         acceptAfterHours: settings.accept_queue_after_hours,
         theme: settings.theme,
-        developerFlags: nextFlags,
+        developerFlags: dbFlags,
       };
 
-      setAcceptAfterHours(nextBaseline.acceptAfterHours);
-      setTheme(nextBaseline.theme);
-      setDeveloperFlags(nextBaseline.developerFlags);
-      setCurrentSettings(nextBaseline);
+      setAcceptAfterHours(newSettings.acceptAfterHours);
+      setTheme(newSettings.theme);
+      setDraftFlags(cloneFlags(dbFlags));
+      setCurrentSettings(newSettings);
       setSaveError(null);
     }
   }, [settings, flags]);
@@ -83,7 +87,7 @@ export const SettingsPage = () => {
   };
 
   const handleFlagChange = (key: BooleanFlagKey, value: boolean) => {
-    setDeveloperFlags((prev) => {
+    setDraftFlags((prev) => {
       if (key === "USE_TEST_DATE" && !value) {
         return {
           ...prev,
@@ -98,12 +102,13 @@ export const SettingsPage = () => {
   };
 
   const handleTestDateChange = (date: Date) => {
-    setDeveloperFlags((prev) => ({ ...prev, TEST_DATE: date }));
+    if (Number.isNaN(date.getTime())) return;
+    setDraftFlags((prev) => ({ ...prev, TEST_DATE: date }));
   };
 
   const handleMultiplierChange = (multiplier: number) => {
     if (!Number.isFinite(multiplier) || multiplier <= 0) return;
-    setDeveloperFlags((prev) => ({ ...prev, TIME_MULTIPLIER: multiplier }));
+    setDraftFlags((prev) => ({ ...prev, TIME_MULTIPLIER: multiplier }));
   };
 
   // Compare the local draft against baseline to enable Save/Cancel only when needed.
@@ -111,15 +116,20 @@ export const SettingsPage = () => {
     currentSettings != null &&
     (acceptAfterHours !== currentSettings.acceptAfterHours ||
       theme !== currentSettings.theme ||
-      (Object.keys(developerFlags) as Array<keyof Omit<Flags, "_id">>).some(
-        (key) => developerFlags[key] !== currentSettings.developerFlags[key],
+      (Object.keys(draftFlags) as Array<keyof Omit<Flags, "_id">>).some(
+        (key) =>
+          !areFlagValuesEqual(
+            key,
+            draftFlags[key],
+            currentSettings.developerFlags[key],
+          ),
       ));
 
   const handleCancel = () => {
     if (!currentSettings) return;
     setAcceptAfterHours(currentSettings.acceptAfterHours);
     setTheme(currentSettings.theme);
-    setDeveloperFlags(currentSettings.developerFlags);
+    setDraftFlags(cloneFlags(currentSettings.developerFlags));
     setSaveError(null);
   };
 
@@ -131,18 +141,20 @@ export const SettingsPage = () => {
     try {
       await setAcceptQueueAfterHours(acceptAfterHours);
       await setAppTheme(theme);
-      await setEnableTestPages(developerFlags.ENABLE_TEST_FEATURES);
-      await setUseTestDate(developerFlags.USE_TEST_DATE);
-      await setFreezeTime(developerFlags.FREEZE_TIME);
-      await setUseTimeMultiplier(developerFlags.USE_TIME_MULTIPLIER);
-      await setTestDate(developerFlags.TEST_DATE);
-      await setMultiplier(developerFlags.TIME_MULTIPLIER);
+      await setEnableTestPages(draftFlags.ENABLE_TEST_FEATURES);
+      await setUseTestDate(draftFlags.USE_TEST_DATE);
+      await setFreezeTime(draftFlags.FREEZE_TIME);
+      await setUseTimeMultiplier(draftFlags.USE_TIME_MULTIPLIER);
+      await setTestDate(draftFlags.TEST_DATE);
+      await setMultiplier(draftFlags.TIME_MULTIPLIER);
 
-      setCurrentSettings({
+      const savedBaseline = {
         acceptAfterHours,
         theme,
-        developerFlags,
-      });
+        developerFlags: cloneFlags(draftFlags),
+      };
+      setCurrentSettings(savedBaseline);
+      setDraftFlags(cloneFlags(savedBaseline.developerFlags));
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : "Failed to save");
     } finally {
@@ -150,7 +162,7 @@ export const SettingsPage = () => {
     }
   };
 
-  const isUseTestDateEnabled = developerFlags.USE_TEST_DATE;
+  const isUseTestDateEnabled = draftFlags.USE_TEST_DATE;
   const developerFlagRowClass =
     "label w-full cursor-pointer justify-between gap-4";
 
@@ -265,7 +277,7 @@ export const SettingsPage = () => {
             </div>
             <input
               type="checkbox"
-              checked={developerFlags.ENABLE_TEST_FEATURES}
+              checked={draftFlags.ENABLE_TEST_FEATURES}
               onChange={(e) =>
                 handleFlagChange("ENABLE_TEST_FEATURES", e.target.checked)
               }
@@ -283,7 +295,7 @@ export const SettingsPage = () => {
             </div>
             <input
               type="checkbox"
-              checked={developerFlags.USE_TEST_DATE}
+              checked={draftFlags.USE_TEST_DATE}
               onChange={(e) =>
                 handleFlagChange("USE_TEST_DATE", e.target.checked)
               }
@@ -299,7 +311,7 @@ export const SettingsPage = () => {
               </label>
               <input
                 type="datetime-local"
-                value={toLocalDatetimeString(developerFlags.TEST_DATE)}
+                value={toLocalDatetimeString(draftFlags.TEST_DATE)}
                 disabled={!isUseTestDateEnabled}
                 onChange={(e) => handleTestDateChange(new Date(e.target.value))}
                 className="input input-bordered w-full max-w-xs"
@@ -316,7 +328,7 @@ export const SettingsPage = () => {
               </div>
               <input
                 type="checkbox"
-                checked={developerFlags.FREEZE_TIME}
+                checked={draftFlags.FREEZE_TIME}
                 disabled={!isUseTestDateEnabled}
                 onChange={(e) =>
                   handleFlagChange("FREEZE_TIME", e.target.checked)
@@ -333,12 +345,12 @@ export const SettingsPage = () => {
                 </span>
                 <p className="text-xs opacity-60">
                   Speeds up test time progression. (1 real second ={" "}
-                  {developerFlags.TIME_MULTIPLIER} test seconds)
+                  {draftFlags.TIME_MULTIPLIER} test seconds)
                 </p>
               </div>
               <input
                 type="checkbox"
-                checked={developerFlags.USE_TIME_MULTIPLIER}
+                checked={draftFlags.USE_TIME_MULTIPLIER}
                 disabled={!isUseTestDateEnabled}
                 onChange={(e) =>
                   handleFlagChange("USE_TIME_MULTIPLIER", e.target.checked)
@@ -356,9 +368,9 @@ export const SettingsPage = () => {
                 min={1}
                 max={120}
                 step={1}
-                value={developerFlags.TIME_MULTIPLIER}
+                value={draftFlags.TIME_MULTIPLIER}
                 disabled={
-                  !isUseTestDateEnabled || !developerFlags.USE_TIME_MULTIPLIER
+                  !isUseTestDateEnabled || !draftFlags.USE_TIME_MULTIPLIER
                 }
                 onChange={(e) => handleMultiplierChange(Number(e.target.value))}
                 className="input input-bordered w-full max-w-xs"
@@ -390,6 +402,24 @@ export const SettingsPage = () => {
       {saveError && <p className="text-sm text-error">{saveError}</p>}
     </div>
   );
+};
+
+const cloneFlags = (source: Omit<Flags, "_id">): Omit<Flags, "_id"> => ({
+  ...source,
+  TEST_DATE: new Date(source.TEST_DATE),
+});
+
+const areFlagValuesEqual = (
+  key: keyof Omit<Flags, "_id">,
+  left: Omit<Flags, "_id">[keyof Omit<Flags, "_id">],
+  right: Omit<Flags, "_id">[keyof Omit<Flags, "_id">],
+) => {
+  if (key === "TEST_DATE") {
+    return (
+      new Date(left as Date).getTime() === new Date(right as Date).getTime()
+    );
+  }
+  return Object.is(left, right);
 };
 
 const toLocalDatetimeString = (date: Date) => {
