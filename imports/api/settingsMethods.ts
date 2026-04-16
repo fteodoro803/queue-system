@@ -83,7 +83,6 @@ Meteor.methods({
       "USE_TEST_DATE",
       "FREEZE_TIME",
       "USE_TIME_MULTIPLIER",
-      "BYPASS_FORM_VALIDATION",
     ];
 
     if (!allowedKeys.includes(key)) {
@@ -183,10 +182,6 @@ export async function setFreezeTime(value: boolean) {
 
 export async function setUseTimeMultiplier(value: boolean) {
   return setFlag("USE_TIME_MULTIPLIER", value);
-}
-
-export async function setBypassFormValidation(value: boolean) {
-  return setFlag("BYPASS_FORM_VALIDATION", value);
 }
 
 export async function setTestDate(date: Date) {

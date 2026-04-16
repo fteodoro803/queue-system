@@ -11,7 +11,6 @@ import { Loading } from "/imports/ui/components/Loading";
 import {
   setAcceptQueueAfterHours,
   setAppTheme,
-  setBypassFormValidation,
   setEnableTestPages,
   setFreezeTime,
   setTestDate,
@@ -56,7 +55,6 @@ export const SettingsPage = () => {
         USE_TEST_DATE: flags.USE_TEST_DATE,
         FREEZE_TIME: flags.FREEZE_TIME,
         USE_TIME_MULTIPLIER: flags.USE_TIME_MULTIPLIER,
-        BYPASS_FORM_VALIDATION: flags.BYPASS_FORM_VALIDATION,
         TEST_DATE: flags.TEST_DATE ?? DEFAULT_FLAGS.TEST_DATE,
         TIME_MULTIPLIER: flags.TIME_MULTIPLIER ?? DEFAULT_FLAGS.TIME_MULTIPLIER,
       };
@@ -137,7 +135,6 @@ export const SettingsPage = () => {
       await setUseTestDate(developerFlags.USE_TEST_DATE);
       await setFreezeTime(developerFlags.FREEZE_TIME);
       await setUseTimeMultiplier(developerFlags.USE_TIME_MULTIPLIER);
-      await setBypassFormValidation(developerFlags.BYPASS_FORM_VALIDATION);
       await setTestDate(developerFlags.TEST_DATE);
       await setMultiplier(developerFlags.TIME_MULTIPLIER);
 
@@ -368,26 +365,6 @@ export const SettingsPage = () => {
               />
             </div>
           </div>
-
-          {/* Bypass Form Validation */}
-          <label className={developerFlagRowClass}>
-            <div>
-              <span className="label-text font-medium">
-                Bypass Form Validation
-              </span>
-              <p className="text-xs opacity-60">
-                Skips field validation checks for development/testing only.
-              </p>
-            </div>
-            <input
-              type="checkbox"
-              checked={developerFlags.BYPASS_FORM_VALIDATION}
-              onChange={(e) =>
-                handleFlagChange("BYPASS_FORM_VALIDATION", e.target.checked)
-              }
-              className="toggle toggle-warning"
-            />
-          </label>
         </div>
       </div>
 

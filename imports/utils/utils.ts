@@ -1,5 +1,3 @@
-import { TEST_SETTINGS } from "/imports/dev/settings";
-
 // ----- Checks -----
 export function isInteger(str: string): boolean {
   return /^\d+$/.test(str);
@@ -7,7 +5,6 @@ export function isInteger(str: string): boolean {
 
 // Checks if string is a valid email address
 export function isValidEmail(email: string): boolean {
-  if (TEST_SETTINGS.BYPASS_FORM_VALIDATION) return true; // bypass validation for testing purposes
   const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
   return emailRegex.test(email);
 }

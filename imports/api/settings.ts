@@ -29,7 +29,6 @@ export interface Flags {
   USE_TEST_DATE: boolean;
   FREEZE_TIME: boolean; // if true, clock won't update time
   USE_TIME_MULTIPLIER: boolean; // if true, time will pass faster than real time (for testing long appointments), only works when USE_TEST_DATE is true
-  BYPASS_FORM_VALIDATION: boolean; // if true, form validation will be skipped
 
   // Test date values in separate fields for admin settings controls
   TEST_DATE: Date; // in UTC timezone, should be displayed in local timezone in the UI
@@ -57,7 +56,6 @@ export const DEFAULT_FLAGS: Omit<Flags, "_id"> = {
   USE_TEST_DATE: false,
   FREEZE_TIME: false,
   USE_TIME_MULTIPLIER: false,
-  BYPASS_FORM_VALIDATION: false,
   TEST_DATE: new Date(new Date().setHours(9, 0, 0, 0)), // default test date is today at 9am
   TIME_MULTIPLIER: 1,
 };

@@ -8,7 +8,7 @@ import "./integration/patient.test";
 import "./integration/provider.test";
 import "./integration/queueMethods.test";
 import "./integration/service.test";
-import { TEST_SETTINGS } from "/imports/dev/settings";
+import { getFlags } from "/imports/api/settingsMethods";
 
 describe("queue-system", function () {
   it("package.json has correct name", async function () {
@@ -29,8 +29,15 @@ describe("queue-system", function () {
   }
 
   it("test settings are disabled", function () {
-    for (const [key, value] of Object.entries(TEST_SETTINGS)) {
-      assert.strictEqual(value, false, `TEST_SETTINGS.${key} should be false`);
+    // for (const [key, value] of Object.entries(TEST_SETTINGS)) {
+    //   assert.strictEqual(value, false, `TEST_SETTINGS.${key} should be false`);
+    // }
+    const flags = getFlags();
+
+    for (const [key, value] of Object.entries(flags)) {
+      if (typeof value === "boolean") {
+        assert.strictEqual(value, false, `Flag ${key} should be false`);
+      }
     }
   });
 });
