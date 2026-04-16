@@ -1,10 +1,4 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { MakeQueueEntryModal } from "/imports/ui/queue/MakeQueueEntryModal";
 import { ProviderAvailabilityModal } from "/imports/ui/provider/ProviderAvailabilityModal";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
@@ -29,6 +23,7 @@ import { resetCounter } from "/imports/api/countersMethods";
 import { ProviderCollection } from "/imports/api/provider";
 import { Patient, PatientsCollection } from "/imports/api/patient";
 import { calculateQueueTime, QueueTimeResult } from "/imports/utils/queueUtils";
+import { ServiceSelector } from "/imports/ui/components/ServiceSelector";
 
 export const QueueManagement = () => {
   const now = useDateTime();
@@ -234,6 +229,7 @@ export const QueueManagement = () => {
           defaultChecked
         />
 
+        {/* Upcoming and Ongoing Queue */}
         <div className="tab-content border-base-300 bg-base-100 p-10">
           {selectedService ? (
             <>
@@ -344,34 +340,5 @@ export const QueueManagement = () => {
         setOpen={setProviderAvailabilityModalOpen}
       />
     </>
-  );
-};
-
-// Buttons to select a Service
-const ServiceSelector = ({
-  services,
-  selectedService,
-  setService,
-}: {
-  services: Service[];
-  selectedService?: Service;
-  setService: Dispatch<SetStateAction<Service | undefined>>;
-}) => {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {services.length === 0 ? (
-        <span className="text-base-content/50">No services available</span>
-      ) : (
-        services.map((service) => (
-          <button
-            key={service._id}
-            className={`btn ${selectedService?._id === service._id ? "btn-primary" : "btn-outline"}`}
-            onClick={() => setService(service)}
-          >
-            {service.name}
-          </button>
-        ))
-      )}
-    </div>
   );
 };

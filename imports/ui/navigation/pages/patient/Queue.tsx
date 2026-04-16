@@ -1,23 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MakeQueueEntryModal } from "/imports/ui/queue/MakeQueueEntryModal";
 import { QueueList } from "/imports/ui/queue/QueueList";
 import { Loading } from "/imports/ui/components/Loading";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
-import { ServicesCollection } from "/imports/api/service";
+import { Service, ServicesCollection } from "/imports/api/service";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { ProviderCollection } from "/imports/api/provider";
 import { Patient, PatientsCollection } from "/imports/api/patient";
+import { ServiceSelector } from "/imports/ui/components/ServiceSelector";
 
 export const Queue = () => {
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
   const isQueueEntryLoading = useSubscribe("queue");
   const queueEntries = useFind(() =>
-    QueueEntryCollection.find({}, { sort: { serviceId: 1, position: 1 } }),
+    QueueEntryCollection.find(
+      { status: { $in: ["in-progress", "waiting", "ready"] } },
+      { sort: { serviceId: 1, position: 1 } },
+    ),
   );
 
   const isServicesLoading = useSubscribe("services");
   const services = useFind(() => ServicesCollection.find());
+  const [selectedService, setSelectedService] = useState<Service | undefined>();
 
   const isProvidersLoading = useSubscribe("providers");
   const providers = useFind(() => ProviderCollection.find({}));
@@ -31,6 +36,29 @@ export const Queue = () => {
   const patientMap: Map<string, Patient> = new Map(
     patients.map((p) => [p._id, p]),
   );
+
+  const totalProviders = providers.filter((p) =>
+    p.services.some((s) => s.id === selectedService?._id && s.enabled),
+  ).length;
+
+  // ---- Effects ----
+  // Select the first service by default when services are loaded
+  useEffect(() => {
+    if (services.length === 0) {
+      setSelectedService(undefined);
+      return;
+    }
+
+    setSelectedService((currentService) => {
+      if (!currentService) return services[0];
+
+      // Keep selection by id, but return the latest reactive object
+      const updatedService = services.find(
+        (service) => service._id === currentService._id,
+      );
+      return updatedService ?? services[0];
+    });
+  }, [services]);
 
   if (
     isQueueEntryLoading() ||
@@ -55,35 +83,31 @@ export const Queue = () => {
         </div>
       </div>
 
-      {/* Queue Status for each Service */}
-      <div>
-        {services.map((service) => {
-          const serviceQueue = queueEntries.filter(
-            (entry) =>
-              entry.serviceId === service._id &&
-              (entry.status === "waiting" ||
-                entry.status === "ready" ||
-                entry.status === "in-progress"),
-          );
-          const activeProviders = providers.filter((p) =>
-            p.services.some((s) => s.id === service._id && s.enabled),
-          ).length;
-          return (
-            <div key={service._id} className="mb-6">
-              <h2 className="text-2xl font-bold">{service.name}</h2>
-              <QueueList
-                queue={serviceQueue}
-                service={service}
-                activeProviders={activeProviders}
-                patientMap={patientMap}
-              />
-            </div>
-          );
-        })}
+      <ServiceSelector
+        services={services}
+        selectedService={selectedService}
+        setService={setSelectedService}
+      />
 
-        {/* Join Queue Modal */}
-        {isModalOpen && <MakeQueueEntryModal setOpen={setModalOpen} />}
-      </div>
+      {/* Queue Status for each Service */}
+      {selectedService ? (
+        <div key={selectedService._id} className="mb-6 mt-6">
+          <QueueList
+            queue={queueEntries}
+            service={selectedService}
+            activeProviders={totalProviders}
+            patientMap={patientMap}
+            adminView={false}
+          />
+        </div>
+      ) : (
+        <div className="py-8 text-center text-sm opacity-60">
+          No services available.
+        </div>
+      )}
+
+      {/* Join Queue Modal */}
+      {isModalOpen && <MakeQueueEntryModal setOpen={setModalOpen} />}
     </>
   );
 };
