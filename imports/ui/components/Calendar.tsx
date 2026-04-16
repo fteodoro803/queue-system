@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { DayPicker, Matcher } from "react-day-picker";
 import "react-day-picker/src/style.css";
-import { TEST_DATE } from "/imports/dev/settings";
 import { styles } from "/imports/utils/styles";
+import { Flags, SettingsCollection } from "/imports/api/settings";
+import { Loading } from "/imports/ui/components/Loading";
+import { useFind, useSubscribe } from "meteor/react-meteor-data";
 
 // TODO: add tagalog localisation
 interface CalendarProps {
   date?: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
+  setDate: Dispatch<SetStateAction<Date | undefined>>;
   startMonth?: Date;
   disabledDates?: Matcher[];
   previousDatesDisabled?: boolean;
@@ -16,20 +18,34 @@ interface CalendarProps {
 export const Calendar = ({
   date,
   setDate,
-  startMonth = TEST_DATE ?? undefined, // default to current month if not provided, use TEST_DATE for testing purposes
+  startMonth,
   disabledDates,
   previousDatesDisabled,
 }: CalendarProps) => {
-  const [month, setMonth] = useState<Date>(startMonth ?? new Date());
+  const isSettingsLoading = useSubscribe("settings");
+  const flags = useFind(() =>
+    SettingsCollection.find({ _id: "app_flags" }),
+  )[0] as Flags | undefined;
+  const testDate: Date | undefined = flags?.USE_TEST_DATE
+    ? flags?.TEST_DATE
+    : undefined;
+
+  const today: Date = testDate ?? new Date();
+  const [month, setMonth] = useState<Date>(
+    testDate ?? startMonth ?? new Date(),
+  );
 
   // Date Options
-  const previousDates = { before: month };
+  const previousDates = { before: today };
   const combinedDisabledDates: Matcher[] = [
     disabledDates ?? [],
     previousDatesDisabled && previousDates,
   ]
     .flat()
     .filter(Boolean) as Matcher[];
+
+  if (isSettingsLoading()) return <Loading />;
+  if (!flags) return <Loading />;
 
   return (
     <DayPicker
@@ -40,7 +56,7 @@ export const Calendar = ({
       onSelect={setDate}
       month={month} // the visible month on the calendar
       onMonthChange={setMonth}
-      today={TEST_DATE ?? new Date()}
+      today={today}
       /* --- Style --- */
       disabled={combinedDisabledDates}
       ISOWeek={true} // week starts on Monday

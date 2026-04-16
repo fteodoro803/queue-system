@@ -1,20 +1,27 @@
 import React, {
   createContext,
+  ReactNode,
   useContext,
   useEffect,
   useRef,
   useState,
 } from "react";
-import { TEST_DATE, TEST_SETTINGS, TIME_MULTIPLIER } from "/imports/dev/settings";
+import { TEST_SETTINGS, TIME_MULTIPLIER } from "/imports/dev/settings";
+import { Flags, SettingsCollection } from "/imports/api/settings";
+import { Loading } from "/imports/ui/components/Loading";
+import { useFind, useSubscribe } from "meteor/react-meteor-data";
 
 export const DateTimeContext = createContext<Date | null>(null);
 
-export const DateTimeProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const [time, setTime] = useState(TEST_DATE ?? new Date());
+export const DateTimeProvider = ({ children }: { children: ReactNode }) => {
+  const isSettingsLoading = useSubscribe("settings");
+  const flags = useFind(() =>
+    SettingsCollection.find({ _id: "app_flags" }),
+  )[0] as Flags | undefined;
+
+  const [time, setTime] = useState(
+    flags?.USE_TEST_DATE ? flags.TEST_DATE : new Date(),
+  );
   const updateTime = 1000; // Update every 1 second (in ms)
 
   // Update time every second, applying time multiplier if enabled
@@ -24,8 +31,9 @@ export const DateTimeProvider = ({
 
     const interval = setInterval(() => {
       const elapsed = (Date.now() - startedAt.current) * TIME_MULTIPLIER;
-      const now = TEST_DATE
-        ? new Date(TEST_DATE.getTime() + elapsed)
+      // use test date, if enabled
+      const now = flags?.USE_TEST_DATE
+        ? new Date(flags.TEST_DATE.getTime() + elapsed)
         : new Date();
 
       setTime(now);
@@ -33,7 +41,10 @@ export const DateTimeProvider = ({
 
     // Cleanup interval on unmount
     return () => clearInterval(interval);
-  }, []);
+  }, [flags?.USE_TEST_DATE, flags?.TEST_DATE]);
+
+  if (isSettingsLoading()) return <Loading />;
+  if (!flags) return <Loading />;
 
   return (
     <DateTimeContext.Provider value={time}>{children}</DateTimeContext.Provider>
