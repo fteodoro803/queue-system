@@ -6,7 +6,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { TIME_MULTIPLIER } from "/imports/dev/settings";
 import { Flags, SettingsCollection } from "/imports/api/settings";
 import { Loading } from "/imports/ui/components/Loading";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
@@ -22,6 +21,8 @@ export const DateTimeProvider = ({ children }: { children: ReactNode }) => {
   const [time, setTime] = useState(
     flags?.USE_TEST_DATE ? flags.TEST_DATE : new Date(),
   );
+  const timeMultiplier = flags?.USE_TIME_MULTIPLIER ? flags.TIME_MULTIPLIER : 1;
+
   const updateTime = 1000; // Update every 1 second (in ms)
 
   // Update time every second, applying time multiplier if enabled
@@ -30,7 +31,7 @@ export const DateTimeProvider = ({ children }: { children: ReactNode }) => {
     if (flags?.FREEZE_TIME) return;
 
     const interval = setInterval(() => {
-      const elapsed = (Date.now() - startedAt.current) * TIME_MULTIPLIER;
+      const elapsed = (Date.now() - startedAt.current) * timeMultiplier;
       // use test date, if enabled
       const now = flags?.USE_TEST_DATE
         ? new Date(flags.TEST_DATE.getTime() + elapsed)
@@ -41,7 +42,13 @@ export const DateTimeProvider = ({ children }: { children: ReactNode }) => {
 
     // Cleanup interval on unmount
     return () => clearInterval(interval);
-  }, [flags?.FREEZE_TIME, flags?.USE_TEST_DATE, flags?.TEST_DATE]);
+  }, [
+    flags?.FREEZE_TIME,
+    flags?.USE_TEST_DATE,
+    flags?.TEST_DATE,
+    flags?.USE_TIME_MULTIPLIER,
+    flags?.TIME_MULTIPLIER,
+  ]);
 
   if (isSettingsLoading()) return <Loading />;
   if (!flags) return <Loading />;
