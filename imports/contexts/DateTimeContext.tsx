@@ -41,7 +41,7 @@ export const DateTimeProvider = ({ children }: { children: ReactNode }) => {
 
     // Cleanup interval on unmount
     return () => clearInterval(interval);
-  }, [flags?.USE_TEST_DATE, flags?.TEST_DATE]);
+  }, [flags?.FREEZE_TIME, flags?.USE_TEST_DATE, flags?.TEST_DATE]);
 
   if (isSettingsLoading()) return <Loading />;
   if (!flags) return <Loading />;
