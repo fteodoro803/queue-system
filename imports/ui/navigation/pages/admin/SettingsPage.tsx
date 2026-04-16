@@ -14,8 +14,7 @@ import {
   setBypassFormValidation,
   setEnableTestPages,
   setFreezeTime,
-  setTestDateDate,
-  setTestDateTime,
+  setTestDate,
   setUseTestDate,
   setUseTimeMultiplier,
   setMultiplier,
@@ -24,7 +23,7 @@ import { styles } from "/imports/utils/styles";
 
 type BooleanFlagKey = Exclude<
   keyof Omit<Flags, "_id">,
-  "TEST_DATE_DATE" | "TEST_DATE_TIME" | "TIME_MULTIPLIER"
+  "TEST_DATE" | "TIME_MULTIPLIER"
 >;
 
 export const SettingsPage = () => {
@@ -58,8 +57,7 @@ export const SettingsPage = () => {
         FREEZE_TIME: flags.FREEZE_TIME,
         USE_TIME_MULTIPLIER: flags.USE_TIME_MULTIPLIER,
         BYPASS_FORM_VALIDATION: flags.BYPASS_FORM_VALIDATION,
-        TEST_DATE_DATE: flags.TEST_DATE_DATE ?? DEFAULT_FLAGS.TEST_DATE_DATE,
-        TEST_DATE_TIME: flags.TEST_DATE_TIME ?? DEFAULT_FLAGS.TEST_DATE_TIME,
+        TEST_DATE: flags.TEST_DATE ?? DEFAULT_FLAGS.TEST_DATE,
         TIME_MULTIPLIER: flags.TIME_MULTIPLIER ?? DEFAULT_FLAGS.TIME_MULTIPLIER,
       };
 
@@ -101,12 +99,8 @@ export const SettingsPage = () => {
     });
   };
 
-  const handleTestDateDateChange = (date: string) => {
-    setDeveloperFlags((prev) => ({ ...prev, TEST_DATE_DATE: date }));
-  };
-
-  const handleTestDateTimeChange = (time: string) => {
-    setDeveloperFlags((prev) => ({ ...prev, TEST_DATE_TIME: time }));
+  const handleTestDateChange = (date: Date) => {
+    setDeveloperFlags((prev) => ({ ...prev, TEST_DATE: date }));
   };
 
   const handleMultiplierChange = (multiplier: number) => {
@@ -144,8 +138,7 @@ export const SettingsPage = () => {
       await setFreezeTime(developerFlags.FREEZE_TIME);
       await setUseTimeMultiplier(developerFlags.USE_TIME_MULTIPLIER);
       await setBypassFormValidation(developerFlags.BYPASS_FORM_VALIDATION);
-      await setTestDateDate(developerFlags.TEST_DATE_DATE);
-      await setTestDateTime(developerFlags.TEST_DATE_TIME);
+      await setTestDate(developerFlags.TEST_DATE);
       await setMultiplier(developerFlags.TIME_MULTIPLIER);
 
       setCurrentSettings({
@@ -303,32 +296,16 @@ export const SettingsPage = () => {
 
           {/* Test Date and Time */}
           <div className="ml-6 border-l border-base-300 pl-4">
-            {/* Test Date */}
             <div className="form-control mb-2">
               <label className="label py-1">
-                <span className="label-text font-medium">Date</span>
+                <span className="label-text font-medium">Date & Time</span>
               </label>
               <input
-                type="date"
-                value={developerFlags.TEST_DATE_DATE}
+                type="datetime-local"
+                value={toLocalDatetimeString(developerFlags.TEST_DATE)}
                 disabled={!isUseTestDateEnabled}
-                onChange={(e) => handleTestDateDateChange(e.target.value)}
+                onChange={(e) => handleTestDateChange(new Date(e.target.value))}
                 className="input input-bordered w-full max-w-xs"
-              />
-            </div>
-
-            {/* Test Time */}
-            <div className="form-control mb-2">
-              <label className="label py-1">
-                <span className="label-text font-medium">Time (24-hour)</span>
-              </label>
-              <input
-                type="time"
-                value={developerFlags.TEST_DATE_TIME}
-                disabled={!isUseTestDateEnabled}
-                onChange={(e) => handleTestDateTimeChange(e.target.value)}
-                className="input input-bordered w-full max-w-xs"
-                step={60}
               />
             </div>
 
@@ -436,4 +413,9 @@ export const SettingsPage = () => {
       {saveError && <p className="text-sm text-error">{saveError}</p>}
     </div>
   );
+};
+
+const toLocalDatetimeString = (date: Date) => {
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 };

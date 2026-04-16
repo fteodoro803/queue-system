@@ -32,8 +32,7 @@ export interface Flags {
   BYPASS_FORM_VALIDATION: boolean; // if true, form validation will be skipped
 
   // Test date values in separate fields for admin settings controls
-  TEST_DATE_DATE: string; // DD-MM-YYYY
-  TEST_DATE_TIME: string; // HH:mm (24-hour)
+  TEST_DATE: Date; // in UTC timezone, should be displayed in local timezone in the UI
   TIME_MULTIPLIER: number; // multiplier for time, only works when USE_TIME_MULTIPLIER is true
 }
 
@@ -59,7 +58,6 @@ export const DEFAULT_FLAGS: Omit<Flags, "_id"> = {
   FREEZE_TIME: false,
   USE_TIME_MULTIPLIER: false,
   BYPASS_FORM_VALIDATION: false,
-  TEST_DATE_DATE: "2026-01-01",
-  TEST_DATE_TIME: "09:00",
+  TEST_DATE: new Date(new Date().setHours(9, 0, 0, 0)), // default test date is today at 9am
   TIME_MULTIPLIER: 1,
 };

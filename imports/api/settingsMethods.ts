@@ -93,17 +93,9 @@ Meteor.methods({
     await updateFlag(key, value);
   },
 
-  async "flags.setTestDateDate"(date: string) {
-    check(date, String);
-    await updateFlag("TEST_DATE_DATE", date);
-  },
-
-  async "flags.setTestDateTime"(time: string) {
-    check(time, String);
-    if (!isValidTimeStr(time)) {
-      throw new Meteor.Error("invalid-time", `Invalid time: ${time}`);
-    }
-    await updateFlag("TEST_DATE_TIME", time);
+  async "flags.setTestDateDate"(date: Date) {
+    check(date, Date);
+    await updateFlag("TEST_DATE", date);
   },
 
   async "flags.setMultiplier"(multiplier: number) {
@@ -197,13 +189,8 @@ export async function setBypassFormValidation(value: boolean) {
   return setFlag("BYPASS_FORM_VALIDATION", value);
 }
 
-export async function setTestDateDate(date: string) {
+export async function setTestDate(date: Date) {
   return Meteor.callAsync("flags.setTestDateDate", date);
-}
-
-export async function setTestDateTime(time: string) {
-  if (!isValidTimeStr(time)) return;
-  return Meteor.callAsync("flags.setTestDateTime", time);
 }
 
 export async function setMultiplier(multiplier: number) {

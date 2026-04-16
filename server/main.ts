@@ -92,28 +92,12 @@ Meteor.startup(async () => {
   // Backfill newly added test-date fields on older app_flags documents.
   await SettingsCollection.updateAsync(
     { _id: "app_flags", TEST_DATE_DATE: { $exists: false } },
-    { $set: { TEST_DATE_DATE: DEFAULT_FLAGS.TEST_DATE_DATE } },
-  );
-  await SettingsCollection.updateAsync(
-    { _id: "app_flags", TEST_DATE_TIME: { $exists: false } },
-    { $set: { TEST_DATE_TIME: DEFAULT_FLAGS.TEST_DATE_TIME } },
+    { $set: { TEST_DATE: DEFAULT_FLAGS.TEST_DATE } },
   );
   await SettingsCollection.updateAsync(
     { _id: "app_flags", TIME_MULTIPLIER: { $exists: false } },
     { $set: { TIME_MULTIPLIER: DEFAULT_FLAGS.TIME_MULTIPLIER } },
   );
-
-  const flags = await SettingsCollection.findOneAsync({ _id: "app_flags" });
-  if (flags && "TEST_DATE_DATE" in flags) {
-    const testDate = flags.TEST_DATE_DATE;
-    if (/^\d{4}-\d{2}-\d{2}$/.test(testDate)) {
-      const [year, month, day] = testDate.split("-");
-      await SettingsCollection.updateAsync(
-        { _id: "app_flags" },
-        { $set: { TEST_DATE_DATE: `${day}-${month}-${year}` } },
-      );
-    }
-  }
 
   console.log("Server started");
 });
