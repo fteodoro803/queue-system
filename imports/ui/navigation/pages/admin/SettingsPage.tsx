@@ -40,19 +40,19 @@ export const SettingsPage = () => {
   const [developerFlags, setDeveloperFlags] =
     useState<Omit<Flags, "_id">>(DEFAULT_FLAGS);
 
-  // ---- Effects ----
-  // Update Settings
-  useEffect(() => {
-    if (settings) {
-      setAcceptAfterHours(settings.accept_queue_after_hours);
-      setTheme(settings.theme);
-    }
-  }, [settings]);
+  // snapshot of current settings for comparison
+  const [currentSettings, setCurrentSettings] = useState<{
+    acceptAfterHours: boolean;
+    theme: string;
+    developerFlags: Omit<Flags, "_id">;
+  } | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  // Update Flags
+  // Fill settings from db
   useEffect(() => {
-    if (flags) {
-      setDeveloperFlags({
+    if (settings && flags) {
+      const nextFlags: Omit<Flags, "_id"> = {
         ENABLE_TEST_PAGES: flags.ENABLE_TEST_PAGES,
         USE_TEST_DATE: flags.USE_TEST_DATE,
         FREEZE_TIME: flags.FREEZE_TIME,
@@ -61,22 +61,32 @@ export const SettingsPage = () => {
         TEST_DATE_DATE: flags.TEST_DATE_DATE ?? DEFAULT_FLAGS.TEST_DATE_DATE,
         TEST_DATE_TIME: flags.TEST_DATE_TIME ?? DEFAULT_FLAGS.TEST_DATE_TIME,
         TIME_MULTIPLIER: flags.TIME_MULTIPLIER ?? DEFAULT_FLAGS.TIME_MULTIPLIER,
-      });
+      };
+
+      const nextBaseline = {
+        acceptAfterHours: settings.accept_queue_after_hours,
+        theme: settings.theme,
+        developerFlags: nextFlags,
+      };
+
+      setAcceptAfterHours(nextBaseline.acceptAfterHours);
+      setTheme(nextBaseline.theme);
+      setDeveloperFlags(nextBaseline.developerFlags);
+      setCurrentSettings(nextBaseline);
+      setSaveError(null);
     }
-  }, [flags]);
+  }, [settings, flags]);
 
-  // --- Handlers ---
-  const handleAcceptAfterHoursChange = async (value: boolean) => {
+  // Draft-only handlers (no writes until Save).
+  const handleAcceptAfterHoursChange = (value: boolean) => {
     setAcceptAfterHours(value);
-    await setAcceptQueueAfterHours(value);
   };
 
-  const handleThemeChange = async (value: string) => {
+  const handleThemeChange = (value: string) => {
     setTheme(value);
-    await setAppTheme(value);
   };
 
-  const handleFlagChange = async (key: BooleanFlagKey, value: boolean) => {
+  const handleFlagChange = (key: BooleanFlagKey, value: boolean) => {
     setDeveloperFlags((prev) => {
       if (key === "USE_TEST_DATE" && !value) {
         return {
@@ -89,35 +99,65 @@ export const SettingsPage = () => {
 
       return { ...prev, [key]: value };
     });
-
-    const updates: Record<
-      BooleanFlagKey,
-      (enabled: boolean) => Promise<unknown>
-    > = {
-      ENABLE_TEST_PAGES: setEnableTestPages,
-      USE_TEST_DATE: setUseTestDate,
-      FREEZE_TIME: setFreezeTime,
-      USE_TIME_MULTIPLIER: setUseTimeMultiplier,
-      BYPASS_FORM_VALIDATION: setBypassFormValidation,
-    };
-
-    await updates[key](value);
   };
 
-  const handleTestDateDateChange = async (date: string) => {
+  const handleTestDateDateChange = (date: string) => {
     setDeveloperFlags((prev) => ({ ...prev, TEST_DATE_DATE: date }));
-    await setTestDateDate(date);
   };
 
-  const handleTestDateTimeChange = async (time: string) => {
+  const handleTestDateTimeChange = (time: string) => {
     setDeveloperFlags((prev) => ({ ...prev, TEST_DATE_TIME: time }));
-    await setTestDateTime(time);
   };
 
-  const handleMultiplierChange = async (multiplier: number) => {
+  const handleMultiplierChange = (multiplier: number) => {
     if (!Number.isFinite(multiplier) || multiplier <= 0) return;
     setDeveloperFlags((prev) => ({ ...prev, TIME_MULTIPLIER: multiplier }));
-    await setMultiplier(multiplier);
+  };
+
+  // Compare the local draft against baseline to enable Save/Cancel only when needed.
+  const hasChanges =
+    currentSettings != null &&
+    (acceptAfterHours !== currentSettings.acceptAfterHours ||
+      theme !== currentSettings.theme ||
+      (Object.keys(developerFlags) as Array<keyof Omit<Flags, "_id">>).some(
+        (key) => developerFlags[key] !== currentSettings.developerFlags[key],
+      ));
+
+  const handleCancel = () => {
+    if (!currentSettings) return;
+    setAcceptAfterHours(currentSettings.acceptAfterHours);
+    setTheme(currentSettings.theme);
+    setDeveloperFlags(currentSettings.developerFlags);
+    setSaveError(null);
+  };
+
+  const handleSave = async () => {
+    if (!currentSettings || !hasChanges) return;
+
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      await setAcceptQueueAfterHours(acceptAfterHours);
+      await setAppTheme(theme);
+      await setEnableTestPages(developerFlags.ENABLE_TEST_PAGES);
+      await setUseTestDate(developerFlags.USE_TEST_DATE);
+      await setFreezeTime(developerFlags.FREEZE_TIME);
+      await setUseTimeMultiplier(developerFlags.USE_TIME_MULTIPLIER);
+      await setBypassFormValidation(developerFlags.BYPASS_FORM_VALIDATION);
+      await setTestDateDate(developerFlags.TEST_DATE_DATE);
+      await setTestDateTime(developerFlags.TEST_DATE_TIME);
+      await setMultiplier(developerFlags.TIME_MULTIPLIER);
+
+      setCurrentSettings({
+        acceptAfterHours,
+        theme,
+        developerFlags,
+      });
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Failed to save");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const isUseTestDateEnabled = developerFlags.USE_TEST_DATE;
@@ -313,10 +353,11 @@ export const SettingsPage = () => {
             <label className={developerFlagRowClass}>
               <div>
                 <span className="label-text font-medium">
-                  Use Time Multiplier
+                  Use Time Multiplier (seconds)
                 </span>
                 <p className="text-xs opacity-60">
-                  Speeds up test time progression.
+                  Speeds up test time progression. (1 real second ={" "}
+                  {developerFlags.TIME_MULTIPLIER} test seconds)
                 </p>
               </div>
               <input
@@ -337,8 +378,8 @@ export const SettingsPage = () => {
               <input
                 type="number"
                 min={1}
-                max={3}
-                step={0.1}
+                max={120}
+                step={1}
                 value={developerFlags.TIME_MULTIPLIER}
                 disabled={
                   !isUseTestDateEnabled || !developerFlags.USE_TIME_MULTIPLIER
@@ -370,6 +411,27 @@ export const SettingsPage = () => {
           </label>
         </div>
       </div>
+
+      <div className="flex justify-end gap-2">
+        <button
+          type="button"
+          className="btn btn-outline"
+          onClick={handleCancel}
+          disabled={!hasChanges || isSaving}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={handleSave}
+          disabled={!hasChanges || isSaving}
+        >
+          {isSaving ? "Saving..." : "Save Changes"}
+        </button>
+      </div>
+
+      {saveError && <p className="text-sm text-error">{saveError}</p>}
     </div>
   );
 };

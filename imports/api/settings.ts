@@ -59,7 +59,7 @@ export const DEFAULT_FLAGS: Omit<Flags, "_id"> = {
   FREEZE_TIME: false,
   USE_TIME_MULTIPLIER: false,
   BYPASS_FORM_VALIDATION: false,
-  TEST_DATE_DATE: "27-02-2026",
+  TEST_DATE_DATE: "2026-01-01",
   TEST_DATE_TIME: "09:00",
   TIME_MULTIPLIER: 1,
 };
