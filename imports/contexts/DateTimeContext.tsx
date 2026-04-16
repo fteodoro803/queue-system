@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { TEST_SETTINGS, TIME_MULTIPLIER } from "/imports/dev/settings";
+import { TIME_MULTIPLIER } from "/imports/dev/settings";
 import { Flags, SettingsCollection } from "/imports/api/settings";
 import { Loading } from "/imports/ui/components/Loading";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
@@ -27,7 +27,7 @@ export const DateTimeProvider = ({ children }: { children: ReactNode }) => {
   // Update time every second, applying time multiplier if enabled
   const startedAt = useRef(Date.now());
   useEffect(() => {
-    if (TEST_SETTINGS.FREEZE_TIME) return;
+    if (flags?.FREEZE_TIME) return;
 
     const interval = setInterval(() => {
       const elapsed = (Date.now() - startedAt.current) * TIME_MULTIPLIER;
