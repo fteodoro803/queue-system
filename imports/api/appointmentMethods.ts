@@ -4,9 +4,9 @@ import { Service, ServicesCollection } from "/imports/api/service";
 import { Patient } from "/imports/api/patient";
 import { Provider } from "/imports/api/provider";
 import { findEarliestSlot } from "/imports/utils/appointmentUtils";
-import { TEST_DATE } from "/imports/dev/settings";
 import { addMonths } from "/imports/utils/utils";
 import { updateServiceAnalytics } from "/imports/api/serviceMethods";
+import { getTestDate } from "/imports/api/settingsMethods";
 
 export const APPOINTMENT_STATES = [
   "scheduled",
@@ -50,8 +50,9 @@ Meteor.methods({
 
   // Marks appointment as in-progress and update timestamp
   // TODO: change startTime to an argument
-  "appointments.start"(id: string) {
-    const startTime = TEST_DATE ?? new Date();
+  async "appointments.start"(id: string) {
+    const testDate = await getTestDate();
+    const startTime = testDate ?? new Date();
     return AppointmentsCollection.updateAsync(id, {
       $set: { status: "in-progress", actual_start: startTime },
     });
@@ -60,12 +61,14 @@ Meteor.methods({
   // Marks appointment as complete and update timestamp and analytics
   // TODO: change startTime to an argument
   async "appointments.complete"(id: string) {
+    const testDate = await getTestDate();
+
     // 1. Get the appointment to calculate the actual duration
     const appointment = await AppointmentsCollection.findOneAsync(id);
     if (!appointment || !appointment.actual_start) return;
 
     const startTime: Date = appointment.actual_start;
-    const endTime: Date = TEST_DATE ?? new Date();
+    const endTime: Date = testDate ?? new Date();
     const duration: number = (endTime.getTime() - startTime.getTime()) / 60000; // duration in minutes
     await updateServiceAnalytics(appointment.serviceId, duration);
 
@@ -96,7 +99,8 @@ Meteor.methods({
     providerId: string,
   ): Promise<Date | undefined> {
     const service = await ServicesCollection.findOneAsync(serviceId);
-    const from = TEST_DATE ?? new Date();
+    const testDate = await getTestDate();
+    const from = testDate ?? new Date();
     const until = addMonths(from, 3); // search up to 3 months in advance
 
     if (!service) return undefined;

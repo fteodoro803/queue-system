@@ -18,7 +18,7 @@ import { Loading } from "/imports/ui/components/Loading";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { ServicesCollection } from "/imports/api/service";
-import { SettingsCollection } from "/imports/api/settings";
+import { Flags, Settings, SettingsCollection } from "/imports/api/settings";
 import { WorkdayModal } from "/imports/ui/dashboard/WorkdayModal";
 import { ProviderCollection } from "/imports/api/provider";
 
@@ -31,7 +31,9 @@ export const AdminDashboard = () => {
   const isProvidersLoading = useSubscribe("providers");
 
   // Settings and Workday
-  const settings = useFind(() => SettingsCollection.find({}))[0];
+  const settings: Settings | Flags = useFind(() =>
+    SettingsCollection.find({ _id: "app_settings" }),
+  )[0] as Settings;
   const dayStarted: boolean = settings?.day_started ?? false;
   const startOfDay: string = settings?.start_of_day;
   const endOfDay: string = settings?.end_of_day;

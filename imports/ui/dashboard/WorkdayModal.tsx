@@ -1,6 +1,6 @@
 import React from "react";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
-import { SettingsCollection } from "/imports/api/settings";
+import { Settings, SettingsCollection } from "/imports/api/settings";
 import { Loading } from "/imports/ui/components/Loading";
 import { setDayStarted } from "/imports/api/settingsMethods";
 import { timeStrToLocaleTime } from "/imports/utils/utils";
@@ -12,7 +12,7 @@ export const WorkdayModal = ({
   setOpen: (value: boolean) => void;
 }) => {
   const isSettingsLoading = useSubscribe("settings");
-  const settings = useFind(() => SettingsCollection.find({}))[0];
+  const settings = useFind(() => SettingsCollection.find({}))[0] as Settings;
   const day_started = settings.day_started;
   const startOfDay: string = settings?.start_of_day;
   const endOfDay: string = settings?.end_of_day;

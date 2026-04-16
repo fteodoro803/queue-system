@@ -1,7 +1,18 @@
 import { Meteor } from "meteor/meteor";
 import { check } from "meteor/check";
-import { SettingsCollection, Settings, EMERGENCY_OPTION } from "/imports/api/settings";
+import {
+  SettingsCollection,
+  Settings,
+  EMERGENCY_OPTION,
+  Flags,
+} from "/imports/api/settings";
 import { isValidTimeStr } from "/imports/utils/utils";
+
+type FlagKey = keyof Omit<Flags, "_id">;
+type BooleanFlagKey = Exclude<
+  FlagKey,
+  "TEST_DATE_DATE" | "TEST_DATE_TIME" | "TIME_MULTIPLIER"
+>;
 
 // Helper to update a single field
 const updateSetting = <K extends keyof Omit<Settings, "_id">>(
@@ -10,6 +21,13 @@ const updateSetting = <K extends keyof Omit<Settings, "_id">>(
 ) => {
   return SettingsCollection.updateAsync(
     { _id: "app_settings" },
+    { $set: { [key]: value } },
+  );
+};
+
+const updateFlag = <K extends FlagKey>(key: K, value: Flags[K]) => {
+  return SettingsCollection.updateAsync(
+    { _id: "app_flags" },
     { $set: { [key]: value } },
   );
 };
@@ -50,37 +68,143 @@ Meteor.methods({
     check(value, Boolean);
     await updateSetting("accept_queue_after_hours", value);
   },
+
+  async "settings.setTheme"(theme: string) {
+    check(theme, String);
+    await updateSetting("theme", theme);
+  },
+
+  async "flags.setFlag"(key: BooleanFlagKey, value: boolean) {
+    check(key, String);
+    check(value, Boolean);
+
+    const allowedKeys: BooleanFlagKey[] = [
+      "ENABLE_TEST_FEATURES",
+      "USE_TEST_DATE",
+      "FREEZE_TIME",
+      "USE_TIME_MULTIPLIER",
+    ];
+
+    if (!allowedKeys.includes(key)) {
+      throw new Meteor.Error("invalid-flag", `Unknown flag: ${key}`);
+    }
+
+    await updateFlag(key, value);
+  },
+
+  async "flags.setTestDateDate"(date: Date) {
+    check(date, Date);
+    await updateFlag("TEST_DATE", date);
+  },
+
+  async "flags.setMultiplier"(multiplier: number) {
+    check(multiplier, Number);
+    if (multiplier <= 0) {
+      throw new Meteor.Error(
+        "invalid-multiplier",
+        `Multiplier must be greater than 0: ${multiplier}`,
+      );
+    }
+    await updateFlag("TIME_MULTIPLIER", multiplier);
+  },
 });
 
+// ---- Settings Methods ----
 export async function setDayStarted(started: boolean) {
-  return await Meteor.callAsync("settings.setDayStarted", started);
+  return Meteor.callAsync("settings.setDayStarted", started);
 }
 
 // TODO: do tests for the working hours to make sure theyre properly formatted
 export async function setStartOfDay(start: string) {
   if (!isValidTimeStr(start)) return;
-  return await Meteor.callAsync("settings.setStartOfDay", start);
+  return Meteor.callAsync("settings.setStartOfDay", start);
+}
+
+export async function getStartOfDay(): Promise<string> {
+  const settings = await getSettings();
+  return settings.start_of_day;
 }
 
 export async function setEndOfDay(end: string) {
   if (!isValidTimeStr(end)) return;
-  return await Meteor.callAsync("settings.setEndOfDay", end);
+  return Meteor.callAsync("settings.setEndOfDay", end);
+}
+
+export async function getEndOfDay(): Promise<string> {
+  const settings = await getSettings();
+  return settings.end_of_day;
 }
 
 export async function setTextFrequency(minutes: number) {
-  return await Meteor.callAsync("settings.setTextFrequency", minutes);
+  return Meteor.callAsync("settings.setTextFrequency", minutes);
 }
 
 export async function setTextMessageTemplate(template: string) {
-  return await Meteor.callAsync("settings.setTextMessageTemplate", template);
+  return Meteor.callAsync("settings.setTextMessageTemplate", template);
 }
 
 export async function setEmergencyOption(
   option: (typeof EMERGENCY_OPTION)[number],
 ) {
-  return await Meteor.callAsync("settings.setEmergencyOption", option);
+  return Meteor.callAsync("settings.setEmergencyOption", option);
 }
 
 export async function setAcceptQueueAfterHours(value: boolean) {
-  return await Meteor.callAsync("settings.setAcceptQueueAfterHours", value);
+  return Meteor.callAsync("settings.setAcceptQueueAfterHours", value);
+}
+
+export async function setAppTheme(theme: string) {
+  return Meteor.callAsync("settings.setTheme", theme);
+}
+
+export async function getSettings(): Promise<Settings> {
+  return (await SettingsCollection.findOneAsync({
+    _id: "app_settings",
+  })) as Settings;
+}
+
+// ---- Flags Methods ----
+export async function getFlags(): Promise<Flags | undefined> {
+  return (await SettingsCollection.findOneAsync({ _id: "app_flags" })) as Flags;
+}
+
+export async function setFlag(key: BooleanFlagKey, value: boolean) {
+  return Meteor.callAsync("flags.setFlag", key, value);
+}
+
+export async function setEnableTestPages(value: boolean) {
+  return setFlag("ENABLE_TEST_FEATURES", value);
+}
+
+export async function setUseTestDate(value: boolean) {
+  // If disabling test pages, also disable all related flags
+  if (!value) {
+    await setFlag("USE_TEST_DATE", false);
+    await setFlag("FREEZE_TIME", false);
+    await setFlag("USE_TIME_MULTIPLIER", false);
+  }
+  return setFlag("USE_TEST_DATE", value);
+}
+
+export async function setFreezeTime(value: boolean) {
+  return setFlag("FREEZE_TIME", value);
+}
+
+export async function setUseTimeMultiplier(value: boolean) {
+  return setFlag("USE_TIME_MULTIPLIER", value);
+}
+
+export async function setTestDate(date: Date) {
+  return Meteor.callAsync("flags.setTestDateDate", date);
+}
+
+export async function getTestDate(): Promise<Date | undefined> {
+  const flags: Flags | undefined = await getFlags();
+  if (!flags?.USE_TEST_DATE) return undefined;
+  return flags?.TEST_DATE;
+}
+
+export async function setMultiplier(multiplier: number) {
+  if (!Number.isFinite(multiplier) || multiplier <= 0) return;
+  return Meteor.callAsync("flags.setMultiplier", multiplier);
 }

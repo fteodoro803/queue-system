@@ -24,7 +24,7 @@ import {
   getEndOfWorkDay,
 } from "/imports/utils/utils";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
-import { SettingsCollection } from "/imports/api/settings";
+import { Settings, SettingsCollection } from "/imports/api/settings";
 import { resetCounter } from "/imports/api/countersMethods";
 import { ProviderCollection } from "/imports/api/provider";
 import { Patient, PatientsCollection } from "/imports/api/patient";
@@ -116,7 +116,7 @@ export const QueueManagement = () => {
     : undefined;
 
   const isSettingsLoading = useSubscribe("settings");
-  const settings = useFind(() => SettingsCollection.find({}))[0];
+  const settings = useFind(() => SettingsCollection.find({}))[0] as Settings;
 
   if (
     isQueueEntryLoading() ||
@@ -181,7 +181,10 @@ export const QueueManagement = () => {
             </div>
 
             {/* Available Doctors Card */}
-            <div className="my-4 cursor-pointer" onClick={() => setProviderAvailabilityModalOpen(true)}>
+            <div
+              className="my-4 cursor-pointer"
+              onClick={() => setProviderAvailabilityModalOpen(true)}
+            >
               <DashboardCard
                 header="Available Providers"
                 body={availableProviders}

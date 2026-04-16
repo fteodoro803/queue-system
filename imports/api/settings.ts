@@ -14,12 +14,30 @@ export interface Settings {
   text_frequency: number; // how often to send text notifications to patients in queue in minutes
   text_message_template: string; // template for text messages, can include placeholders like {patientName}, {positionInQueue}, {estimatedWaitTime}
 
-  //   Queue
+  // Queue
   emergency_option: (typeof EMERGENCY_OPTION)[number]; // how to handle emergency patients in the queue
   accept_queue_after_hours: boolean;
+
+  // Theme
+  theme: string;
 }
 
-export const SettingsCollection = new Mongo.Collection<Settings>("settings");
+export interface Flags {
+  _id: "app_flags";
+
+  ENABLE_TEST_FEATURES: boolean;
+  USE_TEST_DATE: boolean;
+  FREEZE_TIME: boolean; // if true, clock won't update time
+  USE_TIME_MULTIPLIER: boolean; // if true, time will pass faster than real time (for testing long appointments), only works when USE_TEST_DATE is true
+
+  // Test date values in separate fields for admin settings controls
+  TEST_DATE: Date; // in UTC timezone, should be displayed in local timezone in the UI
+  TIME_MULTIPLIER: number; // multiplier for time, only works when USE_TIME_MULTIPLIER is true
+}
+
+export const SettingsCollection = new Mongo.Collection<Settings | Flags>(
+  "settings",
+);
 
 export const DEFAULT_SETTINGS: Omit<Settings, "_id"> = {
   day_started: false,
@@ -30,4 +48,14 @@ export const DEFAULT_SETTINGS: Omit<Settings, "_id"> = {
     "Hi {patientName}, you are currently number {positionInQueue} in the queue. Estimated wait time: {estimatedWaitTime}. Please check-in with the receptionist when you arrive.",
   emergency_option: EMERGENCY_OPTION[0],
   accept_queue_after_hours: false,
+  theme: "default",
+};
+
+export const DEFAULT_FLAGS: Omit<Flags, "_id"> = {
+  ENABLE_TEST_FEATURES: false,
+  USE_TEST_DATE: false,
+  FREEZE_TIME: false,
+  USE_TIME_MULTIPLIER: false,
+  TEST_DATE: new Date(new Date().setHours(9, 0, 0, 0)), // default test date is today at 9am
+  TIME_MULTIPLIER: 1,
 };
