@@ -14,8 +14,10 @@ import { Outlet, useLocation } from "react-router-dom";
 import { NavLinkItem } from "/imports/ui/navigation/NavLinkItem";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { formatDateToLocale } from "/imports/utils/utils";
-import { TEST_SETTINGS } from "/imports/dev/settings";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useFind, useSubscribe } from "meteor/react-meteor-data";
+import { Flags, SettingsCollection } from "/imports/api/settings";
+import { Loading } from "/imports/ui/components/Loading";
 
 export const Sidebar = () => {
   const location = useLocation();
@@ -24,6 +26,18 @@ export const Sidebar = () => {
   const isPatient = location.pathname.startsWith("/patient");
   const now = useDateTime();
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const isSettingsLoading = useSubscribe("settings");
+  const flags = useFind(() =>
+    SettingsCollection.find({ _id: "app_flags" }),
+  )[0] as Flags | undefined;
+
+  if (isSettingsLoading()) return <Loading />;
+
+  if (!flags) {
+    console.log("Flags not found");
+    return <Loading />;
+  }
 
   // Home Screen - don't show dashboard
   if (isHome) return <Outlet />;
@@ -80,7 +94,7 @@ export const Sidebar = () => {
               <p className="text-sm">{`${now.toLocaleDateString()} ${formatDateToLocale(now, true)}`}</p>
             </div>
 
-            {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+            {flags.ENABLE_TEST_FEATURES && (
               <NavLinkItem link="/" label="Home" icon={HomeIcon} />
             )}
 
@@ -95,7 +109,7 @@ export const Sidebar = () => {
                 />
 
                 {/*Appointments Button*/}
-                {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+                {flags.ENABLE_TEST_FEATURES && (
                   <NavLinkItem
                     link="/admin/appointments"
                     label="Appointments"
@@ -111,7 +125,7 @@ export const Sidebar = () => {
                 />
 
                 {/*Patients Button*/}
-                {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+                {flags.ENABLE_TEST_FEATURES && (
                   <NavLinkItem
                     link="/admin/patients"
                     label="Patients"
@@ -134,7 +148,7 @@ export const Sidebar = () => {
                 />
 
                 {/* Test Page Button */}
-                {TEST_SETTINGS.ENABLE_TEST_PAGES && (
+                {flags.ENABLE_TEST_FEATURES && (
                   <NavLinkItem
                     link="/admin/test"
                     label="Test Page"

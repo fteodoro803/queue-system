@@ -1,74 +1,27 @@
 import React from "react";
 
-export const ThemeController = () => {
+export const ThemeController = ({
+  theme,
+  onChange,
+}: {
+  theme: string;
+  onChange?: (value: string) => void;
+}) => {
   return (
     <select
-      className="select select-bordered theme-controller"
+      value={theme}
       onChange={(e) => {
         document.documentElement.setAttribute("data-theme", e.target.value);
+        if (onChange) onChange(e.target.value);
       }}
+      className="select select-bordered theme-controller"
     >
+      {/* Theme Options */}
+      {/* To add more, add them to client/main.css, and a corresponding option here */}
       <option value="default">Default</option>
       <option value="dark">Dark</option>
       <option value="corporate">Corporate</option>
       <option value="pastel">Pastel</option>
     </select>
-
-    // Old dropdown version - replaced with above
-    // <div className="dropdown mb-72">
-    //   <div tabIndex={0} role="button" className="btn m-1">
-    //     Theme
-    //     <svg
-    //       width="12px"
-    //       height="12px"
-    //       className="inline-block h-2 w-2 fill-current opacity-60"
-    //       xmlns="http://www.w3.org/2000/svg"
-    //       viewBox="0 0 2048 2048"
-    //     >
-    //       <path d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"></path>
-    //     </svg>
-    //   </div>
-    //   <ul
-    //     tabIndex={-1}
-    //     className="dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl"
-    //   >
-    //     <li>
-    //       <input
-    //         type="radio"
-    //         name="theme-dropdown"
-    //         className="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
-    //         aria-label="Default"
-    //         value="default"
-    //       />
-    //     </li>
-    //     <li>
-    //       <input
-    //         type="radio"
-    //         name="theme-dropdown"
-    //         className="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
-    //         aria-label="Dark"
-    //         value="dark"
-    //       />
-    //     </li>
-    //     <li>
-    //       <input
-    //         type="radio"
-    //         name="theme-dropdown"
-    //         className="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
-    //         aria-label="Corporate"
-    //         value="corporate"
-    //       />
-    //     </li>
-    //     <li>
-    //       <input
-    //         type="radio"
-    //         name="theme-dropdown"
-    //         className="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
-    //         aria-label="Pastel"
-    //         value="pastel"
-    //       />
-    //     </li>
-    //   </ul>
-    // </div>
   );
 };
