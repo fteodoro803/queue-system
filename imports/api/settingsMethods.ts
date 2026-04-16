@@ -155,7 +155,7 @@ export async function getSettings(): Promise<Settings> {
 }
 
 // ---- Flags Methods ----
-export async function getFlags(): Promise<Flags> {
+export async function getFlags(): Promise<Flags | undefined> {
   return (await SettingsCollection.findOneAsync({ _id: "app_flags" })) as Flags;
 }
 
@@ -191,6 +191,12 @@ export async function setBypassFormValidation(value: boolean) {
 
 export async function setTestDate(date: Date) {
   return Meteor.callAsync("flags.setTestDateDate", date);
+}
+
+export async function getTestDate(): Promise<Date | undefined> {
+  const flags: Flags | undefined = await getFlags();
+  if (!flags?.USE_TEST_DATE) return undefined;
+  return flags?.TEST_DATE;
 }
 
 export async function setMultiplier(multiplier: number) {
