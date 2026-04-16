@@ -17,6 +17,8 @@ import {
   setUseTestDate,
   setUseTimeMultiplier,
   setMultiplier,
+  setStartOfDay,
+  setEndOfDay,
 } from "/imports/api/settingsMethods";
 import { styles } from "/imports/utils/styles";
 
@@ -35,6 +37,8 @@ export const SettingsPage = () => {
   )[0] as Flags | undefined;
   const [acceptAfterHours, setAcceptAfterHours] = useState(false);
   const [theme, setTheme] = useState<string>("default");
+  const [startOfDay, setStartOfDayState] = useState<string>("09:00");
+  const [endOfDay, setEndOfDayState] = useState<string>("17:00");
 
   // What user edits in the form before saving to db
   const [draftFlags, setDraftFlags] =
@@ -44,6 +48,8 @@ export const SettingsPage = () => {
   const [currentSettings, setCurrentSettings] = useState<{
     acceptAfterHours: boolean;
     theme: string;
+    startOfDay: string;
+    endOfDay: string;
     developerFlags: Omit<Flags, "_id">;
   } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -66,11 +72,15 @@ export const SettingsPage = () => {
       const newSettings = {
         acceptAfterHours: settings.accept_queue_after_hours,
         theme: settings.theme,
+        startOfDay: settings.start_of_day,
+        endOfDay: settings.end_of_day,
         developerFlags: dbFlags,
       };
 
       setAcceptAfterHours(newSettings.acceptAfterHours);
       setTheme(newSettings.theme);
+      setStartOfDayState(newSettings.startOfDay);
+      setEndOfDayState(newSettings.endOfDay);
       setDraftFlags(cloneFlags(dbFlags));
       setCurrentSettings(newSettings);
       setSaveError(null);
@@ -80,6 +90,14 @@ export const SettingsPage = () => {
   // Draft-only handlers (no writes until Save).
   const handleAcceptAfterHoursChange = (value: boolean) => {
     setAcceptAfterHours(value);
+  };
+
+  const handleStartOfDayChange = (value: string) => {
+    setStartOfDayState(value);
+  };
+
+  const handleEndOfDayChange = (value: string) => {
+    setEndOfDayState(value);
   };
 
   const handleThemeChange = (value: string) => {
@@ -116,6 +134,8 @@ export const SettingsPage = () => {
     currentSettings != null &&
     (acceptAfterHours !== currentSettings.acceptAfterHours ||
       theme !== currentSettings.theme ||
+      startOfDay !== currentSettings.startOfDay ||
+      endOfDay !== currentSettings.endOfDay ||
       (Object.keys(draftFlags) as Array<keyof Omit<Flags, "_id">>).some(
         (key) =>
           !areFlagValuesEqual(
@@ -125,22 +145,29 @@ export const SettingsPage = () => {
           ),
       ));
 
+  // Time strings are HH:mm, so lexical compare is valid for same-day ordering.
+  const isWorkdayRangeInvalid = startOfDay >= endOfDay;
+
   const handleCancel = () => {
     if (!currentSettings) return;
     setAcceptAfterHours(currentSettings.acceptAfterHours);
     setTheme(currentSettings.theme);
+    setStartOfDayState(currentSettings.startOfDay);
+    setEndOfDayState(currentSettings.endOfDay);
     setDraftFlags(cloneFlags(currentSettings.developerFlags));
     setSaveError(null);
   };
 
   const handleSave = async () => {
-    if (!currentSettings || !hasChanges) return;
+    if (!currentSettings || !hasChanges || isWorkdayRangeInvalid) return;
 
     setIsSaving(true);
     setSaveError(null);
     try {
       await setAcceptQueueAfterHours(acceptAfterHours);
       await setAppTheme(theme);
+      await setStartOfDay(startOfDay);
+      await setEndOfDay(endOfDay);
       await setEnableTestPages(draftFlags.ENABLE_TEST_FEATURES);
       await setUseTestDate(draftFlags.USE_TEST_DATE);
       await setFreezeTime(draftFlags.FREEZE_TIME);
@@ -151,6 +178,8 @@ export const SettingsPage = () => {
       const savedBaseline = {
         acceptAfterHours,
         theme,
+        startOfDay,
+        endOfDay,
         developerFlags: cloneFlags(draftFlags),
       };
       setCurrentSettings(savedBaseline);
@@ -171,6 +200,45 @@ export const SettingsPage = () => {
   return (
     <div className="flex flex-col gap-6 max-w-2xl">
       <h1 className="text-3xl font-bold">Settings</h1>
+
+      {/* General */}
+      <div className={`card bg-base-100 shadow-sm ${styles.outline}`}>
+        <div className="card-body gap-6">
+          <h2 className="card-title text-lg">General</h2>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium mr-2">Start Time</span>
+              </label>
+              <input
+                type="time"
+                value={startOfDay}
+                onChange={(e) => handleStartOfDayChange(e.target.value)}
+                className="input input-bordered w-full"
+              />
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium mr-2">End Time</span>
+              </label>
+              <input
+                type="time"
+                value={endOfDay}
+                onChange={(e) => handleEndOfDayChange(e.target.value)}
+                className="input input-bordered w-full"
+              />
+            </div>
+          </div>
+
+          {isWorkdayRangeInvalid && (
+            <p className="text-sm text-error">
+              Start Time must be earlier than End Time.
+            </p>
+          )}
+        </div>
+      </div>
 
       {/* Notifications */}
       <div className={`card bg-base-100 shadow-sm ${styles.outline}`}>
@@ -393,7 +461,7 @@ export const SettingsPage = () => {
           type="button"
           className="btn btn-primary"
           onClick={handleSave}
-          disabled={!hasChanges || isSaving}
+          disabled={!hasChanges || isSaving || isWorkdayRangeInvalid}
         >
           {isSaving ? "Saving..." : "Save Changes"}
         </button>

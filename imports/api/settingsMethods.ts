@@ -120,9 +120,19 @@ export async function setStartOfDay(start: string) {
   return Meteor.callAsync("settings.setStartOfDay", start);
 }
 
+export async function getStartOfDay(): Promise<string> {
+  const settings = await getSettings();
+  return settings.start_of_day;
+}
+
 export async function setEndOfDay(end: string) {
   if (!isValidTimeStr(end)) return;
   return Meteor.callAsync("settings.setEndOfDay", end);
+}
+
+export async function getEndOfDay(): Promise<string> {
+  const settings = await getSettings();
+  return settings.end_of_day;
 }
 
 export async function setTextFrequency(minutes: number) {
