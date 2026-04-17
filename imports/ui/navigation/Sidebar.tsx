@@ -94,13 +94,13 @@ export const Sidebar = () => {
               <p className="text-sm">{`${now.toLocaleDateString()} ${formatDateToLocale(now, true)}`}</p>
             </div>
 
-            {flags.ENABLE_TEST_FEATURES && (
-              <NavLinkItem link="/" label="Home" icon={HomeIcon} />
-            )}
-
             {/*Admin Sidebar*/}
             {isAdmin && (
               <>
+                {flags.ENABLE_TEST_FEATURES && (
+                  <NavLinkItem link="/" label="Landing Page" icon={HomeIcon} />
+                )}
+
                 {/*Dashboard Button*/}
                 <NavLinkItem
                   link="/admin/dashboard"
