@@ -53,10 +53,9 @@ export const QueueListItem = ({
   const isHighPriority = (service.priority ?? 0) > 1;
 
   // Ready if position is 1 or less than there are available providers
-  const isProviderAvailable: boolean =
-    position && availableProviders && position <= availableProviders
-      ? true
-      : false;
+  const isProviderAvailable: boolean = Boolean(
+    position && availableProviders && position <= availableProviders,
+  );
 
   return (
     <>
