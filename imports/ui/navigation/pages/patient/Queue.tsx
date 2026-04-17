@@ -83,11 +83,13 @@ export const Queue = () => {
         </div>
       </div>
 
-      <ServiceSelector
-        services={services}
-        selectedService={selectedService}
-        setService={setSelectedService}
-      />
+      <div className={"mt-4"}>
+        <ServiceSelector
+          services={services}
+          selectedService={selectedService}
+          setService={setSelectedService}
+        />
+      </div>
 
       {/* Queue Status for each Service */}
       {selectedService ? (

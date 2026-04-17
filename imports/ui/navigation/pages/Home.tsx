@@ -20,7 +20,7 @@ export const Home = () => {
     <div className="mx-auto max-w-3xl px-4 py-10">
       <div className="card bg-base-100 p-6 shadow-md">
         <div className="flex flex-col items-center gap-4 text-center">
-          <h1 className="text-3xl font-bold">Queue Management System Test</h1>
+          <h1 className="text-3xl font-bold">Queue Management System Demo</h1>
 
           <div className="space-y-1 text-sm text-base-content/80">
             <p>
@@ -35,12 +35,14 @@ export const Home = () => {
           </div>
 
           <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-            <Link to="/patient">
+            <Link to="/patient/queue">
               <button className="btn">Patient View</button>
             </Link>
-            <Link to="/service">
-              <button className="btn">Employee View</button>
-            </Link>
+
+            {/*<Link to="/service">*/}
+            {/*  <button className="btn">Employee View</button>*/}
+            {/*</Link>*/}
+
             <Link to="/admin">
               <button className="btn">Admin View</button>
             </Link>
