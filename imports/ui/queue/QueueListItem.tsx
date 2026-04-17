@@ -31,7 +31,7 @@ interface QueueListItemProps {
   admin?: boolean;
 }
 
-const iconSize: string = "size-6";
+const iconSize: string = "size-5";
 const textSize: string = "text-sm";
 
 export const QueueListItem = ({
@@ -68,12 +68,19 @@ export const QueueListItem = ({
         {/* Details Column */}
         <div className="list-col-grow py-1">
           {/* Header */}
-          <div className="card-title">
-            {admin ? patient.name : entry.displayId}
+          <div className="flex items-center justify-between gap-2">
+            <div className="card-title truncate">
+              {admin ? patient.name : entry.displayId}
+            </div>
+            <div
+              className={`badge badge-soft md:hidden ${statusBadgeMap[entry.status]}`}
+            >
+              {entry.status}
+            </div>
           </div>
 
           {/* Body */}
-          <div className="flex items-center gap-4 py-1">
+          <div className="flex flex-wrap items-center sm:gap-1 md:gap-4 py-1">
             {/* ID */}
             {admin && (
               <div className="flex items-center gap-1">
@@ -101,7 +108,7 @@ export const QueueListItem = ({
         <div className="flex items-center gap-4">
           {/* Status */}
           <div
-            className={`badge badge-soft ml-auto ${statusBadgeMap[entry.status]}`}
+            className={`badge badge-soft ml-auto hidden md:inline-flex ${statusBadgeMap[entry.status]}`}
           >
             {entry.status}
           </div>
