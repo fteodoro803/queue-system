@@ -32,6 +32,7 @@ function makeQueueEntry({
     _id: id,
     displayId: `Q-${id}`,
     patientId: `patient-${id}`,
+    providerId: null,
     serviceId,
     position,
     status,

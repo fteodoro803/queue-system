@@ -2,12 +2,14 @@
 import { assert } from "chai";
 import { Meteor } from "meteor/meteor";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
+import { ProviderCollection } from "/imports/api/provider";
 import {
   enqueue,
   startService,
   completeService,
   cancelService,
 } from "/imports/api/queueEntryMethods";
+import { insertProvider, updateProvider } from "/imports/api/providerMethods";
 import { Patient } from "/imports/api/patient";
 import { Service } from "/imports/api/service";
 
@@ -33,11 +35,22 @@ const mockService: Service = {
 const waitTime: number = 5;
 const now: Date = new Date();
 
+async function seedAvailableProviderForMockService(): Promise<string> {
+  const providerId = await insertProvider({
+    name: "Queue Test Provider",
+    services: [{ id: mockService._id, name: mockService.name, enabled: true }],
+  });
+
+  await updateProvider(providerId, { available: true });
+  return providerId;
+}
+
 if (Meteor.isServer) {
   describe("[INTEGRATION] queueEntryMethods", function () {
     // Clean up before each test
     beforeEach(async () => {
       await QueueEntryCollection.removeAsync({});
+      await ProviderCollection.removeAsync({});
     });
 
     // -------------------------
@@ -106,7 +119,8 @@ if (Meteor.isServer) {
     // startService
     // -------------------------
     describe("startService()", function () {
-      it("should set status to in-progress and position to null", async () => {
+      it("should set status to in-progress, clear position, and assign an available provider", async () => {
+        const providerId = await seedAvailableProviderForMockService();
         const id = await enqueue(
           {
             patient: mockPatient,
@@ -118,12 +132,16 @@ if (Meteor.isServer) {
         await startService(id, now);
 
         const entry = await QueueEntryCollection.findOneAsync(id);
+        const provider = await ProviderCollection.findOneAsync(providerId);
         assert.equal(entry?.status, "in-progress");
         assert.isNull(entry?.position);
         assert.exists(entry?.start);
+        assert.equal(entry?.providerId, providerId);
+        assert.equal(provider?.available, false);
       });
 
       it("should shift the next entry to position 1", async () => {
+        await seedAvailableProviderForMockService();
         const id1 = await enqueue(
           {
             patient: mockPatient,
@@ -161,7 +179,8 @@ if (Meteor.isServer) {
     // completeService
     // -------------------------
     describe("completeService()", function () {
-      it("should set status to completed and clear position", async () => {
+      it("should set status to completed, keep position null, and make the provider available again", async () => {
+        const providerId = await seedAvailableProviderForMockService();
         const id = await enqueue(
           {
             patient: mockPatient,
@@ -174,12 +193,16 @@ if (Meteor.isServer) {
         await completeService(id, now);
 
         const entry = await QueueEntryCollection.findOneAsync(id);
+        const provider = await ProviderCollection.findOneAsync(providerId);
         assert.equal(entry?.status, "completed");
         assert.isNull(entry?.position);
         assert.exists(entry?.end);
+        assert.equal(entry?.providerId, providerId);
+        assert.equal(provider?.available, true);
       });
 
       it("should throw if entry is cancelled or completed", async () => {
+        await seedAvailableProviderForMockService();
         const id = await enqueue(
           {
             patient: mockPatient,
