@@ -9,8 +9,10 @@ import {
 } from "/imports/api/settings";
 import { Loading } from "/imports/ui/components/Loading";
 import {
+  clearQueueEntries,
   setAcceptQueueAfterHours,
   setAppTheme,
+  seedDemoData,
   setEnableTestPages,
   setFreezeTime,
   setTestDate,
@@ -54,6 +56,8 @@ export const SettingsPage = () => {
   } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSeeding, setIsSeeding] = useState(false);
+  const [isClearingQueue, setIsClearingQueue] = useState(false);
 
   // Fill settings from db
   useEffect(() => {
@@ -188,6 +192,28 @@ export const SettingsPage = () => {
       setSaveError(error instanceof Error ? error.message : "Failed to save");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSeedDemoData = async () => {
+    setIsSeeding(true);
+    try {
+      await seedDemoData();
+    } catch {
+      // Intentionally silent: no visible feedback for dev utility action.
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
+  const handleClearQueueEntries = async () => {
+    setIsClearingQueue(true);
+    try {
+      await clearQueueEntries();
+    } catch {
+      // Intentionally silent: no visible feedback for dev utility action.
+    } finally {
+      setIsClearingQueue(false);
     }
   };
 
@@ -445,7 +471,44 @@ export const SettingsPage = () => {
               />
             </div>
           </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="font-medium">Force Reseed Demo Data</p>
+              <p className="text-xs opacity-60">
+                Clears existing demo/business data and inserts fresh demo
+                services, providers, patients, and queue entries.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-warning btn-sm"
+              onClick={handleSeedDemoData}
+              disabled={isSeeding}
+            >
+              {isSeeding ? "Reseeding..." : "Force Reseed"}
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="font-medium">Clear Queue Entries</p>
+              <p className="text-xs opacity-60">
+                Deletes all current queue entries without touching services,
+                providers, or patients.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-error btn-sm"
+              onClick={handleClearQueueEntries}
+              disabled={isClearingQueue}
+            >
+              {isClearingQueue ? "Clearing..." : "Clear Queue"}
+            </button>
+          </div>
         </div>
+
       </div>
 
       <div className="flex justify-end gap-2">

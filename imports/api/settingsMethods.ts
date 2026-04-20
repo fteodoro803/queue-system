@@ -7,6 +7,7 @@ import {
   Flags,
 } from "/imports/api/settings";
 import { isValidTimeStr } from "/imports/utils/utils";
+import { QueueEntryCollection } from "/imports/api/queueEntry";
 
 type FlagKey = keyof Omit<Flags, "_id">;
 type BooleanFlagKey = Exclude<
@@ -109,6 +110,21 @@ Meteor.methods({
   },
 });
 
+if (Meteor.isServer) {
+  Meteor.methods({
+    async "dev.seedDemoData"() {
+      const { forceReseedDemoData } = await import("/server/demoSeed");
+      await forceReseedDemoData();
+      return true;
+    },
+
+    async "dev.clearQueueEntries"() {
+      await QueueEntryCollection.removeAsync({});
+      return true;
+    },
+  });
+}
+
 // ---- Settings Methods ----
 export async function setDayStarted(started: boolean) {
   return Meteor.callAsync("settings.setDayStarted", started);
@@ -208,3 +224,12 @@ export async function setMultiplier(multiplier: number) {
   if (!Number.isFinite(multiplier) || multiplier <= 0) return;
   return Meteor.callAsync("flags.setMultiplier", multiplier);
 }
+
+export async function seedDemoData() {
+  return Meteor.callAsync("dev.seedDemoData") as Promise<boolean>;
+}
+
+export async function clearQueueEntries() {
+  return Meteor.callAsync("dev.clearQueueEntries") as Promise<boolean>;
+}
+
