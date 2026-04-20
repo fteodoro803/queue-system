@@ -240,12 +240,14 @@ const ActionButtons = ({
         </button>
       )}
       {/* Cancel Button */}
-      <button
-        className="btn btn-square btn-ghost"
-        onClick={() => setOpenCancelModal(true)}
-      >
-        <XMarkIcon className="w-6" />
-      </button>
+      {status !== "in-progress" && (
+        <button
+          className="btn btn-square btn-ghost"
+          onClick={() => setOpenCancelModal(true)}
+        >
+          <XMarkIcon className="w-6" />
+        </button>
+      )}
     </div>
   );
 };
