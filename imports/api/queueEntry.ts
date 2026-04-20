@@ -14,6 +14,7 @@ export interface QueueEntry {
   displayId: string; // Unique ID for display purposes (e.g., "AB12")
   patientId: string;
   serviceId: string;
+  providerId: string | null; // optional, assigned when provider starts serving the patient
 
   position: number | null;
   status: QueueStatus;

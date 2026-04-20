@@ -8,6 +8,10 @@ import { Patient } from "/imports/api/patient";
 import { Service } from "/imports/api/service";
 import { updateServiceAnalytics } from "/imports/api/serviceMethods";
 import { CountersCollection } from "/imports/api/counters";
+import {
+  selectProvider,
+  setProviderAvailability,
+} from "/imports/api/providerMethods";
 
 export interface QueueEntryData {
   patient: Patient;
@@ -50,6 +54,7 @@ Meteor.methods({
       displayId: displayId,
       patientId: data.patient._id,
       serviceId: data.service._id,
+      providerId: null,
       position: newPosition,
       status: "waiting",
       initialEstimatedWaitTime: estimatedWaitTime ?? null,
@@ -80,7 +85,6 @@ Meteor.methods({
       $set: {
         status: reason === "completed" ? "completed" : "cancelled",
         position: null,
-        end: reason === "completed" ? time : null,
       },
     });
 
@@ -131,6 +135,46 @@ Meteor.methods({
 
     // 2. Update positions of entries behind the dequeued entry
     await updatePositions(entry);
+
+    // 3. Select provider and mark them as unavailable
+    const providerId = await selectProvider(entry.serviceId);
+    if (providerId) {
+      await setProviderAvailability(providerId, false);
+      await QueueEntryCollection.updateAsync(id, {
+        $set: { providerId },
+      });
+    }
+  },
+
+  // Completes a Service
+  async "queueEntry.completeService"(id: string, time: Date) {
+    const entry: QueueEntry | undefined =
+      await QueueEntryCollection.findOneAsync(id);
+    if (!entry) {
+      throw new Meteor.Error("Queue entry not found");
+    }
+
+    // Only entries that are in the queue (position > 0) can be started
+    if (entry.position !== null) {
+      throw new Meteor.Error("Invalid queue entry position");
+    }
+
+    // 1. Update the status of the entry
+    await QueueEntryCollection.updateAsync(id, {
+      $set: {
+        status: "completed",
+        end: time,
+      },
+    });
+
+    // 2. Select provider and mark them as available
+    const providerId = entry.providerId;
+    if (providerId) {
+      await setProviderAvailability(providerId, true);
+    }
+
+    // 3. Dequeue the entry
+    await dequeue(id, "completed", time);
   },
 });
 
@@ -140,12 +184,15 @@ export async function enqueue(
   estimatedWaitTime: number | undefined,
   time: Date,
 ): Promise<string> {
-  return await Meteor.callAsync(
-    "queueEntry.enqueue",
-    data,
-    estimatedWaitTime,
-    time,
-  );
+  return Meteor.callAsync("queueEntry.enqueue", data, estimatedWaitTime, time);
+}
+
+async function dequeue(
+  id: string,
+  reason: DequeueReason,
+  time: Date,
+): Promise<void> {
+  await Meteor.callAsync("queueEntry.dequeue", id, reason, time);
 }
 
 // Checks-in a Patient, and marks them as Ready
@@ -160,12 +207,12 @@ export async function startService(id: string, time: Date): Promise<void> {
 
 // Completes a service for a queue entry and removes it from the queue
 export async function completeService(id: string, time: Date): Promise<void> {
-  await Meteor.callAsync("queueEntry.dequeue", id, "completed", time);
+  await Meteor.callAsync("queueEntry.completeService", id, time);
 }
 
 // Cancels a queue entry
 export async function cancelService(id: string, time: Date): Promise<void> {
-  await Meteor.callAsync("queueEntry.dequeue", id, "cancelled", time);
+  await dequeue(id, "cancelled", time);
 }
 
 // Updates positions of next queue entries for a service

@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MakeQueueEntryModal } from "/imports/ui/queue/MakeQueueEntryModal";
 import { ProviderAvailabilityModal } from "/imports/ui/provider/ProviderAvailabilityModal";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "/imports/ui/components/Loading";
-import { QueueEntryCollection } from "/imports/api/queueEntry";
+import { QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
 import { QueueList } from "/imports/ui/queue/QueueList";
 import { Service, ServicesCollection } from "/imports/api/service";
 import { DashboardCard } from "/imports/ui/components/DashboardCard";
@@ -28,8 +28,17 @@ import { ServiceSelector } from "/imports/ui/components/ServiceSelector";
 export const QueueManagement = () => {
   const now = useDateTime();
   const isQueueEntryLoading = useSubscribe("queue");
-  const queueEntries = useFind(() =>
-    QueueEntryCollection.find({}, { sort: { serviceId: 1, position: 1 } }),
+  const presentQueueEntries: QueueEntry[] = useFind(() =>
+    QueueEntryCollection.find(
+      { status: { $in: ["in-progress", "waiting", "ready"] } },
+      { sort: { serviceId: 1, position: 1 } },
+    ),
+  );
+  const pastQueueEntries: QueueEntry[] = useFind(() =>
+    QueueEntryCollection.find(
+      { status: { $in: ["completed", "cancelled"] } },
+      { sort: { serviceId: 1, position: 1 } },
+    ),
   );
 
   const isServicesLoading = useSubscribe("services");
@@ -78,25 +87,22 @@ export const QueueManagement = () => {
     );
   }, [selectedService]);
 
-  const [ongoing] = useMemo(() => {
-    const ongoing = queueEntries.filter(
-      (entry) => entry.status === "in-progress",
-    );
-    return [ongoing];
-  }, [queueEntries]);
-
   // TODO: Currently doesnt account for specific services, this is just assuming 1 service
   const totalProviders = providers.filter((p) =>
     p.services.some((s) => s.id === selectedService?._id && s.enabled),
   ).length;
-  const unavailableProviders = ongoing?.length;
+  const unavailableProviders = providers.filter((p) =>
+    p.services.some(
+      (s) => s.id === selectedService?._id && s.enabled && !p.available,
+    ),
+  ).length;
   const availableProviders = totalProviders - unavailableProviders;
 
   const maxQueueLength: QueueTimeResult | undefined = selectedService
     ? calculateQueueTime({
         activeProviders: totalProviders,
         currentTime: now,
-        queue: queueEntries,
+        queue: presentQueueEntries,
         service: selectedService,
       })
     : undefined;
@@ -160,8 +166,11 @@ export const QueueManagement = () => {
             <div className="my-4">
               <DashboardCard
                 header="In Queue"
-                body={queueEntries.filter((q) => q.status === "waiting").length}
-                footer={`Completed: ${queueEntries.filter((q) => q.status === "completed").length}`}
+                body={
+                  presentQueueEntries.filter((q) => q.status === "waiting")
+                    .length
+                }
+                footer={`Completed: ${presentQueueEntries.filter((q) => q.status === "completed").length}`}
                 icon={NumberedListIcon}
               />
             </div>
@@ -228,7 +237,7 @@ export const QueueManagement = () => {
                 <div key={selectedService._id} className="mb-6">
                   <h2 className="text-2xl font-bold">Ongoing</h2>
                   <QueueList
-                    queue={queueEntries}
+                    queue={presentQueueEntries}
                     service={selectedService}
                     activeProviders={totalProviders}
                     states={["in-progress"]}
@@ -242,7 +251,7 @@ export const QueueManagement = () => {
                 <div key={selectedService._id} className="mb-6">
                   <h2 className="text-2xl font-bold">Waiting</h2>
                   <QueueList
-                    queue={queueEntries}
+                    queue={presentQueueEntries}
                     service={selectedService}
                     availableProviders={availableProviders}
                     states={["waiting", "ready"]}
@@ -275,7 +284,7 @@ export const QueueManagement = () => {
                   <h2 className="text-2xl font-bold">Finished</h2>
                   <QueueList
                     availableProviders={availableProviders}
-                    queue={queueEntries}
+                    queue={pastQueueEntries}
                     service={selectedService}
                     states={["completed"]}
                     activeProviders={totalProviders}
@@ -307,7 +316,7 @@ export const QueueManagement = () => {
                   <h2 className="text-2xl font-bold">Cancelled</h2>
                   <QueueList
                     availableProviders={availableProviders}
-                    queue={queueEntries}
+                    queue={pastQueueEntries}
                     service={selectedService}
                     states={["cancelled"]}
                     activeProviders={totalProviders}
