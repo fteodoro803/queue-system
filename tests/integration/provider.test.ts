@@ -1,7 +1,11 @@
 import { assert } from "chai";
 import { Meteor } from "meteor/meteor";
 import { ProviderCollection } from "/imports/api/provider";
-import { insertProvider, updateProvider } from "/imports/api/providerMethods";
+import {
+  insertProvider,
+  selectProvider,
+  updateProvider,
+} from "/imports/api/providerMethods";
 
 if (Meteor.isServer) {
   describe("[INTEGRATION] providerMethods", function () {
@@ -40,6 +44,72 @@ if (Meteor.isServer) {
           assert.instanceOf(e, Meteor.Error);
           assert.equal((e as Meteor.Error).error, "not-found");
         }
+      });
+    });
+
+    describe("selectProvider()", function () {
+      it("returns undefined when no eligible providers match", async () => {
+        await insertProvider({
+          name: "Unavailable Provider",
+          available: false,
+          services: [{ id: "svc-1", name: "General", enabled: true }],
+        });
+
+        await insertProvider({
+          name: "Wrong Service Provider",
+          available: true,
+          services: [{ id: "svc-2", name: "Dental", enabled: true }],
+        });
+
+        await insertProvider({
+          name: "Disabled Service Provider",
+          available: true,
+          services: [{ id: "svc-1", name: "General", enabled: false }],
+        });
+
+        const providerId = await selectProvider("svc-1");
+        assert.isUndefined(providerId);
+      });
+
+      it("returns the only eligible provider id", async () => {
+        const eligibleId = await insertProvider({
+          name: "Eligible Provider",
+          services: [{ id: "svc-1", name: "General", enabled: true }],
+        });
+        await updateProvider(eligibleId, { available: true });
+
+        const ineligibleId = await insertProvider({
+          name: "Ineligible Provider",
+          services: [{ id: "svc-1", name: "General", enabled: false }],
+        });
+        await updateProvider(ineligibleId, { available: true });
+
+        const providerId = await selectProvider("svc-1");
+        assert.equal(providerId, eligibleId);
+      });
+
+      it("returns one of eligible provider ids when multiple match", async () => {
+        const eligibleIdOne = await insertProvider({
+          name: "Eligible One",
+          services: [{ id: "svc-1", name: "General", enabled: true }],
+        });
+        const eligibleIdTwo = await insertProvider({
+          name: "Eligible Two",
+          services: [{ id: "svc-1", name: "General", enabled: true }],
+        });
+        await updateProvider(eligibleIdOne, { available: true });
+        await updateProvider(eligibleIdTwo, { available: true });
+
+        const unavailableId = await insertProvider({
+          name: "Unavailable",
+          services: [{ id: "svc-1", name: "General", enabled: true }],
+        });
+        await updateProvider(unavailableId, { available: false });
+
+        const providerId = await selectProvider("svc-1");
+        assert.isDefined(providerId);
+        assert.include([eligibleIdOne, eligibleIdTwo], providerId as string);
+        assert.notEqual(providerId, unavailableId);
       });
     });
   });

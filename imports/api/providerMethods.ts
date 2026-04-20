@@ -197,6 +197,6 @@ export async function selectProvider(
     return undefined; // No available providers for the service
   }
 
-  const providerId = docs[0]._id;
+  const providerId = docs[0]._id.toString();
   return providerId;
 }
