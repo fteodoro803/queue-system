@@ -78,20 +78,11 @@ export const QueueManagement = () => {
     );
   }, [selectedService]);
 
-  const [ongoing, waiting, cancelled, finished] = useMemo(() => {
+  const [ongoing] = useMemo(() => {
     const ongoing = queueEntries.filter(
       (entry) => entry.status === "in-progress",
     );
-    const waiting = queueEntries.filter(
-      (entry) => entry.status === "waiting" || entry.status === "ready",
-    );
-    const cancelled = queueEntries.filter(
-      (entry) => entry.status === "cancelled",
-    );
-    const finished = queueEntries.filter(
-      (entry) => entry.status === "completed",
-    );
-    return [ongoing, waiting, cancelled, finished];
+    return [ongoing];
   }, [queueEntries]);
 
   // TODO: Currently doesnt account for specific services, this is just assuming 1 service
@@ -237,9 +228,10 @@ export const QueueManagement = () => {
                 <div key={selectedService._id} className="mb-6">
                   <h2 className="text-2xl font-bold">Ongoing</h2>
                   <QueueList
-                    queue={ongoing}
+                    queue={queueEntries}
                     service={selectedService}
                     activeProviders={totalProviders}
+                    states={["in-progress"]}
                     patientMap={patientMap}
                     adminView={true}
                   />
@@ -250,9 +242,10 @@ export const QueueManagement = () => {
                 <div key={selectedService._id} className="mb-6">
                   <h2 className="text-2xl font-bold">Waiting</h2>
                   <QueueList
-                    availableProviders={availableProviders}
-                    queue={waiting}
+                    queue={queueEntries}
                     service={selectedService}
+                    availableProviders={availableProviders}
+                    states={["waiting", "ready"]}
                     activeProviders={totalProviders}
                     patientMap={patientMap}
                     adminView={true}
@@ -282,8 +275,9 @@ export const QueueManagement = () => {
                   <h2 className="text-2xl font-bold">Finished</h2>
                   <QueueList
                     availableProviders={availableProviders}
-                    queue={finished}
+                    queue={queueEntries}
                     service={selectedService}
+                    states={["completed"]}
                     activeProviders={totalProviders}
                     patientMap={patientMap}
                     adminView={true}
@@ -313,8 +307,9 @@ export const QueueManagement = () => {
                   <h2 className="text-2xl font-bold">Cancelled</h2>
                   <QueueList
                     availableProviders={availableProviders}
-                    queue={cancelled}
+                    queue={queueEntries}
                     service={selectedService}
+                    states={["cancelled"]}
                     activeProviders={totalProviders}
                     patientMap={patientMap}
                     adminView={true}
