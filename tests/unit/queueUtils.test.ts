@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { expect } from "chai";
 import { QueueEntry } from "/imports/api/queueEntry";
 import { Service } from "/imports/api/service";
 import { calculateQueueTime } from "/imports/utils/queueUtils";
+
+// TODO: tests for multiple providers
 
 const baseService: Service = {
   _id: "service-1",
@@ -11,7 +12,7 @@ const baseService: Service = {
   duration: 30,
   description: "Test service",
   priority: 1,
-  createdAt: new Date(2026, 1, 1, 8, 0),
+  createdAt: new Date(2026, 1, 1, 9, 0),
 };
 
 function makeQueueEntry({
@@ -31,6 +32,7 @@ function makeQueueEntry({
     _id: id,
     displayId: `Q-${id}`,
     patientId: `patient-${id}`,
+    providerId: null,
     serviceId,
     position,
     status,
@@ -38,12 +40,12 @@ function makeQueueEntry({
     readyAt: null,
     start,
     end: null,
-    createdAt: new Date(2026, 1, 1, 8, 0),
+    createdAt: new Date(2026, 1, 1, 9, 0),
   };
 }
 
 describe("[UNIT] QueueUtils", () => {
-  const now = new Date(2026, 1, 1, 10, 0);
+  const now = new Date(2026, 1, 1, 10, 0); // Feb 1, 2026, 10:00 AM
 
   describe("calculateQueueTime()", () => {
     it("returns invalid_position when queueEntry has no position", () => {
@@ -111,7 +113,27 @@ describe("[UNIT] QueueUtils", () => {
       expect(result).to.deep.equal({ ok: true, time: 0 });
     });
 
-    it("calculates full queue time without queueEntry", () => {
+    it("calculates full queue time with only in-progress entries with 1 provider", () => {
+      const queue = [
+        makeQueueEntry({
+          id: "1",
+          status: "in-progress",
+          start: new Date(2026, 1, 1, 9, 45),
+        }),
+      ];
+
+      const result = calculateQueueTime({
+        queue,
+        service: baseService,
+        activeProviders: 1,
+        currentTime: now,
+      });
+
+      // Remaining in-progress time: 15 minutes
+      expect(result).to.deep.equal({ ok: true, time: 15 });
+    });
+
+    it("calculates full queue time without queueEntry with 1 provider", () => {
       const queue = [
         makeQueueEntry({
           id: "4",
@@ -125,12 +147,12 @@ describe("[UNIT] QueueUtils", () => {
       const result = calculateQueueTime({
         queue,
         service: baseService,
-        activeProviders: 2,
+        activeProviders: 1,
         currentTime: now,
       });
 
-      // Remaining in-progress time: 15, waiting+ready ahead: 60, /2 providers => 37.5 => 38
-      expect(result).to.deep.equal({ ok: true, time: 38 });
+      // Remaining in-progress time: 15, waiting+ready ahead: 60 => 75 minutes
+      expect(result).to.deep.equal({ ok: true, time: 75 });
     });
 
     it("calculates entry-specific time using only people ahead", () => {

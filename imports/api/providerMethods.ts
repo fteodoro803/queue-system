@@ -7,6 +7,7 @@ export interface ProviderData {
   email?: string;
   number?: string;
   avatar?: string;
+  available?: boolean;
   services?: ProviderService[];
 }
 
@@ -39,6 +40,7 @@ Meteor.methods({
     if (data.email !== undefined) updates.email = data.email?.trim() ?? null;
     if (data.number !== undefined) updates.number = data.number?.trim() ?? null;
     if (data.avatar !== undefined) updates.avatar = data.avatar?.trim() ?? null;
+    if (data.available !== undefined) updates.available = data.available;
     if (data.services !== undefined) updates.services = data.services;
 
     // Update the provider document with the specified fields
@@ -158,4 +160,43 @@ export async function updateProviderService(
  */
 export async function toggleProviderAvailability(id: string): Promise<number> {
   return Meteor.callAsync("provider.toggleAvailability", id);
+}
+
+export async function setProviderAvailability(
+  id: string,
+  available: boolean,
+): Promise<number> {
+  return await updateProvider(id, { available });
+}
+
+export async function selectProvider(
+  serviceId: string,
+): Promise<string | undefined> {
+  const collection = ProviderCollection.rawCollection();
+  const docs = await collection
+    .aggregate([
+      // 1. Match providers that are available and offer the specified service
+      {
+        $match: {
+          available: true,
+          services: {
+            $elemMatch: {
+              id: serviceId,
+              enabled: true,
+            },
+          },
+        },
+      },
+
+      // 2. Randomly select one provider
+      { $sample: { size: 1 } },
+    ])
+    .toArray();
+
+  if (docs.length === 0) {
+    return undefined; // No available providers for the service
+  }
+
+  const providerId = docs[0]._id.toString();
+  return providerId;
 }

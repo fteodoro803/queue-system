@@ -99,6 +99,7 @@ export const Queue = () => {
             service={selectedService}
             activeProviders={totalProviders}
             patientMap={patientMap}
+            states={["in-progress", "waiting", "ready"]}
             adminView={false}
           />
         </div>

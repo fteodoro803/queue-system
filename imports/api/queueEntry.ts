@@ -7,15 +7,17 @@ export const QUEUE_STATES = [
   "completed",
   "cancelled",
 ] as const;
+export type QueueStatus = (typeof QUEUE_STATES)[number];
 
 export interface QueueEntry {
   _id: string;
   displayId: string; // Unique ID for display purposes (e.g., "AB12")
   patientId: string;
   serviceId: string;
+  providerId: string | null; // assigned when provider starts serving the patient
 
   position: number | null;
-  status: (typeof QUEUE_STATES)[number];
+  status: QueueStatus;
   initialEstimatedWaitTime: number | null; // in minutes, set when patient is added to queue
   readyAt: Date | null;
   start: Date | null;

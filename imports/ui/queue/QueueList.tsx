@@ -1,5 +1,5 @@
 import React from "react";
-import { QueueEntry } from "/imports/api/queueEntry";
+import { QueueEntry, QueueStatus } from "/imports/api/queueEntry";
 import { QueueListItem } from "./QueueListItem";
 import { Service } from "/imports/api/service";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
@@ -9,6 +9,7 @@ import { Patient } from "/imports/api/patient";
 export const QueueList = ({
   queue,
   service,
+  states,
   activeProviders,
   patientMap,
   adminView,
@@ -16,6 +17,7 @@ export const QueueList = ({
 }: {
   queue: QueueEntry[];
   service: Service;
+  states: QueueStatus[];
   activeProviders: number;
   patientMap: Map<string, Patient>;
   adminView?: boolean;
@@ -48,6 +50,9 @@ export const QueueList = ({
             activeProviders: activeProviders,
             currentTime: now,
           });
+
+          const hasCorrectStatus = states.includes(entry.status);
+          if (!hasCorrectStatus) return null;
 
           return (
             <QueueListItem

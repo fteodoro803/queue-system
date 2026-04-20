@@ -1,23 +1,18 @@
 import { Meteor } from "meteor/meteor";
-import {
-  QUEUE_STATES,
-  QueueEntry,
-  QueueEntryCollection,
-} from "/imports/api/queueEntry";
+import { QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
 import { Patient } from "/imports/api/patient";
 import { Service } from "/imports/api/service";
 import { updateServiceAnalytics } from "/imports/api/serviceMethods";
 import { CountersCollection } from "/imports/api/counters";
+import {
+  selectProvider,
+  setProviderAvailability,
+} from "/imports/api/providerMethods";
 
 export interface QueueEntryData {
   patient: Patient;
   service: Service;
 }
-
-type DequeueReason = Extract<
-  (typeof QUEUE_STATES)[number],
-  "cancelled" | "completed"
->;
 
 // Client-Called methods
 Meteor.methods({
@@ -50,6 +45,7 @@ Meteor.methods({
       displayId: displayId,
       patientId: data.patient._id,
       serviceId: data.service._id,
+      providerId: null,
       position: newPosition,
       status: "waiting",
       initialEstimatedWaitTime: estimatedWaitTime ?? null,
@@ -58,43 +54,6 @@ Meteor.methods({
       end: null, // End time will be set after the service is completed
       createdAt: time,
     });
-  },
-
-  // Removes queue entry from the database and updates positions of remaining entries
-  async "queueEntry.dequeue"(id: string, reason: DequeueReason, time: Date) {
-    const entry: QueueEntry | undefined =
-      await QueueEntryCollection.findOneAsync(id);
-    if (!entry) {
-      throw new Meteor.Error("Queue entry not found");
-    }
-
-    if (entry.status === "cancelled" || entry.status === "completed") {
-      throw new Meteor.Error(
-        "Invalid queue entry status",
-        "Cannot complete/cancel what is already completed/cancelled",
-      );
-    }
-
-    // 1. Update the status of the entry
-    await QueueEntryCollection.updateAsync(id, {
-      $set: {
-        status: reason === "completed" ? "completed" : "cancelled",
-        position: null,
-        end: reason === "completed" ? time : null,
-      },
-    });
-
-    // 2. Update positions of entries behind the dequeued entry
-    await updatePositions(entry);
-
-    // 3. Update Service Analytics if completed
-    if (reason === "completed" && entry.start) {
-      const startTime: Date = entry.start;
-      const endTime: Date = time;
-      const duration: number =
-        (endTime.getTime() - startTime.getTime()) / 60000; // duration in minutes
-      await updateServiceAnalytics(entry.serviceId, duration);
-    }
   },
 
   // Check in
@@ -131,6 +90,72 @@ Meteor.methods({
 
     // 2. Update positions of entries behind the dequeued entry
     await updatePositions(entry);
+
+    // 3. Select provider and mark them as unavailable
+    const providerId = await selectProvider(entry.serviceId);
+    if (providerId) {
+      await setProviderAvailability(providerId, false);
+      await QueueEntryCollection.updateAsync(id, {
+        $set: { providerId },
+      });
+    }
+  },
+
+  // Completes a Service
+  async "queueEntry.completeService"(id: string, time: Date) {
+    const entry: QueueEntry | undefined =
+      await QueueEntryCollection.findOneAsync(id);
+    if (!entry) {
+      throw new Meteor.Error("Queue entry not found");
+    }
+
+    // Only entries that are in-progress can be completed
+    if (!entry.start || entry.status !== "in-progress") {
+      throw new Meteor.Error(
+        "Cannot complete a service that  has not been started/is not in-progress",
+      );
+    }
+
+    // 1. Update the status of the entry
+    await QueueEntryCollection.updateAsync(id, {
+      $set: {
+        status: "completed",
+        end: time,
+      },
+    });
+
+    // 2. Select provider and mark them as available
+    const providerId = entry.providerId;
+    if (providerId) {
+      await setProviderAvailability(providerId, true);
+    }
+
+    // 3. Update Service Analytics
+    const startTime: Date = entry.start;
+    const endTime: Date = time;
+    const duration: number = (endTime.getTime() - startTime.getTime()) / 60000; // duration in minutes
+    await updateServiceAnalytics(entry.serviceId, duration);
+  },
+
+  // Cancels a Service
+  async "queueEntry.cancelService"(id: string, time: Date) {
+    const entry: QueueEntry | undefined =
+      await QueueEntryCollection.findOneAsync(id);
+    if (!entry) {
+      throw new Meteor.Error("Queue entry not found");
+    }
+
+    // 1. Update the status of the entry
+    await QueueEntryCollection.updateAsync(id, {
+      $set: {
+        status: "cancelled",
+        position: null, // Set position to null to indicate it's being served
+        end: time,
+      },
+    });
+
+    // 2. Update positions of entries behind the dequeued entry
+    await updatePositions(entry);
   },
 });
 
@@ -140,12 +165,7 @@ export async function enqueue(
   estimatedWaitTime: number | undefined,
   time: Date,
 ): Promise<string> {
-  return await Meteor.callAsync(
-    "queueEntry.enqueue",
-    data,
-    estimatedWaitTime,
-    time,
-  );
+  return Meteor.callAsync("queueEntry.enqueue", data, estimatedWaitTime, time);
 }
 
 // Checks-in a Patient, and marks them as Ready
@@ -160,15 +180,15 @@ export async function startService(id: string, time: Date): Promise<void> {
 
 // Completes a service for a queue entry and removes it from the queue
 export async function completeService(id: string, time: Date): Promise<void> {
-  await Meteor.callAsync("queueEntry.dequeue", id, "completed", time);
+  await Meteor.callAsync("queueEntry.completeService", id, time);
 }
 
 // Cancels a queue entry
 export async function cancelService(id: string, time: Date): Promise<void> {
-  await Meteor.callAsync("queueEntry.dequeue", id, "cancelled", time);
+  await Meteor.callAsync("queueEntry.cancelService", id, time);
 }
 
-// Updates positions of next queue entries for a service
+/** Helper function to update positions of queue entries behind a given entry */
 async function updatePositions(entry: QueueEntry): Promise<void> {
   // If the entry is not in the queue, no need to update positions
   if (entry.position === null || entry.position <= 0) return;
