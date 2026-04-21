@@ -5,6 +5,7 @@ import { Service } from "/imports/api/service";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { calculateQueueTime } from "/imports/utils/queueUtils";
 import { Patient } from "/imports/api/patient";
+import { Stats } from "/imports/api/stats";
 
 export const QueueList = ({
   queue,
@@ -14,6 +15,7 @@ export const QueueList = ({
   patientMap,
   adminView,
   availableProviders,
+  stats,
 }: {
   queue: QueueEntry[];
   service: Service;
@@ -22,6 +24,7 @@ export const QueueList = ({
   patientMap: Map<string, Patient>;
   adminView?: boolean;
   availableProviders?: number;
+  stats?: Stats;
 }) => {
   const now = useDateTime();
 
@@ -49,6 +52,7 @@ export const QueueList = ({
             service: service,
             activeProviders: activeProviders,
             currentTime: now,
+            stats: stats,
           });
 
           const hasCorrectStatus = states.includes(entry.status);
