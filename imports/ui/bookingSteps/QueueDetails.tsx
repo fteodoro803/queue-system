@@ -14,6 +14,8 @@ import { Provider, ProviderCollection } from "/imports/api/provider";
 import { Loading } from "../components/Loading";
 import { enqueue, QueueEntryData } from "/imports/api/queueEntryMethods";
 import { Service } from "/imports/api/service";
+import { getStatsQuery } from "/imports/api/statsMethods";
+import { Stats } from "/imports/api/stats";
 
 // Parent — only handles loading
 export const QueueDetails = ({
@@ -23,14 +25,21 @@ export const QueueDetails = ({
   entryData: QueueEntryData | undefined;
   setOpen: (value: boolean) => void;
 }) => {
+  const now = useDateTime();
   const isProvidersLoading = useSubscribe("providers");
   const providers = useFind(() => ProviderCollection.find({}));
   const isQueueLoading = useSubscribe("queue");
   const queue = useFind(() =>
     QueueEntryCollection.find({ serviceId: entryData?.service?._id }),
   );
+  const isStatsLoading = useSubscribe("stats");
+  const stats = useFind(
+    () => (entryData ? getStatsQuery(entryData.service._id, now) : undefined),
+    [entryData?.service._id],
+  );
 
-  if (isProvidersLoading() || isQueueLoading()) return <Loading />;
+  if (isProvidersLoading() || isQueueLoading() || isStatsLoading())
+    return <Loading />;
 
   return (
     <QueueDetailsContent
@@ -38,6 +47,7 @@ export const QueueDetails = ({
       setOpen={setOpen}
       providers={providers}
       queue={queue}
+      stats={stats ?? undefined}
     />
   );
 };
@@ -48,11 +58,13 @@ const QueueDetailsContent = ({
   setOpen,
   providers,
   queue,
+  stats,
 }: {
   entryData: QueueEntryData | undefined;
   setOpen: (value: boolean) => void;
   providers: Provider[];
   queue: QueueEntry[];
+  stats?: Stats[] | undefined;
 }) => {
   const now = useDateTime();
 
@@ -76,6 +88,7 @@ const QueueDetailsContent = ({
           service: entryData.service,
           activeProviders,
           currentTime: now,
+          stats: stats && stats.length > 0 ? stats[0] : undefined,
         });
 
         // If an error is calculated, we shouldn't enqueue patient
@@ -104,6 +117,7 @@ const QueueDetailsContent = ({
     service: entryData.service,
     activeProviders: activeProviders,
     currentTime: now,
+    stats: stats && stats.length > 0 ? stats[0] : undefined,
   });
 
   const effectiveFailureReason =

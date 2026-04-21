@@ -9,6 +9,7 @@ import {
 } from "/imports/api/settings";
 import { Loading } from "/imports/ui/components/Loading";
 import {
+  clearAllData,
   clearQueueEntries,
   setAcceptQueueAfterHours,
   setAppTheme,
@@ -58,6 +59,7 @@ export const SettingsPage = () => {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isSeeding, setIsSeeding] = useState(false);
   const [isClearingQueue, setIsClearingQueue] = useState(false);
+  const [isClearingAllData, setIsClearingAllData] = useState(false);
 
   // Fill settings from db
   useEffect(() => {
@@ -214,6 +216,22 @@ export const SettingsPage = () => {
       // Intentionally silent: no visible feedback for dev utility action.
     } finally {
       setIsClearingQueue(false);
+    }
+  };
+
+  const handleClearAllData = async () => {
+    const isConfirmed = window.confirm(
+      "Delete all services, providers, patients, queue entries, appointments, stats, and counters? This cannot be undone.",
+    );
+    if (!isConfirmed) return;
+
+    setIsClearingAllData(true);
+    try {
+      await clearAllData();
+    } catch {
+      // Intentionally silent: no visible feedback for dev utility action.
+    } finally {
+      setIsClearingAllData(false);
     }
   };
 
@@ -477,7 +495,7 @@ export const SettingsPage = () => {
               <p className="font-medium">Force Reseed Demo Data</p>
               <p className="text-xs opacity-60">
                 Clears existing demo/business data and inserts fresh demo
-                services, providers, patients, and queue entries.
+                services, providers, patients, queue entries, and stats.
               </p>
             </div>
             <button
@@ -507,8 +525,25 @@ export const SettingsPage = () => {
               {isClearingQueue ? "Clearing..." : "Clear Queue"}
             </button>
           </div>
-        </div>
 
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="font-medium">Delete All Data</p>
+              <p className="text-xs opacity-60">
+                Deletes services, providers, patients, queue entries,
+                appointments, stats, and counters. Settings and flags are kept.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-error btn-sm"
+              onClick={handleClearAllData}
+              disabled={isClearingAllData}
+            >
+              {isClearingAllData ? "Deleting..." : "Delete All"}
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-end gap-2">

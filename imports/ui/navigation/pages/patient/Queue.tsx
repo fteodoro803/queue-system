@@ -8,8 +8,11 @@ import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { ProviderCollection } from "/imports/api/provider";
 import { Patient, PatientsCollection } from "/imports/api/patient";
 import { ServiceSelector } from "/imports/ui/components/ServiceSelector";
+import { getStatsQuery } from "/imports/api/statsMethods";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
 
 export const Queue = () => {
+  const now = useDateTime();
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
   const isQueueEntryLoading = useSubscribe("queue");
@@ -35,6 +38,13 @@ export const Queue = () => {
   );
   const patientMap: Map<string, Patient> = new Map(
     patients.map((p) => [p._id, p]),
+  );
+
+  const isStatsLoading = useSubscribe("stats");
+  const stats = useFind(
+    () =>
+      selectedService ? getStatsQuery(selectedService._id, now) : undefined,
+    [selectedService],
   );
 
   const totalProviders = providers.filter((p) =>
@@ -64,7 +74,8 @@ export const Queue = () => {
     isQueueEntryLoading() ||
     isServicesLoading() ||
     isProvidersLoading() ||
-    isPatientsLoading()
+    isPatientsLoading() ||
+    isStatsLoading()
   ) {
     return <Loading />;
   }
@@ -101,6 +112,7 @@ export const Queue = () => {
             patientMap={patientMap}
             states={["in-progress", "waiting", "ready"]}
             adminView={false}
+            stats={stats && stats.length > 0 ? stats[0] : undefined}
           />
         </div>
       ) : (
