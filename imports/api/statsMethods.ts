@@ -64,3 +64,20 @@ async function initialiseStats(data: StatsData): Promise<string> {
 export async function updateStats(data: StatsData): Promise<void> {
   await Meteor.callAsync("stats.update", data);
 }
+
+export const getStatsQuery = (
+  serviceId: string,
+  date: Date,
+  daysBack: number = 30,
+) => {
+  const startDate = new Date(date);
+  startDate.setDate(startDate.getDate() - daysBack);
+
+  return StatsCollection.find({
+    serviceId,
+    date: {
+      $gte: startDate,
+      $lte: date,
+    },
+  });
+};
