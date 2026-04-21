@@ -2,7 +2,6 @@ import { Meteor } from "meteor/meteor";
 import { QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
 import { Patient } from "/imports/api/patient";
 import { Service } from "/imports/api/service";
-import { updateServiceAnalytics } from "/imports/api/serviceMethods";
 import { CountersCollection } from "/imports/api/counters";
 import {
   selectProvider,
@@ -134,8 +133,6 @@ Meteor.methods({
     // 3. Update Service Analytics
     const startTime: Date = entry.start;
     const endTime: Date = time;
-    const duration: number = (endTime.getTime() - startTime.getTime()) / 60000; // duration in minutes
-    await updateServiceAnalytics(entry.serviceId, duration);
 
     await updateStats({
       serviceId: entry.serviceId,

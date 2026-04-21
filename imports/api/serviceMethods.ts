@@ -95,29 +95,6 @@ export async function updateService(
   return await Meteor.callAsync("services.update", id, data);
 }
 
-export async function updateServiceAnalytics(
-  serviceId: string,
-  duration: number,
-) {
-  const service = await ServicesCollection.findOneAsync(serviceId);
-  if (!service) return;
-
-  const newTotal = (service.totalDuration ?? 0) + duration;
-  const newCount = (service.count ?? 0) + 1;
-  const newAverage = newTotal / newCount;
-
-  await ServicesCollection.updateAsync(serviceId, {
-    // $inc: { count: 1, totalDuration: duration },
-    // $set: { avgDuration: newAverage },
-
-    $set: { count: newCount, totalDuration: newTotal, avgDuration: newAverage },
-  });
-}
-
-export async function clearServiceAnalytics() {
-  return await Meteor.callAsync("services.clearAnalytics");
-}
-
 export async function getService(id: string) {
   return await ServicesCollection.findOneAsync(id);
 }
