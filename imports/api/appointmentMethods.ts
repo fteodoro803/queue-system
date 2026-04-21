@@ -5,7 +5,6 @@ import { Patient } from "/imports/api/patient";
 import { Provider } from "/imports/api/provider";
 import { findEarliestSlot } from "/imports/utils/appointmentUtils";
 import { addMonths } from "/imports/utils/utils";
-import { updateServiceAnalytics } from "/imports/api/serviceMethods";
 import { getTestDate } from "/imports/api/settingsMethods";
 
 export const APPOINTMENT_STATES = [
@@ -67,10 +66,7 @@ Meteor.methods({
     const appointment = await AppointmentsCollection.findOneAsync(id);
     if (!appointment || !appointment.actual_start) return;
 
-    const startTime: Date = appointment.actual_start;
     const endTime: Date = testDate ?? new Date();
-    const duration: number = (endTime.getTime() - startTime.getTime()) / 60000; // duration in minutes
-    await updateServiceAnalytics(appointment.serviceId, duration);
 
     return AppointmentsCollection.updateAsync(id, {
       $set: { status: "completed", actual_end: endTime },

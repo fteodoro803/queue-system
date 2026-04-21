@@ -94,7 +94,7 @@ export const MakeQueueEntryModal = ({
             )}
 
             {/* Finalised Queue Details */}
-            {page === 4 && (
+            {page === 4 && queueEntryData && (
               <QueueDetails entryData={queueEntryData} setOpen={setOpen} />
             )}
           </div>

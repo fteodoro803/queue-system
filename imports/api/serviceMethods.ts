@@ -56,19 +56,6 @@ Meteor.methods({
 
     return result;
   },
-
-  // Clear analytics data for all services
-  async "services.clearAnalytics"() {
-    return await ServicesCollection.updateAsync(
-      {},
-      { $set: { count: 0, totalDuration: null, avgDuration: null } },
-      { multi: true },
-    );
-  },
-
-  // TODO: Calculate performance across all services
-  // "services.calculatePerformance"() {
-  // }
 });
 
 // ---- Exports for the Meteor methods ----
@@ -79,7 +66,7 @@ Meteor.methods({
  * @returns The ID of the newly created service document
  */
 export async function insertService(data: ServiceData): Promise<string> {
-  return await Meteor.callAsync("services.insert", data);
+  return Meteor.callAsync("services.insert", data);
 }
 
 /**
@@ -92,30 +79,7 @@ export async function updateService(
   id: string,
   data: Partial<ServiceData>,
 ): Promise<number> {
-  return await Meteor.callAsync("services.update", id, data);
-}
-
-export async function updateServiceAnalytics(
-  serviceId: string,
-  duration: number,
-) {
-  const service = await ServicesCollection.findOneAsync(serviceId);
-  if (!service) return;
-
-  const newTotal = (service.totalDuration ?? 0) + duration;
-  const newCount = (service.count ?? 0) + 1;
-  const newAverage = newTotal / newCount;
-
-  await ServicesCollection.updateAsync(serviceId, {
-    // $inc: { count: 1, totalDuration: duration },
-    // $set: { avgDuration: newAverage },
-
-    $set: { count: newCount, totalDuration: newTotal, avgDuration: newAverage },
-  });
-}
-
-export async function clearServiceAnalytics() {
-  return await Meteor.callAsync("services.clearAnalytics");
+  return Meteor.callAsync("services.update", id, data);
 }
 
 export async function getService(id: string) {

@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { QueueEntry } from "/imports/api/queueEntry";
 import { Service } from "/imports/api/service";
+import { Stats } from "/imports/api/stats";
 import { calculateQueueTime } from "/imports/utils/queueUtils";
 
 // TODO: tests for multiple providers
@@ -14,6 +15,17 @@ const baseService: Service = {
   priority: 1,
   createdAt: new Date(2026, 1, 1, 9, 0),
 };
+
+function makeStats(partial?: Partial<Stats>): Stats {
+  return {
+    _id: "service-1-2026-02-01",
+    serviceId: "service-1",
+    date: new Date(2026, 1, 1),
+    count: 1,
+    totalDuration: 30,
+    ...partial,
+  };
+}
 
 function makeQueueEntry({
   id,
@@ -185,12 +197,7 @@ describe("[UNIT] QueueUtils", () => {
       expect(result).to.deep.equal({ ok: true, time: 60 });
     });
 
-    it("prefers avgDuration when available", () => {
-      const serviceWithAverage: Service = {
-        ...baseService,
-        avgDuration: 20,
-      };
-
+    it("prefers average duration derived from stats when available", () => {
       const queueEntry = makeQueueEntry({
         id: "10",
         status: "waiting",
@@ -205,9 +212,10 @@ describe("[UNIT] QueueUtils", () => {
       const result = calculateQueueTime({
         queue,
         queueEntry,
-        service: serviceWithAverage,
+        service: baseService,
         activeProviders: 1,
         currentTime: now,
+        stats: makeStats({ count: 3, totalDuration: 60 }), // avg = 20
       });
 
       expect(result).to.deep.equal({ ok: true, time: 20 });

@@ -24,6 +24,7 @@ import { ProviderCollection } from "/imports/api/provider";
 import { Patient, PatientsCollection } from "/imports/api/patient";
 import { calculateQueueTime, QueueTimeResult } from "/imports/utils/queueUtils";
 import { ServiceSelector } from "/imports/ui/components/ServiceSelector";
+import { getStatsQuery } from "/imports/api/statsMethods";
 
 export const QueueManagement = () => {
   const now = useDateTime();
@@ -52,6 +53,13 @@ export const QueueManagement = () => {
   const patients = useFind(() => PatientsCollection.find({}));
   const patientMap: Map<string, Patient> = new Map(
     patients.map((p) => [p._id, p]),
+  );
+
+  const isStatsLoading = useSubscribe("stats");
+  const stats = useFind(
+    () =>
+      selectedService ? getStatsQuery(selectedService._id, now) : undefined,
+    [selectedService],
   );
 
   const [queueEntryModalOpen, setQueueEntryModalOpen] =
@@ -98,14 +106,16 @@ export const QueueManagement = () => {
   ).length;
   const availableProviders = totalProviders - unavailableProviders;
 
-  const maxQueueLength: QueueTimeResult | undefined = selectedService
-    ? calculateQueueTime({
-        activeProviders: totalProviders,
-        currentTime: now,
-        queue: presentQueueEntries,
-        service: selectedService,
-      })
-    : undefined;
+  const maxQueueLength: QueueTimeResult | undefined =
+    selectedService && stats
+      ? calculateQueueTime({
+          activeProviders: totalProviders,
+          currentTime: now,
+          queue: presentQueueEntries,
+          service: selectedService,
+          stats: stats.length > 0 ? stats[0] : undefined,
+        })
+      : undefined;
 
   const isSettingsLoading = useSubscribe("settings");
   const settings = useFind(() => SettingsCollection.find({}))[0] as Settings;
@@ -115,7 +125,8 @@ export const QueueManagement = () => {
     isServicesLoading() ||
     isProvidersLoading() ||
     isPatientsLoading() ||
-    isSettingsLoading()
+    isSettingsLoading() ||
+    isStatsLoading()
   ) {
     return <Loading />;
   }
@@ -258,6 +269,7 @@ export const QueueManagement = () => {
                     activeProviders={totalProviders}
                     patientMap={patientMap}
                     adminView={true}
+                    stats={stats && stats.length > 0 ? stats[0] : undefined}
                   />
                 </div>
               </div>

@@ -3,7 +3,6 @@ import { Service } from "/imports/api/service";
 import { Field } from "../components/Field";
 import {
   BanknotesIcon,
-  ChartBarIcon,
   ChatBubbleBottomCenterIcon,
   ClockIcon,
   WrenchIcon,
@@ -25,7 +24,6 @@ export const ServiceDetailsModal = ({
   const [cost, setCost] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [hasChanges, setHasChanges] = useState<boolean>(false);
-  const [averageDuration, setAverageDuration] = useState<string>("");
 
   // React to Service change
   useEffect(() => {
@@ -33,7 +31,6 @@ export const ServiceDetailsModal = ({
 
     setName(service.name);
     setDuration(service.duration.toString());
-    setAverageDuration(service.avgDuration?.toString() ?? "N/A");
     setCost(service.cost?.toString() ?? "");
     setDescription(service.description);
   }, [service]);
@@ -71,7 +68,6 @@ export const ServiceDetailsModal = ({
   const handleCancel = () => {
     setName(service.name);
     setDuration(service.duration.toString());
-    setAverageDuration(service.avgDuration?.toString() ?? "N/A");
     setCost(service.cost?.toString() ?? "");
     setDescription(service.description);
 
@@ -139,15 +135,6 @@ export const ServiceDetailsModal = ({
               icon={ClockIcon}
               mode="editable"
             />
-            <div className="flex items-center gap-1.5 mt-1.5 text-xs text-base-content/50">
-              <ChartBarIcon className="h-3 w-3" />
-              <span>
-                Avg:{" "}
-                <span className="font-semibold text-base-content/70">
-                  {averageDuration} mins
-                </span>
-              </span>
-            </div>
           </div>
 
           {/* Cost */}

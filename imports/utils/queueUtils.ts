@@ -1,5 +1,6 @@
 import { QueueEntry } from "/imports/api/queueEntry";
 import { Service } from "/imports/api/service";
+import { Stats } from "/imports/api/stats";
 
 export const statusBadgeMap: Record<string, string> = {
   ready: "badge-success",
@@ -28,12 +29,14 @@ export function calculateQueueTime({
   service,
   activeProviders,
   currentTime,
+  stats,
 }: {
   queue: QueueEntry[];
   queueEntry?: QueueEntry;
   service: Service;
   activeProviders: number;
   currentTime: Date;
+  stats?: Stats;
 }): QueueTimeResult {
   // If entry has no position, we can't calculate wait time
   if (queueEntry && !queueEntry.position) {
@@ -49,7 +52,10 @@ export function calculateQueueTime({
     return { ok: false, reason: "wrong_service" };
 
   // Service duration in minutes
-  const serviceDuration = service.avgDuration ?? service.duration;
+  const averageDuration: number | undefined = stats
+    ? stats.totalDuration / stats.count
+    : undefined;
+  const serviceDuration = averageDuration ?? service.duration;
 
   // 1. Get the time remaining for people being served ("in-progress")
   let remainingTime = 0;
