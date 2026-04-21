@@ -8,6 +8,12 @@ import {
 } from "/imports/api/settings";
 import { isValidTimeStr } from "/imports/utils/utils";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
+import { ServicesCollection } from "/imports/api/service";
+import { PatientsCollection } from "/imports/api/patient";
+import { ProviderCollection } from "/imports/api/provider";
+import { AppointmentsCollection } from "/imports/api/appointment";
+import { CountersCollection } from "/imports/api/counters";
+import { StatsCollection } from "/imports/api/stats";
 
 type FlagKey = keyof Omit<Flags, "_id">;
 type BooleanFlagKey = Exclude<
@@ -122,6 +128,19 @@ if (Meteor.isServer) {
       await QueueEntryCollection.removeAsync({});
       return true;
     },
+
+    async "dev.clearAllData"() {
+      await Promise.all([
+        QueueEntryCollection.removeAsync({}),
+        AppointmentsCollection.removeAsync({}),
+        StatsCollection.removeAsync({}),
+        CountersCollection.removeAsync({}),
+        ProviderCollection.removeAsync({}),
+        PatientsCollection.removeAsync({}),
+        ServicesCollection.removeAsync({}),
+      ]);
+      return true;
+    },
   });
 }
 
@@ -233,3 +252,6 @@ export async function clearQueueEntries() {
   return Meteor.callAsync("dev.clearQueueEntries") as Promise<boolean>;
 }
 
+export async function clearAllData() {
+  return Meteor.callAsync("dev.clearAllData") as Promise<boolean>;
+}

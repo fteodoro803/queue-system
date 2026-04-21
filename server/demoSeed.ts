@@ -2,21 +2,34 @@ import { PatientsCollection } from "/imports/api/patient";
 import { ProviderCollection } from "/imports/api/provider";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { ServicesCollection } from "/imports/api/service";
+import { AppointmentsCollection } from "/imports/api/appointment";
+import { CountersCollection } from "/imports/api/counters";
+import { StatsCollection } from "/imports/api/stats";
 
 async function hasAnyBusinessData(): Promise<boolean> {
-  const [existingService, existingProvider, existingPatient, existingQueueEntry] =
-    await Promise.all([
-      ServicesCollection.findOneAsync({}),
-      ProviderCollection.findOneAsync({}),
-      PatientsCollection.findOneAsync({}),
-      QueueEntryCollection.findOneAsync({}),
-    ]);
+  const [
+    existingService,
+    existingProvider,
+    existingPatient,
+    existingQueueEntry,
+    existingAppointment,
+    existingStats,
+  ] = await Promise.all([
+    ServicesCollection.findOneAsync({}),
+    ProviderCollection.findOneAsync({}),
+    PatientsCollection.findOneAsync({}),
+    QueueEntryCollection.findOneAsync({}),
+    AppointmentsCollection.findOneAsync({}),
+    StatsCollection.findOneAsync({}),
+  ]);
 
   return Boolean(
     existingService ||
       existingProvider ||
       existingPatient ||
-      existingQueueEntry,
+      existingQueueEntry ||
+      existingAppointment ||
+      existingStats,
   );
 }
 
@@ -37,9 +50,12 @@ export async function seedDemoDataIfEmpty(): Promise<boolean> {
  */
 export async function forceReseedDemoData(): Promise<void> {
   await QueueEntryCollection.removeAsync({});
+  await AppointmentsCollection.removeAsync({});
   await ProviderCollection.removeAsync({});
   await PatientsCollection.removeAsync({});
   await ServicesCollection.removeAsync({});
+  await CountersCollection.removeAsync({});
+  await StatsCollection.removeAsync({});
   await insertDemoData();
 }
 
@@ -57,9 +73,6 @@ async function insertDemoData(): Promise<void> {
     description: "General checkup and consultation",
     priority: 1,
     createdAt: minutesAgo(240),
-    count: 1,
-    totalDuration: 25,
-    avgDuration: 25,
   });
 
   await ServicesCollection.insertAsync({
@@ -70,9 +83,6 @@ async function insertDemoData(): Promise<void> {
     description: "Routine vaccination service",
     priority: 1,
     createdAt: minutesAgo(240),
-    count: 0,
-    totalDuration: null,
-    avgDuration: null,
   });
 
   // 3 providers
@@ -230,8 +240,26 @@ async function insertDemoData(): Promise<void> {
     createdAt: minutesAgo(70),
   });
 
+  // Daily stats seed based on UTC day key (matches stats method key format).
+  const utcDayKey = now.toISOString().split("T")[0];
+  const statsDate = new Date(`${utcDayKey}T00:00:00.000Z`);
+
+  await StatsCollection.insertAsync({
+    _id: `seed-service-general-${utcDayKey}`,
+    serviceId: "seed-service-general",
+    date: statsDate,
+    count: 4,
+    totalDuration: 80,
+  });
+
+  await StatsCollection.insertAsync({
+    _id: `seed-service-vaccination-${utcDayKey}`,
+    serviceId: "seed-service-vaccination",
+    date: statsDate,
+    count: 3,
+    totalDuration: 45,
+  });
+
   return;
 }
-
-
 
