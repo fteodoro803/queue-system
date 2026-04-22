@@ -240,25 +240,48 @@ async function insertDemoData(): Promise<void> {
     createdAt: minutesAgo(70),
   });
 
-  // Daily stats seed based on UTC day key (matches stats method key format).
-  const utcDayKey = now.toISOString().split("T")[0];
-  const statsDate = new Date(`${utcDayKey}T00:00:00.000Z`);
+  // Daily stats seed — today plus the past 7 days.
+  // General Consultation: avg ~22 min/patient, 12–18 patients/day
+  // Vaccination:          avg ~13 min/patient, 12–16 patients/day
+  const historicalStats: Array<{
+    daysAgo: number;
+    gcCount: number;
+    gcTotal: number;
+    vcCount: number;
+    vcTotal: number;
+  }> = [
+    { daysAgo: 0, gcCount: 4,  gcTotal: 80,  vcCount: 3,  vcTotal: 45  },
+    { daysAgo: 1, gcCount: 14, gcTotal: 308, vcCount: 13, vcTotal: 169 },
+    { daysAgo: 2, gcCount: 18, gcTotal: 396, vcCount: 16, vcTotal: 208 },
+    { daysAgo: 3, gcCount: 15, gcTotal: 330, vcCount: 14, vcTotal: 182 },
+    { daysAgo: 4, gcCount: 12, gcTotal: 264, vcCount: 12, vcTotal: 156 },
+    { daysAgo: 5, gcCount: 17, gcTotal: 374, vcCount: 15, vcTotal: 195 },
+    { daysAgo: 6, gcCount: 13, gcTotal: 286, vcCount: 12, vcTotal: 156 },
+    { daysAgo: 7, gcCount: 16, gcTotal: 352, vcCount: 14, vcTotal: 182 },
+  ];
 
-  await StatsCollection.insertAsync({
-    _id: `seed-service-general-${utcDayKey}`,
-    serviceId: "seed-service-general",
-    date: statsDate,
-    count: 4,
-    totalDuration: 80,
-  });
+  for (const row of historicalStats) {
+    const d = new Date(now);
+    d.setUTCDate(d.getUTCDate() - row.daysAgo);
+    const dayKey = d.toISOString().split("T")[0];
+    const dayDate = new Date(`${dayKey}T00:00:00.000Z`);
 
-  await StatsCollection.insertAsync({
-    _id: `seed-service-vaccination-${utcDayKey}`,
-    serviceId: "seed-service-vaccination",
-    date: statsDate,
-    count: 3,
-    totalDuration: 45,
-  });
+    await StatsCollection.insertAsync({
+      _id: `seed-service-general-${dayKey}`,
+      serviceId: "seed-service-general",
+      date: dayDate,
+      count: row.gcCount,
+      totalDuration: row.gcTotal,
+    });
+
+    await StatsCollection.insertAsync({
+      _id: `seed-service-vaccination-${dayKey}`,
+      serviceId: "seed-service-vaccination",
+      date: dayDate,
+      count: row.vcCount,
+      totalDuration: row.vcTotal,
+    });
+  }
 
   return;
 }

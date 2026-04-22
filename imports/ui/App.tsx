@@ -12,6 +12,7 @@ import { QueueManagement } from "/imports/ui/navigation/pages/admin/QueueManagem
 import { Queue } from "/imports/ui/navigation/pages/patient/Queue";
 import { SettingsPage } from "/imports/ui/navigation/pages/admin/SettingsPage";
 import { ProviderManagement } from "/imports/ui/navigation/pages/admin/ProviderManagement";
+import { Statistics } from "/imports/ui/navigation/pages/admin/Statistics";
 
 export const App = () => (
   <DateTimeProvider>
@@ -31,6 +32,7 @@ export const App = () => (
             <Route path="queue" element={<QueueManagement />} />
             <Route path="test" element={<TestPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="statistics" element={<Statistics />} />
           </Route>
 
           {/* Patient Routes */}
