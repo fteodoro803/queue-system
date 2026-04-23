@@ -31,7 +31,8 @@ export const Statistics = () => {
     return <Loading />;
   }
 
-  const avgWaitTimes = getAverageServiceTime(stats, selectedService);
+  const averageServiceTime = getAverageServiceTime(stats, selectedService);
+
   return (
     <>
       <h1 className="text-3xl font-bold">Statistics</h1>
@@ -43,7 +44,11 @@ export const Statistics = () => {
         />
       </div>
 
-      <ServiceTimeChart data={avgWaitTimes} />
+      {/*Average Service Time*/}
+      <div>
+        <h2 className="text-2xl font-bold mt-2">Average Service Time</h2>
+        <ServiceTimeChart data={averageServiceTime} />
+      </div>
     </>
   );
 };
