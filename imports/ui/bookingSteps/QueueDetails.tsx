@@ -79,6 +79,7 @@ const QueueDetailsContent = ({
   ).length;
 
   // ---- Effects ----
+  // FIXME: estimated wait time at enqueue isnt consistent withMaxQueueLength
   useEffect(() => {
     const enqueuePatient = async () => {
       if (entryData) {
@@ -97,6 +98,10 @@ const QueueDetailsContent = ({
           setQueueErrorReason(estServiceTime.reason);
           return;
         }
+
+        console.log(
+          `QueueDetails: Service Time at enqueue: ${estServiceTime.time} minutes`,
+        );
 
         const entryId = await enqueue(entryData, estServiceTime.time, now);
         const newEntry = await QueueEntryCollection.findOneAsync(entryId);

@@ -99,6 +99,18 @@ Meteor.methods({
         $set: { providerId },
       });
     }
+
+    // 4. Update Stats
+    const estimatedWaitTime: number | undefined =
+      entry.initialEstimatedWaitTime ?? undefined;
+    await updateStats({
+      serviceId: entry.serviceId,
+      date: time,
+      inc: {
+        isCompleted: true,
+        estimatedWaitTime: estimatedWaitTime,
+      },
+    });
   },
 
   // Completes a Service
