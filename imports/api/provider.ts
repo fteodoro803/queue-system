@@ -10,7 +10,7 @@ export interface ProviderService {
 
 export interface Provider extends Profile {
   available: boolean; // Whether a provider is ready to take in assignments (ex. service a patient)
-  atWork: boolean; // Whether the provider is currently at work and on shift
+  active: boolean; // Whether the provider is currently at work and on shift
   services: ProviderService[]; // Services offered by the provider
 }
 

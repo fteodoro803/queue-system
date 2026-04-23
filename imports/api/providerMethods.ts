@@ -7,7 +7,7 @@ export interface ProviderData {
   email?: string;
   number?: string;
   avatar?: string;
-  atWork?: boolean;
+  active?: boolean;
   available?: boolean;
   services?: ProviderService[];
 }
@@ -24,7 +24,7 @@ Meteor.methods({
       avatar: data.avatar?.trim() ?? null,
       services: data.services ?? [],
       available: false, // Default to unavailable
-      atWork: false, // Default to not at work
+      active: false, // Default to not at work
       createdAt: new Date(),
     });
   },
@@ -43,7 +43,7 @@ Meteor.methods({
     if (data.number !== undefined) updates.number = data.number?.trim() ?? null;
     if (data.avatar !== undefined) updates.avatar = data.avatar?.trim() ?? null;
     if (data.available !== undefined) updates.available = data.available;
-    if (data.atWork !== undefined) updates.atWork = data.atWork;
+    if (data.active !== undefined) updates.active = data.active;
     if (data.services !== undefined) updates.services = data.services;
 
     // Update the provider document with the specified fields
@@ -81,7 +81,7 @@ Meteor.methods({
   },
 
   // Updates whether a Provider is at work
-  async "provider.toggleAtWork"(id: string): Promise<number> {
+  async "provider.toggleActive"(id: string): Promise<number> {
     // 1. Get the current atWork status
     const provider = await ProviderCollection.findOneAsync(id);
     if (!provider) {
@@ -90,11 +90,11 @@ Meteor.methods({
         `Provider with id ${id} does not exist`,
       );
     }
-    const currentAtWork = provider.atWork;
+    const currentActive = provider.active;
 
-    // 2. Flip the atWork status
+    // 2. Flip the active status
     return await ProviderCollection.updateAsync(id, {
-      $set: { atWork: !currentAtWork },
+      $set: { active: !currentActive },
     });
   },
 
@@ -189,13 +189,6 @@ export async function setProviderAvailability(
   available: boolean,
 ): Promise<number> {
   return await updateProvider(id, { available });
-}
-
-export async function setProviderAtWork(
-  id: string,
-  atWork: boolean,
-): Promise<number> {
-  return await updateProvider(id, { atWork });
 }
 
 // TODO: consider combining toggle and set functions into one function with a parameter to specify the desired status
