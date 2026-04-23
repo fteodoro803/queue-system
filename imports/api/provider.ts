@@ -5,11 +5,12 @@ export interface ProviderService {
   id: string;
   name: string; // for display in DB
   // cost: number;
-  enabled: boolean; // Whether the provider currently offers this service
+  enabled: boolean; // Whether the provider currently offers this service (so appointments can be made)
 }
 
 export interface Provider extends Profile {
-  available: boolean;
+  available: boolean; // Whether a provider is ready to take in assignments (ex. service a patient)
+  atWork: boolean; // Whether the provider is currently at work and on shift
   services: ProviderService[]; // Services offered by the provider
 }
 
