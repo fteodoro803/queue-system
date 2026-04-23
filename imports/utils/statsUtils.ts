@@ -34,7 +34,7 @@ import { Service } from "/imports/api/service";
  * //   "2025-01-14": { totalDuration: 40, count: 2 },
  * // }
  */
-export const groupBy = <T, K extends string>(
+const groupBy = <T, K extends string>(
   items: T[],
   getKey: (item: T) => K,
   mergeStrategy: (acc: T, item: T) => T,
@@ -54,6 +54,9 @@ export const groupBy = <T, K extends string>(
     {} as Record<K, T>,
   );
 };
+
+const filteredByService = (service: Service | undefined, stats: Stats[]) =>
+  service ? stats.filter((stat) => stat.serviceId === service._id) : stats;
 
 /**
  * Calculates average service time per day, optionally filtered by a specific service.
@@ -81,9 +84,7 @@ export const getAverageServiceTime = (
   }
 
   // 1. Filter stats if a service is specified, otherwise use all stats
-  const filtered = service
-    ? stats.filter((stat) => stat.serviceId === service._id)
-    : stats;
+  const filtered = filteredByService(service, stats);
 
   // 2. Group by date, summing totalDuration and count across all services per day
   const groupedData = groupBy(
@@ -104,6 +105,48 @@ export const getAverageServiceTime = (
       date: new Date(date),
       avgWaitTime:
         data.count > 0 ? Math.round(data.totalDuration / data.count) : 0,
+    }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime()); // sort by date
+
+  return result;
+};
+
+/**
+ * Calculates total queue entries per day, optionally filtered by a specific service.
+ *
+ * @param stats - Array of Stats objects containing queue entry data.
+ * @param service - Optional Service object to filter the stats by a specific service.
+ * @returns An array of DataPoint objects sorted by date ascending.
+ */
+export const getQueueCount = (
+  stats: Stats[],
+  service?: Service,
+): { date: Date; count: number }[] => {
+  // Early return if stats array is empty or if any stat is missing required fields
+  if (stats.length === 0) return [];
+  if (stats.some((stat) => !stat.date || !stat.count)) {
+    console.warn("Some stats are missing required fields");
+    return [];
+  }
+
+  // 1. Filter stats if a service is specified, otherwise use all stats
+  const filtered = filteredByService(service, stats);
+
+  // 2. Group by date, summing count across all services per day
+  const groupedData = groupBy(
+    filtered,
+    (stat) => stat.date.toISOString(), // group by date string
+    (acc, item) => ({
+      ...acc,
+      count: acc.count + item.count,
+    }),
+  );
+
+  // 3. Convert grouped object to a sorted DataPoint array
+  const result: { date: Date; count: number }[] = Object.entries(groupedData)
+    .map(([date, data]) => ({
+      date: new Date(date),
+      count: data.count,
     }))
     .sort((a, b) => a.date.getTime() - b.date.getTime()); // sort by date
 

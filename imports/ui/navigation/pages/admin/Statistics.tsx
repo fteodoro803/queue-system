@@ -12,7 +12,10 @@ import {
   YAxis,
 } from "recharts";
 import { StatsCollection } from "/imports/api/stats";
-import { getAverageServiceTime } from "/imports/utils/statsUtils";
+import {
+  getAverageServiceTime,
+  getQueueCount,
+} from "/imports/utils/statsUtils";
 import { AxisDomain } from "recharts/types/util/types";
 
 export const Statistics = () => {
@@ -31,6 +34,7 @@ export const Statistics = () => {
     return <Loading />;
   }
 
+  const queueCount = getQueueCount(stats, selectedService);
   const averageServiceTime = getAverageServiceTime(stats, selectedService);
 
   return (
@@ -42,6 +46,12 @@ export const Statistics = () => {
           services={services}
           setSelectedService={setSelectedService}
         />
+      </div>
+
+      {/*Daily Queue Entries*/}
+      <div>
+        <h2 className="text-2xl font-bold mt-2">Daily Queue Entries</h2>
+        <QueueCountChart data={queueCount} />
       </div>
 
       {/*Average Service Time*/}
@@ -85,6 +95,46 @@ const ServiceSelect = ({
       </select>
       <span className="label">Optional</span>
     </fieldset>
+  );
+};
+
+export const QueueCountChart = ({
+  data,
+  maxX,
+  maxY,
+}: {
+  data: { date: Date; count: number }[];
+  maxX?: number;
+  maxY?: number;
+}) => {
+  const xDomain: AxisDomain = maxX ? [0, maxX] : [0, "auto"];
+  const yDomain: AxisDomain = maxY ? [0, maxY] : [0, "auto"];
+
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis
+          dataKey="date"
+          tickFormatter={(date: Date) =>
+            date.toLocaleDateString(undefined, { dateStyle: "short" })
+          }
+          domain={xDomain}
+        />
+        <YAxis
+          domain={yDomain}
+          label={{ value: "count", angle: -90, position: "insideLeft" }}
+        />
+        <Tooltip />
+        <Line
+          type="monotone"
+          dataKey="count"
+          stroke="#8884d8"
+          strokeWidth={2}
+          dot={false}
+        />
+      </LineChart>
+    </ResponsiveContainer>
   );
 };
 
