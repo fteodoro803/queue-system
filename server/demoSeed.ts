@@ -240,9 +240,10 @@ async function insertDemoData(): Promise<void> {
     createdAt: minutesAgo(70),
   });
 
-  // Daily stats seed — today plus the past 7 days.
-  // General Consultation: avg ~22 min/patient, 12–18 patients/day
-  // Vaccination:          avg ~13 min/patient, 12–16 patients/day
+  // Daily stats — today (partial) + past 30 days.
+  // GC: longer, more variable consultations (15–32 min). Peaks Mon/Tue, drops Thu/Fri.
+  // VC: shorter, spikier (8–20 min). Peaks Fri, dips Mon/Tue. Different rhythm to GC.
+  // Apr 22 2026 = Wednesday; days-ago 3=Sun, 4=Sat, 10=Sun, 11=Sat, etc.
   const historicalStats: Array<{
     daysAgo: number;
     gcCount: number;
@@ -250,14 +251,38 @@ async function insertDemoData(): Promise<void> {
     vcCount: number;
     vcTotal: number;
   }> = [
-    { daysAgo: 0, gcCount: 4,  gcTotal: 80,  vcCount: 3,  vcTotal: 45  },
-    { daysAgo: 1, gcCount: 14, gcTotal: 308, vcCount: 13, vcTotal: 169 },
-    { daysAgo: 2, gcCount: 18, gcTotal: 396, vcCount: 16, vcTotal: 208 },
-    { daysAgo: 3, gcCount: 15, gcTotal: 330, vcCount: 14, vcTotal: 182 },
-    { daysAgo: 4, gcCount: 12, gcTotal: 264, vcCount: 12, vcTotal: 156 },
-    { daysAgo: 5, gcCount: 17, gcTotal: 374, vcCount: 15, vcTotal: 195 },
-    { daysAgo: 6, gcCount: 13, gcTotal: 286, vcCount: 12, vcTotal: 156 },
-    { daysAgo: 7, gcCount: 16, gcTotal: 352, vcCount: 14, vcTotal: 182 },
+    // daysAgo  gcCount  gcTotal   vcCount  vcTotal    gcAvg  vcAvg
+    { daysAgo:  0, gcCount:  4, gcTotal:   76, vcCount:  3, vcTotal:  54 }, // today partial  19 / 18
+    { daysAgo:  1, gcCount: 20, gcTotal:  560, vcCount: 14, vcTotal: 126 }, // Tue            28 /  9
+    { daysAgo:  2, gcCount: 22, gcTotal:  660, vcCount: 13, vcTotal: 117 }, // Mon            30 /  9
+    { daysAgo:  3, gcCount: 12, gcTotal:  192, vcCount: 12, vcTotal: 108 }, // Sun weekend    16 /  9
+    { daysAgo:  4, gcCount: 13, gcTotal:  208, vcCount: 12, vcTotal: 132 }, // Sat weekend    16 / 11
+    { daysAgo:  5, gcCount: 16, gcTotal:  272, vcCount: 19, vcTotal: 342 }, // Fri            17 / 18
+    { daysAgo:  6, gcCount: 15, gcTotal:  240, vcCount: 18, vcTotal: 306 }, // Thu            16 / 17
+    { daysAgo:  7, gcCount: 18, gcTotal:  486, vcCount: 15, vcTotal: 180 }, // Wed            27 / 12
+    { daysAgo:  8, gcCount: 21, gcTotal:  630, vcCount: 13, vcTotal: 117 }, // Tue            30 /  9
+    { daysAgo:  9, gcCount: 19, gcTotal:  570, vcCount: 12, vcTotal: 108 }, // Mon            30 /  9
+    { daysAgo: 10, gcCount: 12, gcTotal:  180, vcCount: 12, vcTotal:  96 }, // Sun weekend    15 /  8
+    { daysAgo: 11, gcCount: 12, gcTotal:  216, vcCount: 13, vcTotal: 143 }, // Sat weekend    18 / 11
+    { daysAgo: 12, gcCount: 14, gcTotal:  224, vcCount: 20, vcTotal: 400 }, // Fri            16 / 20
+    { daysAgo: 13, gcCount: 15, gcTotal:  255, vcCount: 18, vcTotal: 324 }, // Thu            17 / 18
+    { daysAgo: 14, gcCount: 17, gcTotal:  442, vcCount: 14, vcTotal: 168 }, // Wed            26 / 12
+    { daysAgo: 15, gcCount: 20, gcTotal:  640, vcCount: 13, vcTotal: 130 }, // Tue            32 / 10
+    { daysAgo: 16, gcCount: 18, gcTotal:  540, vcCount: 12, vcTotal: 108 }, // Mon            30 /  9
+    { daysAgo: 17, gcCount: 12, gcTotal:  192, vcCount: 12, vcTotal: 120 }, // Sun weekend    16 / 10
+    { daysAgo: 18, gcCount: 13, gcTotal:  195, vcCount: 12, vcTotal: 132 }, // Sat weekend    15 / 11
+    { daysAgo: 19, gcCount: 15, gcTotal:  255, vcCount: 17, vcTotal: 306 }, // Fri            17 / 18
+    { daysAgo: 20, gcCount: 16, gcTotal:  256, vcCount: 16, vcTotal: 256 }, // Thu            16 / 16
+    { daysAgo: 21, gcCount: 19, gcTotal:  513, vcCount: 15, vcTotal: 165 }, // Wed            27 / 11
+    { daysAgo: 22, gcCount: 22, gcTotal:  594, vcCount: 13, vcTotal: 117 }, // Tue            27 /  9
+    { daysAgo: 23, gcCount: 20, gcTotal:  560, vcCount: 12, vcTotal:  96 }, // Mon            28 /  8
+    { daysAgo: 24, gcCount: 12, gcTotal:  180, vcCount: 12, vcTotal: 108 }, // Sun weekend    15 /  9
+    { daysAgo: 25, gcCount: 13, gcTotal:  221, vcCount: 13, vcTotal: 156 }, // Sat weekend    17 / 12
+    { daysAgo: 26, gcCount: 14, gcTotal:  238, vcCount: 19, vcTotal: 361 }, // Fri            17 / 19
+    { daysAgo: 27, gcCount: 16, gcTotal:  272, vcCount: 18, vcTotal: 324 }, // Thu            17 / 18
+    { daysAgo: 28, gcCount: 18, gcTotal:  468, vcCount: 15, vcTotal: 180 }, // Wed            26 / 12
+    { daysAgo: 29, gcCount: 21, gcTotal:  609, vcCount: 14, vcTotal: 126 }, // Tue            29 /  9
+    { daysAgo: 30, gcCount: 20, gcTotal:  580, vcCount: 13, vcTotal: 117 }, // Mon            29 /  9
   ];
 
   for (const row of historicalStats) {
