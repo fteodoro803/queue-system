@@ -106,15 +106,13 @@ export const QueueManagement = () => {
   }, [selectedService]);
 
   // TODO: Currently doesnt account for specific services, this is just assuming 1 service
-  const totalProviders = providers.filter((p) =>
-    p.services.some((s) => s.id === selectedService?._id && s.enabled),
+  const activeProviders = providers.filter(
+    (p) =>
+      p.active &&
+      p.services.some((s) => s.id === selectedService?._id && s.enabled),
   );
-  const unavailableProviders = providers.filter((p) =>
-    p.services.some(
-      (s) => s.id === selectedService?._id && s.enabled && !p.available,
-    ),
-  ).length;
-  const availableProviders = totalProviders.length - unavailableProviders;
+  const availableProviders = providers.filter((p) => p.available).length;
+  const unavailableProviders = activeProviders.length - availableProviders;
 
   const maxQueueLength: QueueTimeResult | undefined =
     selectedService && stats
@@ -260,7 +258,7 @@ export const QueueManagement = () => {
                   <QueueList
                     queue={presentQueueEntries}
                     service={selectedService}
-                    providers={totalProviders}
+                    providers={activeProviders}
                     states={["in-progress"]}
                     patientMap={patientMap}
                     adminView={true}
@@ -276,7 +274,7 @@ export const QueueManagement = () => {
                     service={selectedService}
                     availableProviders={availableProviders}
                     states={["waiting", "ready"]}
-                    providers={totalProviders}
+                    providers={activeProviders}
                     patientMap={patientMap}
                     adminView={true}
                     stats={stats && stats.length > 0 ? stats[0] : undefined}
@@ -309,7 +307,7 @@ export const QueueManagement = () => {
                     queue={pastQueueEntries}
                     service={selectedService}
                     states={["completed"]}
-                    providers={totalProviders}
+                    providers={activeProviders}
                     patientMap={patientMap}
                     adminView={true}
                   />
@@ -341,7 +339,7 @@ export const QueueManagement = () => {
                     queue={pastQueueEntries}
                     service={selectedService}
                     states={["cancelled"]}
-                    providers={totalProviders}
+                    providers={activeProviders}
                     patientMap={patientMap}
                     adminView={true}
                   />
