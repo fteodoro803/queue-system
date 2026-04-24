@@ -49,7 +49,7 @@ export const Queue = () => {
 
   const totalProviders = providers.filter((p) =>
     p.services.some((s) => s.id === selectedService?._id && s.enabled),
-  ).length;
+  );
 
   // ---- Effects ----
   // Select the first service by default when services are loaded
@@ -108,7 +108,7 @@ export const Queue = () => {
           <QueueList
             queue={queueEntries}
             service={selectedService}
-            activeProviders={totalProviders}
+            providers={totalProviders}
             patientMap={patientMap}
             states={["in-progress", "waiting", "ready"]}
             adminView={false}

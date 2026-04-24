@@ -9,6 +9,7 @@ import {
   NumberedListIcon,
   Cog6ToothIcon,
   IdentificationIcon,
+  ChartPieIcon,
 } from "@heroicons/react/24/solid";
 import { Outlet, useLocation } from "react-router-dom";
 import { NavLinkItem } from "/imports/ui/navigation/NavLinkItem";
@@ -106,6 +107,13 @@ export const Sidebar = () => {
                   link="/admin/dashboard"
                   label="Dashboard"
                   icon={PresentationChartLineIcon}
+                />
+
+                {/*Stats Button*/}
+                <NavLinkItem
+                  link="/admin/statistics"
+                  label="Statistics"
+                  icon={ChartPieIcon}
                 />
 
                 {/*Appointments Button*/}

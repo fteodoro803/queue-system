@@ -4,7 +4,10 @@ import { ProviderCollection } from "/imports/api/provider";
 import { ProviderServicesTable } from "/imports/ui/provider/ProviderServicesTable";
 import { CalendarIcon } from "@heroicons/react/24/outline";
 import { Avatar } from "/imports/ui/components/Avatar";
-import { toggleProviderAvailability } from "/imports/api/providerMethods";
+import {
+  toggleProviderActive,
+  toggleProviderAvailability,
+} from "/imports/api/providerMethods";
 
 export const ProviderAvailabilityModal = ({
   open,
@@ -21,6 +24,15 @@ export const ProviderAvailabilityModal = ({
       await toggleProviderAvailability(providerId);
     } catch (error) {
       console.error("Error toggling provider availability:", error);
+    }
+  };
+
+  // TODO: if AtWork is off, automatically set Available off
+  const handleToggleActive = async (providerId: string) => {
+    try {
+      await toggleProviderActive(providerId);
+    } catch (error) {
+      console.error("Error toggling provider at work status:", error);
     }
   };
 
@@ -82,6 +94,17 @@ export const ProviderAvailabilityModal = ({
                         </p>
                       )}
                     </div>
+                    {/* Active Toggle */}
+                    <div className="flex items-center gap-2 ml-auto">
+                      <p>Active</p>
+                      <input
+                        type="checkbox"
+                        className="toggle toggle-success toggle-sm "
+                        checked={provider.active}
+                        onChange={() => handleToggleActive(provider._id)}
+                      />
+                    </div>
+
                     {/* Availability Toggle */}
                     <div className="flex items-center gap-2 ml-auto">
                       <p>Available</p>
