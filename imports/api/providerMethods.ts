@@ -74,6 +74,13 @@ Meteor.methods({
     }
     const currentAvailability = provider.available;
 
+    // If provider is being set to available, ensure they are active (at work)
+    if (!currentAvailability && !provider.active) {
+      await ProviderCollection.updateAsync(id, {
+        $set: { active: true },
+      });
+    }
+
     // 2. Flip the availability status
     return await ProviderCollection.updateAsync(id, {
       $set: { available: !currentAvailability },
@@ -91,6 +98,13 @@ Meteor.methods({
       );
     }
     const currentActive = provider.active;
+
+    // If provider is being set to inactive, also set them to unavailable
+    if (currentActive) {
+      await ProviderCollection.updateAsync(id, {
+        $set: { available: false },
+      });
+    }
 
     // 2. Flip the active status
     return await ProviderCollection.updateAsync(id, {
