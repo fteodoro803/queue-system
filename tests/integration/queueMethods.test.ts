@@ -32,7 +32,6 @@ const mockService: Service = {
   createdAt: new Date(),
 };
 
-const waitTime: number = 5;
 const now: Date = new Date();
 
 async function seedAvailableProviderForMockService(): Promise<string> {
@@ -63,7 +62,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
 
@@ -81,7 +79,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
         const id2 = await enqueue(
@@ -89,7 +86,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
 
@@ -106,7 +102,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
         const entry = await QueueEntryCollection.findOneAsync(id);
@@ -126,7 +121,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
         await startService(id, now);
@@ -147,7 +141,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
         const id2 = await enqueue(
@@ -155,7 +148,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
 
@@ -186,7 +178,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
         await startService(id, now);
@@ -208,7 +199,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
         await startService(id, now);
@@ -233,7 +223,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
         await cancelService(id, now);
@@ -249,7 +238,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
         const id2 = await enqueue(
@@ -257,7 +245,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
         const id3 = await enqueue(
@@ -265,7 +252,6 @@ if (Meteor.isServer) {
             patient: mockPatient,
             service: mockService,
           },
-          waitTime,
           now,
         );
 

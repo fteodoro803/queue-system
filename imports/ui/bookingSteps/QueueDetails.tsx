@@ -12,7 +12,11 @@ import { convertMinutesToTime } from "/imports/utils/utils";
 import { calculateQueueTime, QueueTimeResult } from "/imports/utils/queueUtils";
 import { Provider, ProviderCollection } from "/imports/api/provider";
 import { Loading } from "../components/Loading";
-import { enqueue, QueueEntryData } from "/imports/api/queueEntryMethods";
+import {
+  enqueue,
+  QueueEntryData,
+  setInitialEstimatedWaitTime,
+} from "/imports/api/queueEntryMethods";
 import { Service } from "/imports/api/service";
 import { getStatsQuery } from "/imports/api/statsMethods";
 import { Stats } from "/imports/api/stats";
@@ -71,61 +75,63 @@ const QueueDetailsContent = ({
   // ---- State & Derived Data ----
   const [entry, setEntry] = useState<QueueEntry | undefined>(undefined);
   const [service, setService] = useState<Service | undefined>(undefined);
+  const [queueCalculation, setQueueCalculation] = useState<
+    QueueTimeResult | undefined
+  >(undefined);
   const [queueErrorReason, setQueueErrorReason] =
     useState<QueueFailureReason>();
 
   // ---- Effects ----
-  // FIXME: estimated wait time at enqueue isnt consistent withMaxQueueLength
+  // Enqueue patient when entryData is available
   useEffect(() => {
     const enqueuePatient = async () => {
       if (entryData) {
-        setQueueErrorReason(undefined);
-        const estServiceTime: QueueTimeResult = calculateQueueTime({
-          queue,
-          service: entryData.service,
-          providers,
-          currentTime: now,
-          stats: stats && stats.length > 0 ? stats[0] : undefined,
-        });
+        // setQueueErrorReason(undefined);
 
-        // If an error is calculated, we shouldn't enqueue patient
-        if (!estServiceTime.ok) {
-          console.error("Cannot enqueue patient:", estServiceTime.reason);
-          setQueueErrorReason(estServiceTime.reason);
-          return;
-        }
-
-        console.log(
-          `QueueDetails: Service Time at enqueue: ${estServiceTime.time} minutes`,
-        );
-
-        const entryId = await enqueue(entryData, estServiceTime.time, now);
+        // Enqueue the patient and get the new entry
+        const entryId = await enqueue(entryData, now);
         const newEntry = await QueueEntryCollection.findOneAsync(entryId);
-        setEntry(newEntry);
 
+        setEntry(newEntry);
         setService(entryData.service);
       }
     };
     enqueuePatient();
   }, [entryData]);
 
+  // Calculate queue time whenever queue, entry, service, providers, or stats change
+  useEffect(() => {
+    const getWaitTime = async () => {
+      if (!entry || !service) return;
+
+      // Calculate and set initial estimated wait time
+      const result = calculateQueueTime({
+        queue: queue,
+        queueEntry: entry,
+        service: service,
+        providers,
+        currentTime: now,
+        stats: stats && stats.length > 0 ? stats[0] : undefined,
+      });
+
+      // set the initial estimated waiting time
+      if (result.ok) {
+        if (entry?.initialEstimatedWaitTime == null) {
+          await setInitialEstimatedWaitTime(entry._id, result.time);
+        }
+        setQueueCalculation(result);
+      } else {
+        setQueueErrorReason(result.reason);
+      }
+    };
+
+    getWaitTime();
+  }, [entry, service, providers, stats]);
+
   // ---- Early Returns ----
   if (!entryData) return null;
 
-  const maxQueueLength: QueueTimeResult = calculateQueueTime({
-    queueEntry: entry,
-    queue: queue,
-    service: entryData.service,
-    providers,
-    currentTime: now,
-    stats: stats && stats.length > 0 ? stats[0] : undefined,
-  });
-
-  const effectiveFailureReason =
-    queueErrorReason ||
-    (!maxQueueLength.ok ? maxQueueLength.reason : undefined);
-
-  if (effectiveFailureReason) {
+  if (queueErrorReason) {
     return (
       <div className="flex flex-col gap-4">
         <div role="alert" className="alert alert-error">
@@ -133,7 +139,7 @@ const QueueDetailsContent = ({
           <div>
             <p className="font-semibold">You could not be queued right now.</p>
             <p className="text-sm">
-              {getQueueFailureMessage(effectiveFailureReason)}
+              {getQueueFailureMessage(queueErrorReason)}
             </p>
             <p className="text-sm">
               Please contact us directly or try again later!
@@ -177,9 +183,9 @@ const QueueDetailsContent = ({
           <span className="text-sm">
             Est. wait:{" "}
             <span className="font-semibold text-base-content">
-              {maxQueueLength.ok
-                ? convertMinutesToTime(maxQueueLength.time)
-                : "Unavailable"}
+              {queueCalculation?.ok
+                ? convertMinutesToTime(queueCalculation.time)
+                : "N/A"}
             </span>
           </span>
         </div>

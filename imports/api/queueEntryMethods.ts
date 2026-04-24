@@ -16,13 +16,8 @@ export interface QueueEntryData {
 
 // Client-Called methods
 Meteor.methods({
-  // Inserts queue entry to database and calculates position
-  // TODO: why is estimated wait time an argument? It should be calculated at the end of this (issue #154)
-  async "queueEntry.enqueue"(
-    data: QueueEntryData,
-    estimatedWaitTime: number | undefined,
-    time: Date,
-  ) {
+  // Inserts entry to queue, and calculates its position
+  async "queueEntry.enqueue"(data: QueueEntryData, time: Date) {
     // 1. Get the current max position in the queue, for respective service
     const maxPositionEntry: QueueEntry | undefined =
       await QueueEntryCollection.findOneAsync(
@@ -42,18 +37,30 @@ Meteor.methods({
     // 3. Generate display ID
     const displayId = await generateDisplayId(data.service);
 
-    return QueueEntryCollection.insertAsync({
+    // 4. Insert the entry into queue
+    const queueEntryId = QueueEntryCollection.insertAsync({
       displayId: displayId,
       patientId: data.patient._id,
       serviceId: data.service._id,
       providerId: null,
       position: newPosition,
       status: "waiting",
-      initialEstimatedWaitTime: estimatedWaitTime ?? null,
+      initialEstimatedWaitTime: null, // placeholder
       readyAt: null,
       start: null, // Start time will be set once the service is started
       end: null, // End time will be set after the service is completed
       createdAt: time,
+    });
+
+    return queueEntryId;
+  },
+
+  // Set initialEstimatedWaitTime
+  async "queueEntry.setInitialEstimatedWaitTime"(id: string, time: number) {
+    await QueueEntryCollection.updateAsync(id, {
+      $set: {
+        initialEstimatedWaitTime: time,
+      },
     });
   },
 
@@ -186,10 +193,17 @@ Meteor.methods({
 // Enqueues a patient to a service queue
 export async function enqueue(
   data: QueueEntryData,
-  estimatedWaitTime: number | undefined,
   time: Date,
 ): Promise<string> {
-  return Meteor.callAsync("queueEntry.enqueue", data, estimatedWaitTime, time);
+  return Meteor.callAsync("queueEntry.enqueue", data, time);
+}
+
+// Sets initial estimated wait time for a queue entry
+export async function setInitialEstimatedWaitTime(
+  id: string,
+  time: number,
+): Promise<void> {
+  await Meteor.callAsync("queueEntry.setInitialEstimatedWaitTime", id, time);
 }
 
 // Checks-in a Patient, and marks them as Ready
