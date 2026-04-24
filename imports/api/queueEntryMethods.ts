@@ -17,6 +17,7 @@ export interface QueueEntryData {
 // Client-Called methods
 Meteor.methods({
   // Inserts queue entry to database and calculates position
+  // TODO: why is estimated wait time an argument? It should be calculated at the end of this (issue #154)
   async "queueEntry.enqueue"(
     data: QueueEntryData,
     estimatedWaitTime: number | undefined,
@@ -103,12 +104,15 @@ Meteor.methods({
     // 4. Update Stats
     const estimatedWaitTime: number | undefined =
       entry.initialEstimatedWaitTime ?? undefined;
+    const actualWaitTime: number =
+      (time.getTime() - entry.createdAt.getTime()) / 60000; // in minutes
     await updateStats({
       serviceId: entry.serviceId,
       date: time,
       inc: {
         isCompleted: true,
         estimatedWaitTime: estimatedWaitTime,
+        actualWaitTime: actualWaitTime,
       },
     });
   },

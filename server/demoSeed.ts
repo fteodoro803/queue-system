@@ -63,6 +63,43 @@ async function insertDemoData(): Promise<void> {
   const now = new Date();
   const minutesAgo = (minutes: number) =>
     new Date(now.getTime() - minutes * 60 * 1000);
+  const getSeededWaitTimeTotals = ({
+    serviceType,
+    count,
+    totalDuration,
+    daysAgo,
+  }: {
+    serviceType: "general" | "vaccination";
+    count: number;
+    totalDuration: number;
+    daysAgo: number;
+  }) => {
+    if (count <= 0) {
+      return {
+        estimatedWaitTime: 0,
+        actualWaitTime: 0,
+      };
+    }
+
+    const averageDuration = totalDuration / count;
+    const averageEstimatedWaitTime =
+      serviceType === "general"
+        ? Math.max(12, Math.round(averageDuration * 0.9 + count * 0.25))
+        : Math.max(8, Math.round(averageDuration * 0.75 + count * 0.35));
+    const actualWaitVariance =
+      serviceType === "general"
+        ? (daysAgo % 5) - 2
+        : ((daysAgo + 2) % 5) - 2;
+    const averageActualWaitTime = Math.max(
+      0,
+      averageEstimatedWaitTime + actualWaitVariance,
+    );
+
+    return {
+      estimatedWaitTime: averageEstimatedWaitTime * count,
+      actualWaitTime: averageActualWaitTime * count,
+    };
+  };
 
   // 2 services
   await ServicesCollection.insertAsync({
@@ -93,6 +130,7 @@ async function insertDemoData(): Promise<void> {
     number: "09170000001",
     avatar: null,
     available: false,
+    active: true,
     services: [{ id: "seed-service-general", name: "General Consultation", enabled: true }],
     createdAt: minutesAgo(220),
   });
@@ -104,6 +142,7 @@ async function insertDemoData(): Promise<void> {
     number: "09170000002",
     avatar: null,
     available: true,
+    active: true,
     services: [
       { id: "seed-service-general", name: "General Consultation", enabled: true },
       { id: "seed-service-vaccination", name: "Vaccination", enabled: true },
@@ -118,6 +157,7 @@ async function insertDemoData(): Promise<void> {
     number: "09170000003",
     avatar: null,
     available: true,
+    active: true,
     services: [{ id: "seed-service-vaccination", name: "Vaccination", enabled: true }],
     createdAt: minutesAgo(220),
   });
@@ -240,7 +280,7 @@ async function insertDemoData(): Promise<void> {
     createdAt: minutesAgo(70),
   });
 
-  // Daily stats — today (partial) + past 30 days.
+  // Daily stats — today (partial) + past 30 days, including seeded wait times.
   // GC: longer, more variable consultations (15–32 min). Peaks Mon/Tue, drops Thu/Fri.
   // VC: shorter, spikier (8–20 min). Peaks Fri, dips Mon/Tue. Different rhythm to GC.
   // Apr 22 2026 = Wednesday; days-ago 3=Sun, 4=Sat, 10=Sun, 11=Sat, etc.
@@ -290,6 +330,18 @@ async function insertDemoData(): Promise<void> {
     d.setUTCDate(d.getUTCDate() - row.daysAgo);
     const dayKey = d.toISOString().split("T")[0];
     const dayDate = new Date(`${dayKey}T00:00:00.000Z`);
+    const generalWaitTimes = getSeededWaitTimeTotals({
+      serviceType: "general",
+      count: row.gcCount,
+      totalDuration: row.gcTotal,
+      daysAgo: row.daysAgo,
+    });
+    const vaccinationWaitTimes = getSeededWaitTimeTotals({
+      serviceType: "vaccination",
+      count: row.vcCount,
+      totalDuration: row.vcTotal,
+      daysAgo: row.daysAgo,
+    });
 
     await StatsCollection.insertAsync({
       _id: `seed-service-general-${dayKey}`,
@@ -297,6 +349,8 @@ async function insertDemoData(): Promise<void> {
       date: dayDate,
       count: row.gcCount,
       totalDuration: row.gcTotal,
+      estimatedWaitTime: generalWaitTimes.estimatedWaitTime,
+      actualWaitTime: generalWaitTimes.actualWaitTime,
     });
 
     await StatsCollection.insertAsync({
@@ -305,6 +359,8 @@ async function insertDemoData(): Promise<void> {
       date: dayDate,
       count: row.vcCount,
       totalDuration: row.vcTotal,
+      estimatedWaitTime: vaccinationWaitTimes.estimatedWaitTime,
+      actualWaitTime: vaccinationWaitTimes.actualWaitTime,
     });
   }
 

@@ -9,6 +9,7 @@ export interface StatsData {
     startTime?: Date;
     endTime?: Date;
     estimatedWaitTime?: number;
+    actualWaitTime?: number;
   };
 }
 
@@ -26,6 +27,7 @@ Meteor.methods({
           count: 0,
           totalDuration: 0,
           estimatedWaitTime: 0,
+          actualWaitTime: 0,
         },
       },
     );
@@ -42,7 +44,6 @@ Meteor.methods({
         ? (data.inc.endTime.getTime() - data.inc.startTime.getTime()) / 60000
         : undefined;
 
-
     return StatsCollection.upsertAsync(
       { _id: id },
       {
@@ -51,6 +52,7 @@ Meteor.methods({
           count: data.inc?.isCompleted ? 1 : 0,
           totalDuration: duration ?? 0,
           estimatedWaitTime: data.inc?.estimatedWaitTime ?? 0,
+          actualWaitTime: data.inc?.actualWaitTime ?? 0,
         },
       },
     );
