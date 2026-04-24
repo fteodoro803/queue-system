@@ -1,6 +1,7 @@
 import { QueueEntry } from "/imports/api/queueEntry";
 import { Service } from "/imports/api/service";
 import { Stats } from "/imports/api/stats";
+import { Provider } from "/imports/api/provider";
 
 export const statusBadgeMap: Record<string, string> = {
   ready: "badge-success",
@@ -21,106 +22,112 @@ export type QueueTimeResult =
         | "empty_queue";
     };
 
-// Calculates the estimated total service time for a queue
-// If an entry is supplied, calculates the estimated wait time for that entry.
 export function calculateQueueTime({
   queue,
   queueEntry,
   service,
-  activeProviders,
+  providers,
   currentTime,
   stats,
 }: {
   queue: QueueEntry[];
   queueEntry?: QueueEntry;
   service: Service;
-  activeProviders: number;
+  providers: Provider[];
   currentTime: Date;
   stats?: Stats;
 }): QueueTimeResult {
-  // If entry has no position, we can't calculate wait time
-  if (queueEntry && !queueEntry.position) {
+  // Guard — invalid position
+  if (queueEntry && queueEntry.position == null) {
     return { ok: false, reason: "invalid_position" };
   }
 
-  // If no active providers, we can't estimate wait time
-  if (!activeProviders || activeProviders <= 0)
-    return { ok: false, reason: "no_providers" };
-
-  // If entry is supplied but not in the queue or for a different service, return undefined
-  if (queueEntry && queueEntry.serviceId !== service._id)
+  // Guard — wrong service
+  if (queueEntry && queueEntry.serviceId !== service._id) {
     return { ok: false, reason: "wrong_service" };
+  }
 
-  // Service duration in minutes
-  const averageDuration: number | undefined = stats
-    ? stats.totalDuration / stats.count
-    : undefined;
-  const serviceDuration = averageDuration ?? service.duration;
+  // Filter to providers offering this service and are active
+  const activeProviders = providers.filter(
+    (p) =>
+      p.active && p.services.some((s) => s.id === service._id && s.enabled),
+  );
 
-  // 1. Get the time remaining for people being served ("in-progress")
-  let remainingTime = 0;
-  const inProgressEntries = queue.filter(
+  if (activeProviders.length === 0) {
+    return { ok: false, reason: "no_providers" };
+  }
+
+  // Service duration
+  const serviceDuration =
+    stats && stats.count > 0
+      ? stats.totalDuration / stats.count
+      : service.duration;
+
+  // Build lane finish times
+  const inProgress = queue.filter(
     (e) => e.serviceId === service._id && e.status === "in-progress",
   );
-  for (const entry of inProgressEntries) {
-    if (entry.start) {
-      const timeElapsed =
-        (currentTime.getTime() - entry.start.getTime()) / 60000;
-      const timeLeft = Math.max(0, serviceDuration - timeElapsed);
-      remainingTime += timeLeft;
-    } else {
-      // If start time is missing, assume full duration left
-      remainingTime += serviceDuration;
-    }
+
+  // Start with in-progress entries occupying lanes
+  const laneTimes: number[] = inProgress.map((entry) => {
+    if (!entry.start) return serviceDuration;
+    const elapsed = (currentTime.getTime() - entry.start.getTime()) / 60000;
+    return Math.max(0, serviceDuration - elapsed);
+  });
+
+  // Fill remaining lanes with 0 (free providers)
+  const freeLanes = activeProviders.length - inProgress.length;
+  for (let i = 0; i < freeLanes; i++) {
+    laneTimes.push(0);
   }
 
-  // 2a. Get waiting time for people "waiting"/"ready" ahead of the entry
-  let timeOfWaitingAhead: number = 0;
-  // People ahead of entry excluding the in-progress ones
-  if (queueEntry) {
-    const peopleAhead = queue.filter(
-      (e) =>
-        e.serviceId === service._id &&
-        (e.status === "waiting" || e.status === "ready") &&
-        e.position != null &&
-        queueEntry.position != null &&
-        e.position < queueEntry.position,
-    ).length;
-    timeOfWaitingAhead = peopleAhead * serviceDuration;
+  // If queueEntry is in-progress, return its remaining time directly
+  if (queueEntry?.status === "in-progress") {
+    if (!queueEntry.start) return { ok: true, time: 0 };
+    const elapsed =
+      (currentTime.getTime() - queueEntry.start.getTime()) / 60000;
+    return {
+      ok: true,
+      time: Math.ceil(Math.max(0, serviceDuration - elapsed)),
+    };
   }
 
-  // 2b. If no entry supplied, calculate based on the full queue length for the service
-  else {
-    const numPeopleWaiting = queue.filter(
+  // Get waiting patients in position order
+  const waiting = queue
+    .filter(
       (e) =>
         e.serviceId === service._id &&
         (e.status === "waiting" || e.status === "ready") &&
         e.position != null,
-    ).length;
+    )
+    .sort((a, b) => a.position! - b.position!);
 
-    timeOfWaitingAhead = numPeopleWaiting * serviceDuration;
+  if (waiting.length === 0) return { ok: true, time: 0 };
+
+  // Assign each waiting patient to the earliest finishing lane
+  let targetWaitTime: number | undefined;
+
+  for (const entry of waiting) {
+    // Find earliest finishing lane
+    const earliestLane = laneTimes.indexOf(Math.min(...laneTimes));
+    const waitTime = laneTimes[earliestLane];
+
+    // If this is the entry we care about, record its wait time
+    if (queueEntry && entry._id === queueEntry._id) {
+      targetWaitTime = waitTime;
+    }
+
+    // Update lane
+    laneTimes[earliestLane] += serviceDuration;
   }
 
-  // 3. Take into account the number of active providers for the service
-  // Count active queue entries for this service (waiting, ready, in-progress)
-  const activeQueueLength = queue.filter(
-    (e) =>
-      e.serviceId === service._id &&
-      (e.status === "waiting" ||
-        e.status === "in-progress" ||
-        e.status === "ready"),
-  ).length;
-  if (activeQueueLength === 0) return { ok: true, time: 0 }; // If no one in queue, wait time is 0
+  // Return specific entry wait time or total queue time
+  if (queueEntry) {
+    return targetWaitTime != null
+      ? { ok: true, time: Math.ceil(targetWaitTime) }
+      : { ok: false, reason: "invalid_position" };
+  }
 
-  // Min used because if there are more providers than patients, it doesnt shorten the wait time
-  const effectiveProviders = Math.min(
-    Math.max(1, activeProviders),
-    activeQueueLength,
-  );
-
-  // 4. Calculate total wait time
-  const totalWaitTime: number = Math.ceil(
-    (remainingTime + timeOfWaitingAhead) / effectiveProviders,
-  );
-  return { ok: true, time: totalWaitTime };
+  // No entry supplied — return the time until the last patient is served
+  return { ok: true, time: Math.ceil(Math.max(...laneTimes)) };
 }

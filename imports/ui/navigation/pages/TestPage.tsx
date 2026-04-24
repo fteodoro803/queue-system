@@ -80,6 +80,7 @@ export const TestPage = () => {
     _id: "54321",
     name: "Dr. Smith",
     available: true,
+    active: true,
     services: providerServices,
     createdAt: date ?? new Date(),
   };

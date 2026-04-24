@@ -47,7 +47,17 @@ export const QueueManagement = () => {
   const [selectedService, setSelectedService] = useState<Service | undefined>();
 
   const isProvidersLoading = useSubscribe("providers");
-  let providers = useFind(() => ProviderCollection.find({}));
+  let providers = useFind(
+    () =>
+      selectedService
+        ? ProviderCollection.find({
+            services: {
+              $elemMatch: { id: selectedService._id, enabled: true },
+            },
+          })
+        : ProviderCollection.find({}),
+    [selectedService?._id],
+  );
 
   const isPatientsLoading = useSubscribe("patients");
   const patients = useFind(() => PatientsCollection.find({}));
@@ -96,20 +106,18 @@ export const QueueManagement = () => {
   }, [selectedService]);
 
   // TODO: Currently doesnt account for specific services, this is just assuming 1 service
-  const totalProviders = providers.filter((p) =>
-    p.services.some((s) => s.id === selectedService?._id && s.enabled),
-  ).length;
-  const unavailableProviders = providers.filter((p) =>
-    p.services.some(
-      (s) => s.id === selectedService?._id && s.enabled && !p.available,
-    ),
-  ).length;
-  const availableProviders = totalProviders - unavailableProviders;
+  const activeProviders = providers.filter(
+    (p) =>
+      p.active &&
+      p.services.some((s) => s.id === selectedService?._id && s.enabled),
+  );
+  const availableProviders = providers.filter((p) => p.available).length;
+  const unavailableProviders = activeProviders.length - availableProviders;
 
   const maxQueueLength: QueueTimeResult | undefined =
     selectedService && stats
       ? calculateQueueTime({
-          activeProviders: totalProviders,
+          providers,
           currentTime: now,
           queue: presentQueueEntries,
           service: selectedService,
@@ -250,7 +258,7 @@ export const QueueManagement = () => {
                   <QueueList
                     queue={presentQueueEntries}
                     service={selectedService}
-                    activeProviders={totalProviders}
+                    providers={activeProviders}
                     states={["in-progress"]}
                     patientMap={patientMap}
                     adminView={true}
@@ -266,7 +274,7 @@ export const QueueManagement = () => {
                     service={selectedService}
                     availableProviders={availableProviders}
                     states={["waiting", "ready"]}
-                    activeProviders={totalProviders}
+                    providers={activeProviders}
                     patientMap={patientMap}
                     adminView={true}
                     stats={stats && stats.length > 0 ? stats[0] : undefined}
@@ -299,7 +307,7 @@ export const QueueManagement = () => {
                     queue={pastQueueEntries}
                     service={selectedService}
                     states={["completed"]}
-                    activeProviders={totalProviders}
+                    providers={activeProviders}
                     patientMap={patientMap}
                     adminView={true}
                   />
@@ -331,7 +339,7 @@ export const QueueManagement = () => {
                     queue={pastQueueEntries}
                     service={selectedService}
                     states={["cancelled"]}
-                    activeProviders={totalProviders}
+                    providers={activeProviders}
                     patientMap={patientMap}
                     adminView={true}
                   />
