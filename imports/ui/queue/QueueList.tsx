@@ -6,12 +6,13 @@ import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { calculateQueueTime } from "/imports/utils/queueUtils";
 import { Patient } from "/imports/api/patient";
 import { Stats } from "/imports/api/stats";
+import { Provider } from "/imports/api/provider";
 
 export const QueueList = ({
   queue,
   service,
   states,
-  activeProviders,
+  providers,
   patientMap,
   adminView,
   availableProviders,
@@ -20,7 +21,7 @@ export const QueueList = ({
   queue: QueueEntry[];
   service: Service;
   states: QueueStatus[];
-  activeProviders: number;
+  providers: Provider[];
   patientMap: Map<string, Patient>;
   adminView?: boolean;
   availableProviders?: number;
@@ -50,7 +51,7 @@ export const QueueList = ({
             queue: filteredQueue,
             queueEntry: entry,
             service: service,
-            activeProviders: activeProviders,
+            providers,
             currentTime: now,
             stats: stats,
           });
