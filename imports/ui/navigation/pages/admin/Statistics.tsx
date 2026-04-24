@@ -15,6 +15,7 @@ import { StatsCollection } from "/imports/api/stats";
 import {
   getAverageServiceTime,
   getQueueCount,
+  getWaitTimeDifference,
 } from "/imports/utils/statsUtils";
 import { AxisDomain } from "recharts/types/util/types";
 
@@ -36,6 +37,7 @@ export const Statistics = () => {
 
   const queueCount = getQueueCount(stats, selectedService);
   const averageServiceTime = getAverageServiceTime(stats, selectedService);
+  const waitTimeDifference = getWaitTimeDifference(stats, selectedService);
 
   return (
     <>
@@ -58,6 +60,19 @@ export const Statistics = () => {
       <div>
         <h2 className="text-2xl font-bold mt-2">Average Service Time</h2>
         <ServiceTimeChart data={averageServiceTime} />
+      </div>
+
+      {/*Wait Time Difference*/}
+      <div>
+        <h2 className="text-2xl font-bold mt-2">
+          Estimated vs Actual Wait Time
+        </h2>
+        <p className="text-sm text-base-content/60 mb-2">
+          Positive values mean estimates were longer than actual (conservative).
+          Negative values mean actual wait times exceeded estimates
+          (optimistic).
+        </p>
+        <WaitTimeDifferenceChart data={waitTimeDifference} />
       </div>
     </>
   );
@@ -170,6 +185,45 @@ export const ServiceTimeChart = ({
           type="monotone"
           dataKey="avgWaitTime"
           stroke="#8884d8"
+          strokeWidth={2}
+          dot={false}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+};
+
+export const WaitTimeDifferenceChart = ({
+  data,
+  maxX,
+  maxY,
+}: {
+  data: { date: Date; difference: number }[];
+  maxX?: number;
+  maxY?: number;
+}) => {
+  const xDomain: AxisDomain = maxX ? [0, maxX] : [0, "auto"];
+  const yDomain: AxisDomain = maxY ? [0, maxY] : ["auto", "auto"];
+
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis
+          dataKey="date"
+          tickFormatter={(date: Date) =>
+            date.toLocaleDateString(undefined, { dateStyle: "short" })
+          }
+          domain={xDomain}
+        />
+        <YAxis
+          domain={yDomain}
+          label={{ value: "minutes", angle: -90, position: "insideLeft" }}
+        />
+        <Line
+          type="monotone"
+          dataKey="difference"
+          stroke="#82ca9d"
           strokeWidth={2}
           dot={false}
         />

@@ -152,3 +152,75 @@ export const getQueueCount = (
 
   return result;
 };
+
+/**
+ * Calculates the difference between average estimated and actual wait times per day,
+ * optionally filtered by a specific service.
+ *
+ * @param stats - Array of Stats objects containing wait time data.
+ * @param service - Optional Service object to filter the stats by a specific service.
+ * @returns An array of DataPoint objects sorted by date ascending.
+ *         Positive values indicate estimated times were longer than actual (good prediction).
+ *         Negative values indicate estimated times were shorter than actual (underestimated).
+ *
+ * @example
+ * // All services combined
+ * getWaitTimeDifference({ stats })
+ *
+ * // Filtered to one service
+ * getWaitTimeDifference({ stats, service: selectedService })
+ */
+export const getWaitTimeDifference = (
+  stats: Stats[],
+  service?: Service,
+): { date: Date; difference: number }[] => {
+  // Early return if stats array is empty or if any stat is missing required fields
+  if (stats.length === 0) return [];
+  if (
+    stats.some(
+      (stat) =>
+        !stat.date ||
+        !stat.count ||
+        stat.estimatedWaitTime === undefined ||
+        stat.actualWaitTime === undefined,
+    )
+  ) {
+    console.warn("Some stats are missing required wait time fields");
+    return [];
+  }
+
+  // 1. Filter stats if a service is specified, otherwise use all stats
+  const filtered = filteredByService(service, stats);
+
+  // 2. Group by date, summing wait times and count across all services per day
+  const groupedData = groupBy(
+    filtered,
+    (stat) => stat.date.toISOString(), // group by date string
+    (acc, item) => ({
+      ...acc,
+      estimatedWaitTime:
+        acc.estimatedWaitTime + item.estimatedWaitTime,
+      actualWaitTime: acc.actualWaitTime + item.actualWaitTime,
+      count: acc.count + item.count,
+    }),
+  );
+
+  // 3. Convert grouped object to a sorted DataPoint array
+  const result: { date: Date; difference: number }[] = Object.entries(
+    groupedData,
+  )
+    .map(([date, data]) => ({
+      date: new Date(date),
+      difference:
+        data.count > 0
+          ? Math.round(
+              data.estimatedWaitTime / data.count -
+                data.actualWaitTime / data.count,
+            )
+          : 0,
+    }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime()); // sort by date
+
+  return result;
+};
+
