@@ -47,7 +47,17 @@ export const QueueManagement = () => {
   const [selectedService, setSelectedService] = useState<Service | undefined>();
 
   const isProvidersLoading = useSubscribe("providers");
-  let providers = useFind(() => ProviderCollection.find({}));
+  let providers = useFind(
+    () =>
+      selectedService
+        ? ProviderCollection.find({
+            services: {
+              $elemMatch: { id: selectedService._id, enabled: true },
+            },
+          })
+        : ProviderCollection.find({}),
+    [selectedService?._id],
+  );
 
   const isPatientsLoading = useSubscribe("patients");
   const patients = useFind(() => PatientsCollection.find({}));
@@ -109,7 +119,7 @@ export const QueueManagement = () => {
   const maxQueueLength: QueueTimeResult | undefined =
     selectedService && stats
       ? calculateQueueTime({
-          activeProviders: totalProviders,
+          providers,
           currentTime: now,
           queue: presentQueueEntries,
           service: selectedService,

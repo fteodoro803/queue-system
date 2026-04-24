@@ -192,8 +192,8 @@ export async function setProviderAvailability(
 }
 
 // TODO: consider combining toggle and set functions into one function with a parameter to specify the desired status
-export async function toggleProviderAtWork(id: string): Promise<number> {
-  return Meteor.callAsync("provider.toggleAtWork", id);
+export async function toggleProviderActive(id: string): Promise<number> {
+  return Meteor.callAsync("provider.toggleActive", id);
 }
 
 export async function selectProvider(

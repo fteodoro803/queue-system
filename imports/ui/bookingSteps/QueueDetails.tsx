@@ -74,10 +74,6 @@ const QueueDetailsContent = ({
   const [queueErrorReason, setQueueErrorReason] =
     useState<QueueFailureReason>();
 
-  const activeProviders = providers.filter((p) =>
-    p.services.some((s) => s.id === entryData?.service._id && s.enabled),
-  ).length;
-
   // ---- Effects ----
   // FIXME: estimated wait time at enqueue isnt consistent withMaxQueueLength
   useEffect(() => {
@@ -87,7 +83,7 @@ const QueueDetailsContent = ({
         const estServiceTime: QueueTimeResult = calculateQueueTime({
           queue,
           service: entryData.service,
-          activeProviders,
+          providers,
           currentTime: now,
           stats: stats && stats.length > 0 ? stats[0] : undefined,
         });
@@ -120,7 +116,7 @@ const QueueDetailsContent = ({
     queueEntry: entry,
     queue: queue,
     service: entryData.service,
-    activeProviders: activeProviders,
+    providers,
     currentTime: now,
     stats: stats && stats.length > 0 ? stats[0] : undefined,
   });

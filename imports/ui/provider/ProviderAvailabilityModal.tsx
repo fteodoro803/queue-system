@@ -5,7 +5,7 @@ import { ProviderServicesTable } from "/imports/ui/provider/ProviderServicesTabl
 import { CalendarIcon } from "@heroicons/react/24/outline";
 import { Avatar } from "/imports/ui/components/Avatar";
 import {
-  toggleProviderAtWork,
+  toggleProviderActive,
   toggleProviderAvailability,
 } from "/imports/api/providerMethods";
 
@@ -28,9 +28,9 @@ export const ProviderAvailabilityModal = ({
   };
 
   // TODO: if AtWork is off, automatically set Available off
-  const handleToggleAtWork = async (providerId: string) => {
+  const handleToggleActive = async (providerId: string) => {
     try {
-      await toggleProviderAtWork(providerId);
+      await toggleProviderActive(providerId);
     } catch (error) {
       console.error("Error toggling provider at work status:", error);
     }
@@ -94,14 +94,14 @@ export const ProviderAvailabilityModal = ({
                         </p>
                       )}
                     </div>
-                    {/* At Work Toggle */}
+                    {/* Active Toggle */}
                     <div className="flex items-center gap-2 ml-auto">
-                      <p>At Work</p>
+                      <p>Active</p>
                       <input
                         type="checkbox"
                         className="toggle toggle-success toggle-sm "
-                        checked={provider.atWork}
-                        onChange={() => handleToggleAtWork(provider._id)}
+                        checked={provider.active}
+                        onChange={() => handleToggleActive(provider._id)}
                       />
                     </div>
 
