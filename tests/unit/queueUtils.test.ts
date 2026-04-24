@@ -1,10 +1,9 @@
 import { expect } from "chai";
 import { QueueEntry } from "/imports/api/queueEntry";
+import { Provider } from "/imports/api/provider";
 import { Service } from "/imports/api/service";
 import { Stats } from "/imports/api/stats";
 import { calculateQueueTime } from "/imports/utils/queueUtils";
-
-// TODO: tests for multiple providers
 
 const baseService: Service = {
   _id: "service-1",
@@ -23,7 +22,41 @@ function makeStats(partial?: Partial<Stats>): Stats {
     date: new Date(2026, 1, 1),
     count: 1,
     totalDuration: 30,
+    estimatedWaitTime: 30,
+    actualWaitTime: 25,
     ...partial,
+  };
+}
+
+function makeProvider({
+  id,
+  active = true,
+  available = true,
+  serviceId = "service-1",
+  enabled = true,
+}: {
+  id: string;
+  active?: boolean;
+  available?: boolean;
+  serviceId?: string;
+  enabled?: boolean;
+}): Provider {
+  return {
+    _id: id,
+    name: `Provider ${id}`,
+    email: `${id}@example.com`,
+    number: "09170000000",
+    avatar: null,
+    available,
+    active,
+    services: [
+      {
+        id: serviceId,
+        name: baseService.name,
+        enabled,
+      },
+    ],
+    createdAt: new Date(2026, 1, 1, 9, 0),
   };
 }
 
@@ -71,18 +104,22 @@ describe("[UNIT] QueueUtils", () => {
         queue: [queueEntry],
         queueEntry,
         service: baseService,
-        activeProviders: 1,
+        providers: [makeProvider({ id: "provider-1" })],
         currentTime: now,
       });
 
       expect(result).to.deep.equal({ ok: false, reason: "invalid_position" });
     });
 
-    it("returns no_providers when activeProviders is zero", () => {
+    it("returns no_providers when no active provider can serve the service", () => {
       const result = calculateQueueTime({
         queue: [],
         service: baseService,
-        activeProviders: 0,
+        providers: [
+          makeProvider({ id: "provider-inactive", active: false }),
+          makeProvider({ id: "provider-disabled", enabled: false }),
+          makeProvider({ id: "provider-other-service", serviceId: "service-2" }),
+        ],
         currentTime: now,
       });
 
@@ -101,7 +138,7 @@ describe("[UNIT] QueueUtils", () => {
         queue: [queueEntry],
         queueEntry,
         service: baseService,
-        activeProviders: 1,
+        providers: [makeProvider({ id: "provider-1" })],
         currentTime: now,
       });
 
@@ -118,30 +155,50 @@ describe("[UNIT] QueueUtils", () => {
           }),
         ],
         service: baseService,
-        activeProviders: 2,
+        providers: [
+          makeProvider({ id: "provider-1" }),
+          makeProvider({ id: "provider-2" }),
+        ],
         currentTime: now,
       });
 
       expect(result).to.deep.equal({ ok: true, time: 0 });
     });
 
-    it("calculates full queue time with only in-progress entries with 1 provider", () => {
-      const queue = [
-        makeQueueEntry({
-          id: "1",
-          status: "in-progress",
-          start: new Date(2026, 1, 1, 9, 45),
-        }),
-      ];
+    it("returns invalid_position for an in-progress entry with no queue position", () => {
+      const queueEntry = makeQueueEntry({
+        id: "1",
+        status: "in-progress",
+        start: new Date(2026, 1, 1, 9, 45),
+      });
 
       const result = calculateQueueTime({
-        queue,
+        queue: [queueEntry],
+        queueEntry,
         service: baseService,
-        activeProviders: 1,
+        providers: [makeProvider({ id: "provider-1" })],
         currentTime: now,
       });
 
-      // Remaining in-progress time: 15 minutes
+      expect(result).to.deep.equal({ ok: false, reason: "invalid_position" });
+    });
+
+    it("returns remaining time directly when an in-progress entry is passed with a position", () => {
+      const queueEntry = makeQueueEntry({
+        id: "1b",
+        status: "in-progress",
+        position: 1,
+        start: new Date(2026, 1, 1, 9, 45),
+      });
+
+      const result = calculateQueueTime({
+        queue: [queueEntry],
+        queueEntry,
+        service: baseService,
+        providers: [makeProvider({ id: "provider-1" })],
+        currentTime: now,
+      });
+
       expect(result).to.deep.equal({ ok: true, time: 15 });
     });
 
@@ -159,7 +216,7 @@ describe("[UNIT] QueueUtils", () => {
       const result = calculateQueueTime({
         queue,
         service: baseService,
-        activeProviders: 1,
+        providers: [makeProvider({ id: "provider-1" })],
         currentTime: now,
       });
 
@@ -189,7 +246,7 @@ describe("[UNIT] QueueUtils", () => {
         queue,
         queueEntry,
         service: baseService,
-        activeProviders: 1,
+        providers: [makeProvider({ id: "provider-1" })],
         currentTime: now,
       });
 
@@ -213,12 +270,44 @@ describe("[UNIT] QueueUtils", () => {
         queue,
         queueEntry,
         service: baseService,
-        activeProviders: 1,
+        providers: [makeProvider({ id: "provider-1" })],
         currentTime: now,
         stats: makeStats({ count: 3, totalDuration: 60 }), // avg = 20
       });
 
       expect(result).to.deep.equal({ ok: true, time: 20 });
+    });
+
+    it("distributes waiting patients across multiple provider lanes", () => {
+      const queueEntry = makeQueueEntry({
+        id: "target",
+        status: "waiting",
+        position: 3,
+      });
+
+      const queue = [
+        makeQueueEntry({
+          id: "12",
+          status: "in-progress",
+          start: new Date(2026, 1, 1, 9, 45),
+        }),
+        makeQueueEntry({ id: "13", status: "waiting", position: 1 }),
+        makeQueueEntry({ id: "14", status: "ready", position: 2 }),
+        queueEntry,
+      ];
+
+      const result = calculateQueueTime({
+        queue,
+        queueEntry,
+        service: baseService,
+        providers: [
+          makeProvider({ id: "provider-1" }),
+          makeProvider({ id: "provider-2" }),
+        ],
+        currentTime: now,
+      });
+
+      expect(result).to.deep.equal({ ok: true, time: 30 });
     });
   });
 });
