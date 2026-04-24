@@ -10,7 +10,7 @@ import {
   CheckIcon,
 } from "@heroicons/react/24/outline";
 import { QueueIcon } from "/imports/ui/components/QueueIcon";
-import { formatDateToLocale } from "/imports/utils/utils";
+import { convertMinutesToTime, formatDateToLocale } from "/imports/utils/utils";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { QueueTimeResult, statusBadgeMap } from "/imports/utils/queueUtils";
 import {
@@ -154,12 +154,12 @@ const TimeStatus = ({
     <>
       {/* Estimated Time Until */}
       {(entry.status === "waiting" || entry.status === "ready") &&
-        timeUntil != undefined && (
+        timeUntil && (
           <div className="flex items-center gap-1">
             <ClockIcon className={iconSize} />
             <p className={textSize}>
-              {timeUntil.ok
-                ? `est. ${timeUntil.time} min`
+              {timeUntil && timeUntil.ok
+                ? `est. ${convertMinutesToTime(timeUntil.time)}`
                 : `ERROR (${timeUntil.reason})`}
             </p>
           </div>
