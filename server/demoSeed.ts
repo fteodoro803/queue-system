@@ -25,11 +25,11 @@ async function hasAnyBusinessData(): Promise<boolean> {
 
   return Boolean(
     existingService ||
-      existingProvider ||
-      existingPatient ||
-      existingQueueEntry ||
-      existingAppointment ||
-      existingStats,
+    existingProvider ||
+    existingPatient ||
+    existingQueueEntry ||
+    existingAppointment ||
+    existingStats,
   );
 }
 
@@ -87,9 +87,7 @@ async function insertDemoData(): Promise<void> {
         ? Math.max(12, Math.round(averageDuration * 0.9 + count * 0.25))
         : Math.max(8, Math.round(averageDuration * 0.75 + count * 0.35));
     const actualWaitVariance =
-      serviceType === "general"
-        ? (daysAgo % 5) - 2
-        : ((daysAgo + 2) % 5) - 2;
+      serviceType === "general" ? (daysAgo % 5) - 2 : ((daysAgo + 2) % 5) - 2;
     const averageActualWaitTime = Math.max(
       0,
       averageEstimatedWaitTime + actualWaitVariance,
@@ -107,6 +105,7 @@ async function insertDemoData(): Promise<void> {
     name: "General Consultation",
     shortcode: "GC",
     duration: 20,
+    cost: 500,
     description: "General checkup and consultation",
     priority: 1,
     createdAt: minutesAgo(240),
@@ -117,6 +116,7 @@ async function insertDemoData(): Promise<void> {
     name: "Vaccination",
     shortcode: "VC",
     duration: 15,
+    cost: 250,
     description: "Routine vaccination service",
     priority: 1,
     createdAt: minutesAgo(240),
@@ -131,7 +131,13 @@ async function insertDemoData(): Promise<void> {
     avatar: null,
     available: false,
     active: true,
-    services: [{ id: "seed-service-general", name: "General Consultation", enabled: true }],
+    services: [
+      {
+        id: "seed-service-general",
+        name: "General Consultation",
+        enabled: true,
+      },
+    ],
     createdAt: minutesAgo(220),
   });
 
@@ -144,7 +150,11 @@ async function insertDemoData(): Promise<void> {
     available: true,
     active: true,
     services: [
-      { id: "seed-service-general", name: "General Consultation", enabled: true },
+      {
+        id: "seed-service-general",
+        name: "General Consultation",
+        enabled: true,
+      },
       { id: "seed-service-vaccination", name: "Vaccination", enabled: true },
     ],
     createdAt: minutesAgo(220),
@@ -158,7 +168,9 @@ async function insertDemoData(): Promise<void> {
     avatar: null,
     available: true,
     active: true,
-    services: [{ id: "seed-service-vaccination", name: "Vaccination", enabled: true }],
+    services: [
+      { id: "seed-service-vaccination", name: "Vaccination", enabled: true },
+    ],
     createdAt: minutesAgo(220),
   });
 
@@ -292,37 +304,37 @@ async function insertDemoData(): Promise<void> {
     vcTotal: number;
   }> = [
     // daysAgo  gcCount  gcTotal   vcCount  vcTotal    gcAvg  vcAvg
-    { daysAgo:  0, gcCount:  4, gcTotal:   76, vcCount:  3, vcTotal:  54 }, // today partial  19 / 18
-    { daysAgo:  1, gcCount: 20, gcTotal:  560, vcCount: 14, vcTotal: 126 }, // Tue            28 /  9
-    { daysAgo:  2, gcCount: 22, gcTotal:  660, vcCount: 13, vcTotal: 117 }, // Mon            30 /  9
-    { daysAgo:  3, gcCount: 12, gcTotal:  192, vcCount: 12, vcTotal: 108 }, // Sun weekend    16 /  9
-    { daysAgo:  4, gcCount: 13, gcTotal:  208, vcCount: 12, vcTotal: 132 }, // Sat weekend    16 / 11
-    { daysAgo:  5, gcCount: 16, gcTotal:  272, vcCount: 19, vcTotal: 342 }, // Fri            17 / 18
-    { daysAgo:  6, gcCount: 15, gcTotal:  240, vcCount: 18, vcTotal: 306 }, // Thu            16 / 17
-    { daysAgo:  7, gcCount: 18, gcTotal:  486, vcCount: 15, vcTotal: 180 }, // Wed            27 / 12
-    { daysAgo:  8, gcCount: 21, gcTotal:  630, vcCount: 13, vcTotal: 117 }, // Tue            30 /  9
-    { daysAgo:  9, gcCount: 19, gcTotal:  570, vcCount: 12, vcTotal: 108 }, // Mon            30 /  9
-    { daysAgo: 10, gcCount: 12, gcTotal:  180, vcCount: 12, vcTotal:  96 }, // Sun weekend    15 /  8
-    { daysAgo: 11, gcCount: 12, gcTotal:  216, vcCount: 13, vcTotal: 143 }, // Sat weekend    18 / 11
-    { daysAgo: 12, gcCount: 14, gcTotal:  224, vcCount: 20, vcTotal: 400 }, // Fri            16 / 20
-    { daysAgo: 13, gcCount: 15, gcTotal:  255, vcCount: 18, vcTotal: 324 }, // Thu            17 / 18
-    { daysAgo: 14, gcCount: 17, gcTotal:  442, vcCount: 14, vcTotal: 168 }, // Wed            26 / 12
-    { daysAgo: 15, gcCount: 20, gcTotal:  640, vcCount: 13, vcTotal: 130 }, // Tue            32 / 10
-    { daysAgo: 16, gcCount: 18, gcTotal:  540, vcCount: 12, vcTotal: 108 }, // Mon            30 /  9
-    { daysAgo: 17, gcCount: 12, gcTotal:  192, vcCount: 12, vcTotal: 120 }, // Sun weekend    16 / 10
-    { daysAgo: 18, gcCount: 13, gcTotal:  195, vcCount: 12, vcTotal: 132 }, // Sat weekend    15 / 11
-    { daysAgo: 19, gcCount: 15, gcTotal:  255, vcCount: 17, vcTotal: 306 }, // Fri            17 / 18
-    { daysAgo: 20, gcCount: 16, gcTotal:  256, vcCount: 16, vcTotal: 256 }, // Thu            16 / 16
-    { daysAgo: 21, gcCount: 19, gcTotal:  513, vcCount: 15, vcTotal: 165 }, // Wed            27 / 11
-    { daysAgo: 22, gcCount: 22, gcTotal:  594, vcCount: 13, vcTotal: 117 }, // Tue            27 /  9
-    { daysAgo: 23, gcCount: 20, gcTotal:  560, vcCount: 12, vcTotal:  96 }, // Mon            28 /  8
-    { daysAgo: 24, gcCount: 12, gcTotal:  180, vcCount: 12, vcTotal: 108 }, // Sun weekend    15 /  9
-    { daysAgo: 25, gcCount: 13, gcTotal:  221, vcCount: 13, vcTotal: 156 }, // Sat weekend    17 / 12
-    { daysAgo: 26, gcCount: 14, gcTotal:  238, vcCount: 19, vcTotal: 361 }, // Fri            17 / 19
-    { daysAgo: 27, gcCount: 16, gcTotal:  272, vcCount: 18, vcTotal: 324 }, // Thu            17 / 18
-    { daysAgo: 28, gcCount: 18, gcTotal:  468, vcCount: 15, vcTotal: 180 }, // Wed            26 / 12
-    { daysAgo: 29, gcCount: 21, gcTotal:  609, vcCount: 14, vcTotal: 126 }, // Tue            29 /  9
-    { daysAgo: 30, gcCount: 20, gcTotal:  580, vcCount: 13, vcTotal: 117 }, // Mon            29 /  9
+    { daysAgo: 0, gcCount: 4, gcTotal: 76, vcCount: 3, vcTotal: 54 }, // today partial  19 / 18
+    { daysAgo: 1, gcCount: 20, gcTotal: 560, vcCount: 14, vcTotal: 126 }, // Tue            28 /  9
+    { daysAgo: 2, gcCount: 22, gcTotal: 660, vcCount: 13, vcTotal: 117 }, // Mon            30 /  9
+    { daysAgo: 3, gcCount: 12, gcTotal: 192, vcCount: 12, vcTotal: 108 }, // Sun weekend    16 /  9
+    { daysAgo: 4, gcCount: 13, gcTotal: 208, vcCount: 12, vcTotal: 132 }, // Sat weekend    16 / 11
+    { daysAgo: 5, gcCount: 16, gcTotal: 272, vcCount: 19, vcTotal: 342 }, // Fri            17 / 18
+    { daysAgo: 6, gcCount: 15, gcTotal: 240, vcCount: 18, vcTotal: 306 }, // Thu            16 / 17
+    { daysAgo: 7, gcCount: 18, gcTotal: 486, vcCount: 15, vcTotal: 180 }, // Wed            27 / 12
+    { daysAgo: 8, gcCount: 21, gcTotal: 630, vcCount: 13, vcTotal: 117 }, // Tue            30 /  9
+    { daysAgo: 9, gcCount: 19, gcTotal: 570, vcCount: 12, vcTotal: 108 }, // Mon            30 /  9
+    { daysAgo: 10, gcCount: 12, gcTotal: 180, vcCount: 12, vcTotal: 96 }, // Sun weekend    15 /  8
+    { daysAgo: 11, gcCount: 12, gcTotal: 216, vcCount: 13, vcTotal: 143 }, // Sat weekend    18 / 11
+    { daysAgo: 12, gcCount: 14, gcTotal: 224, vcCount: 20, vcTotal: 400 }, // Fri            16 / 20
+    { daysAgo: 13, gcCount: 15, gcTotal: 255, vcCount: 18, vcTotal: 324 }, // Thu            17 / 18
+    { daysAgo: 14, gcCount: 17, gcTotal: 442, vcCount: 14, vcTotal: 168 }, // Wed            26 / 12
+    { daysAgo: 15, gcCount: 20, gcTotal: 640, vcCount: 13, vcTotal: 130 }, // Tue            32 / 10
+    { daysAgo: 16, gcCount: 18, gcTotal: 540, vcCount: 12, vcTotal: 108 }, // Mon            30 /  9
+    { daysAgo: 17, gcCount: 12, gcTotal: 192, vcCount: 12, vcTotal: 120 }, // Sun weekend    16 / 10
+    { daysAgo: 18, gcCount: 13, gcTotal: 195, vcCount: 12, vcTotal: 132 }, // Sat weekend    15 / 11
+    { daysAgo: 19, gcCount: 15, gcTotal: 255, vcCount: 17, vcTotal: 306 }, // Fri            17 / 18
+    { daysAgo: 20, gcCount: 16, gcTotal: 256, vcCount: 16, vcTotal: 256 }, // Thu            16 / 16
+    { daysAgo: 21, gcCount: 19, gcTotal: 513, vcCount: 15, vcTotal: 165 }, // Wed            27 / 11
+    { daysAgo: 22, gcCount: 22, gcTotal: 594, vcCount: 13, vcTotal: 117 }, // Tue            27 /  9
+    { daysAgo: 23, gcCount: 20, gcTotal: 560, vcCount: 12, vcTotal: 96 }, // Mon            28 /  8
+    { daysAgo: 24, gcCount: 12, gcTotal: 180, vcCount: 12, vcTotal: 108 }, // Sun weekend    15 /  9
+    { daysAgo: 25, gcCount: 13, gcTotal: 221, vcCount: 13, vcTotal: 156 }, // Sat weekend    17 / 12
+    { daysAgo: 26, gcCount: 14, gcTotal: 238, vcCount: 19, vcTotal: 361 }, // Fri            17 / 19
+    { daysAgo: 27, gcCount: 16, gcTotal: 272, vcCount: 18, vcTotal: 324 }, // Thu            17 / 18
+    { daysAgo: 28, gcCount: 18, gcTotal: 468, vcCount: 15, vcTotal: 180 }, // Wed            26 / 12
+    { daysAgo: 29, gcCount: 21, gcTotal: 609, vcCount: 14, vcTotal: 126 }, // Tue            29 /  9
+    { daysAgo: 30, gcCount: 20, gcTotal: 580, vcCount: 13, vcTotal: 117 }, // Mon            29 /  9
   ];
 
   for (const row of historicalStats) {
@@ -366,4 +378,3 @@ async function insertDemoData(): Promise<void> {
 
   return;
 }
-
