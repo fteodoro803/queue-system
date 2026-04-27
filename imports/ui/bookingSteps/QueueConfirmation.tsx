@@ -11,7 +11,7 @@ import {
   UserIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
-import { QueueEntryCollection } from "/imports/api/queueEntry";
+import { QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Loading } from "/imports/ui/components/Loading";
 import { getStatsQuery } from "/imports/api/statsMethods";
@@ -59,15 +59,48 @@ export const QueueConfirmation = ({
     return <Loading />;
   }
 
-  const queueTimeResult = calculateQueueTime({
-    queue,
-    service,
+  const waitingOrReady = queue.filter(
+    (entry) =>
+      entry.serviceId === service._id &&
+      (entry.status === "waiting" || entry.status === "ready") &&
+      entry.position != null,
+  );
+
+  const maxPosition = waitingOrReady.reduce(
+    (max, entry) => Math.max(max, entry.position ?? 0),
+    0,
+  );
+  const simulatedPosition = maxPosition + 1;
+
+  // Simulate the pending entry so this estimate matches post-enqueue QueueDetails behavior.
+  const simulatedQueueEntry: QueueEntry = {
+    _id: "simulated-queue-entry",
+    displayId: "PENDING",
+    patientId: patient._id,
+    serviceId: service._id,
+    providerId: null,
+    position: simulatedPosition,
+    status: "waiting",
+    initialEstimatedWaitTime: null,
+    readyAt: null,
+    start: null,
+    end: null,
+    createdAt: now,
+  };
+
+  const simulatedQueue = [...queue, simulatedQueueEntry];
+
+  // Calculate estimated wait time
+  const result = calculateQueueTime({
+    queue: simulatedQueue,
+    queueEntry: simulatedQueueEntry,
+    service: service,
     providers,
     currentTime: now,
     stats: stats && stats.length > 0 ? stats[0] : undefined,
   });
-  const queueTime = queueTimeResult.ok
-    ? `${convertMinutesToTime(queueTimeResult.time)} min`
+  const queueTime = result.ok
+    ? `${convertMinutesToTime(result.time)} min`
     : undefined;
 
   return (
@@ -143,7 +176,7 @@ export const QueueConfirmation = ({
       </div>
 
       {/* Queue Time estimate */}
-      {queueTimeResult.ok && (
+      {result.ok && (
         <div className="flex items-center gap-2 p-3 rounded-lg bg-warning/10 ring-1 ring-warning/30 text-warning">
           <ExclamationTriangleIcon className="h-4 w-4 shrink-0" />
           <span className="text-sm font-medium">
