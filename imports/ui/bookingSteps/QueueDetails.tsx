@@ -31,7 +31,7 @@ export const QueueDetails = ({
 }) => {
   const now = useDateTime();
   const isProvidersLoading = useSubscribe("providers");
-  const providers = useFind(() => ProviderCollection.find({}));
+  const providers = useFind(() => ProviderCollection.find({})); // TODO: optimize to only fetch providers relevant to the service
   const isQueueLoading = useSubscribe("queue");
   const queue = useFind(() =>
     QueueEntryCollection.find({ serviceId: entryData?.service?._id }),

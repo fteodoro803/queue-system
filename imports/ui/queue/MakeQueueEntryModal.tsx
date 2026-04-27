@@ -85,7 +85,7 @@ export const MakeQueueEntryModal = ({
             {page === 2 && <SelectPatient setPatient={setPatient} />}
 
             {/* Confirm Details */}
-            {page === 3 && (
+            {page === 3 && patient && service && (
               <QueueConfirmation
                 patient={patient}
                 service={service}
