@@ -19,7 +19,8 @@ export type QueueTimeResult =
         | "no_providers"
         | "invalid_position"
         | "wrong_service"
-        | "empty_queue";
+        | "empty_queue"
+        | "invalid_status";
     };
 
 export function calculateQueueTime({
@@ -37,14 +38,31 @@ export function calculateQueueTime({
   currentTime: Date;
   stats?: Stats;
 }): QueueTimeResult {
-  // Guard — invalid position
-  if (queueEntry && queueEntry.position == null) {
-    return { ok: false, reason: "invalid_position" };
-  }
+  // QueueEntry Guards
+  if (queueEntry) {
+    // wrong service
+    if (queueEntry.serviceId !== service._id) {
+      return { ok: false, reason: "wrong_service" };
+    }
 
-  // Guard — wrong service
-  if (queueEntry && queueEntry.serviceId !== service._id) {
-    return { ok: false, reason: "wrong_service" };
+    // invalid position while waiting or ready
+    if (
+      (queueEntry.status === "waiting" || queueEntry.status === "ready") &&
+      queueEntry.position == null
+    ) {
+      return { ok: false, reason: "invalid_position" };
+    }
+
+    if (queueEntry.status === "in-progress" && queueEntry.position != null) {
+      return { ok: false, reason: "invalid_position" };
+    }
+
+    if (
+      queueEntry.status === "completed" ||
+      queueEntry.status === "cancelled"
+    ) {
+      return { ok: false, reason: "invalid_status" };
+    }
   }
 
   // Filter to providers offering this service and are active
