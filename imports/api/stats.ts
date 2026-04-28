@@ -9,7 +9,7 @@ export interface Stats {
   serviceId: string;
   date: Date; // the start time of the entry
   granularity: StatsGranularity;
-  count: number; // number of appointments for the service
+  numCompletedAppointments: number;
   totalDuration: number; // service duration
   estimatedWaitTime: number; // given by system when the queue entry is created
   actualWaitTime: number; // calculated when the service is started

@@ -78,7 +78,12 @@ export const getAverageServiceTime = (
 ): { date: Date; avgWaitTime: number }[] => {
   // Early return if stats array is empty or if any stat is missing required fields
   if (stats.length === 0) return [];
-  if (stats.some((stat) => !stat.date || !stat.totalDuration || !stat.count)) {
+  if (
+    stats.some(
+      (stat) =>
+        !stat.date || !stat.totalDuration || !stat.numCompletedAppointments,
+    )
+  ) {
     console.warn("Some stats are missing required fields");
     return [];
   }
@@ -93,7 +98,8 @@ export const getAverageServiceTime = (
     (acc, item) => ({
       ...acc,
       totalDuration: acc.totalDuration + item.totalDuration,
-      count: acc.count + item.count,
+      numCompletedAppointments:
+        acc.numCompletedAppointments + item.numCompletedAppointments,
     }),
   );
 
@@ -104,7 +110,9 @@ export const getAverageServiceTime = (
     .map(([date, data]) => ({
       date: new Date(date),
       avgWaitTime:
-        data.count > 0 ? Math.round(data.totalDuration / data.count) : 0,
+        data.numCompletedAppointments > 0
+          ? Math.round(data.totalDuration / data.numCompletedAppointments)
+          : 0,
     }))
     .sort((a, b) => a.date.getTime() - b.date.getTime()); // sort by date
 
@@ -124,7 +132,7 @@ export const getQueueCount = (
 ): { date: Date; count: number }[] => {
   // Early return if stats array is empty or if any stat is missing required fields
   if (stats.length === 0) return [];
-  if (stats.some((stat) => !stat.date || !stat.count)) {
+  if (stats.some((stat) => !stat.date || !stat.numCompletedAppointments)) {
     console.warn("Some stats are missing required fields");
     return [];
   }
@@ -138,7 +146,8 @@ export const getQueueCount = (
     (stat) => stat.date.toISOString(), // group by date string
     (acc, item) => ({
       ...acc,
-      count: acc.count + item.count,
+      numCompletedAppointments:
+        acc.numCompletedAppointments + item.numCompletedAppointments,
     }),
   );
 
@@ -146,7 +155,7 @@ export const getQueueCount = (
   const result: { date: Date; count: number }[] = Object.entries(groupedData)
     .map(([date, data]) => ({
       date: new Date(date),
-      count: data.count,
+      count: data.numCompletedAppointments,
     }))
     .sort((a, b) => a.date.getTime() - b.date.getTime()); // sort by date
 
@@ -180,7 +189,7 @@ export const getWaitTimeDifference = (
     stats.some(
       (stat) =>
         !stat.date ||
-        !stat.count ||
+        !stat.numCompletedAppointments ||
         stat.estimatedWaitTime === undefined ||
         stat.actualWaitTime === undefined,
     )
@@ -198,10 +207,10 @@ export const getWaitTimeDifference = (
     (stat) => stat.date.toISOString(), // group by date string
     (acc, item) => ({
       ...acc,
-      estimatedWaitTime:
-        acc.estimatedWaitTime + item.estimatedWaitTime,
+      estimatedWaitTime: acc.estimatedWaitTime + item.estimatedWaitTime,
       actualWaitTime: acc.actualWaitTime + item.actualWaitTime,
-      count: acc.count + item.count,
+      numCompletedAppointments:
+        acc.numCompletedAppointments + item.numCompletedAppointments,
     }),
   );
 
@@ -212,10 +221,10 @@ export const getWaitTimeDifference = (
     .map(([date, data]) => ({
       date: new Date(date),
       difference:
-        data.count > 0
+        data.numCompletedAppointments > 0
           ? Math.round(
-              data.estimatedWaitTime / data.count -
-                data.actualWaitTime / data.count,
+              data.estimatedWaitTime / data.numCompletedAppointments -
+                data.actualWaitTime / data.numCompletedAppointments,
             )
           : 0,
     }))
@@ -223,4 +232,3 @@ export const getWaitTimeDifference = (
 
   return result;
 };
-
