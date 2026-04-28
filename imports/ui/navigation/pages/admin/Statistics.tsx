@@ -6,6 +6,7 @@ import {
   CartesianGrid,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -59,7 +60,13 @@ export const Statistics = () => {
       {/*Average Service Time*/}
       <div>
         <h2 className="text-2xl font-bold mt-2">Average Service Time</h2>
-        <ServiceTimeChart data={averageServiceTime} />
+        <p className="text-sm text-base-content/60 mb-2">
+          Red dashed line is the listed service time.
+        </p>
+        <ServiceTimeChart
+          data={averageServiceTime}
+          serviceDuration={selectedService?.duration}
+        />
       </div>
 
       {/*Wait Time Difference*/}
@@ -155,15 +162,17 @@ export const QueueCountChart = ({
 
 export const ServiceTimeChart = ({
   data,
-  maxX,
-  maxY,
+  serviceDuration,
+  multiplier = 1.5,
 }: {
   data: { date: Date; avgWaitTime: number }[];
-  maxX?: number;
-  maxY?: number;
+  serviceDuration?: number;
+  multiplier?: number;
 }) => {
-  const xDomain: AxisDomain = maxX ? [0, maxX] : [0, "auto"];
-  const yDomain: AxisDomain = maxY ? [0, maxY] : [0, "auto"];
+  const xDomain: AxisDomain = [0, "auto"];
+  const yDomain: AxisDomain = serviceDuration
+    ? [0, serviceDuration * multiplier]
+    : [0, "auto"];
 
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -181,6 +190,21 @@ export const ServiceTimeChart = ({
           label={{ value: "mins", angle: -90, position: "insideLeft" }}
         />
         <Tooltip />
+
+        {/*Reference Line - listed service duration*/}
+        {serviceDuration && (
+          <ReferenceLine
+            y={serviceDuration}
+            stroke="#ff7300"
+            strokeDasharray="4 4"
+            label={{
+              value: `${serviceDuration}mins`,
+              position: "insideTopRight",
+              fontSize: 12,
+            }}
+          />
+        )}
+
         <Line
           type="monotone"
           dataKey="avgWaitTime"
@@ -195,14 +219,12 @@ export const ServiceTimeChart = ({
 
 export const WaitTimeDifferenceChart = ({
   data,
-  maxX,
   maxY,
 }: {
   data: { date: Date; difference: number }[];
-  maxX?: number;
   maxY?: number;
 }) => {
-  const xDomain: AxisDomain = maxX ? [0, maxX] : [0, "auto"];
+  const xDomain: AxisDomain = [0, "auto"];
   const yDomain: AxisDomain = maxY ? [0, maxY] : ["auto", "auto"];
 
   return (
