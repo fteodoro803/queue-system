@@ -1,18 +1,10 @@
 import { Meteor } from "meteor/meteor";
-import { StatsCollection, StatsGranularity } from "/imports/api/stats";
+import {
+  StatsCollection,
+  StatsData,
+  StatsGranularity,
+} from "/imports/api/stats";
 import { formateDateToLocaleMonth } from "/imports/utils/utils";
-
-export interface StatsData {
-  serviceId: string;
-  date: Date;
-  inc?: {
-    count?: number;
-    startTime?: Date;
-    endTime?: Date;
-    estimatedWaitTime?: number;
-    actualWaitTime?: number;
-  };
-}
 
 Meteor.methods({
   async "stats.update"(data: StatsData) {
@@ -39,10 +31,14 @@ Meteor.methods({
 
           // Increment/Update fields
           $inc: {
-            count: data.inc?.count ?? 0,
+            // Completed Service fields
+            numCompletedAppointments: data.inc?.numCompletedAppointments ?? 0,
             totalDuration: duration ?? 0,
             estimatedWaitTime: data.inc?.estimatedWaitTime ?? 0,
             actualWaitTime: data.inc?.actualWaitTime ?? 0,
+
+            // Cancellations
+            numCancellations: data.inc?.numCancellations ?? 0,
           },
         },
       );
@@ -59,11 +55,10 @@ function getStatsKey(
   const month = formateDateToLocaleMonth(date);
   const day = date.getDate();
   const hour = date.getHours();
-  const amPm: string = hour % 12 === 0 ? "am" : "pm";
 
   switch (granularity) {
     case "hourly":
-      return `${serviceId}-${year}-${month}-${day}-${hour}${amPm}`;
+      return `${serviceId}-${year}-${month}-${day}-${hour}`;
     case "daily":
       return `${serviceId}-${year}-${month}-${day}`;
     case "monthly":

@@ -120,7 +120,7 @@ Meteor.methods({
     // Only entries that are in-progress can be completed
     if (!entry.start || entry.status !== "in-progress") {
       throw new Meteor.Error(
-        "Cannot complete a service that  has not been started/is not in-progress",
+        "Cannot complete a service that has not been started/is not in-progress",
       );
     }
 
@@ -151,7 +151,7 @@ Meteor.methods({
       serviceId: entry.serviceId,
       date: entry.start,
       inc: {
-        count: 1,
+        numCompletedAppointments: 1,
         estimatedWaitTime: estimatedWaitTime,
         actualWaitTime: actualWaitTime,
         startTime,
@@ -173,12 +173,20 @@ Meteor.methods({
       $set: {
         status: "cancelled",
         position: null, // Set position to null to indicate it's being served
-        end: time,
       },
     });
 
     // 2. Update positions of entries behind the dequeued entry
     await updatePositions(entry);
+
+    // 3. Update stats
+    await updateStats({
+      serviceId: entry.serviceId,
+      date: time,
+      inc: {
+        numCancellations: 1,
+      },
+    });
   },
 });
 
