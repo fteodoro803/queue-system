@@ -9,11 +9,21 @@ import { formateDateToLocaleMonth } from "/imports/utils/utils";
 Meteor.methods({
   async "stats.update"(data: StatsData) {
     const granularities: StatsGranularity[] = ["hourly", "daily", "monthly"];
+    const { startTime, endTime, ...incrementFields } = data.inc ?? {};
 
     const duration: number | undefined =
-      data.inc?.startTime && data.inc?.endTime
-        ? (data.inc.endTime.getTime() - data.inc.startTime.getTime()) / 60000
+      startTime && endTime
+        ? (endTime.getTime() - startTime.getTime()) / 60000
         : undefined;
+
+    // Build $inc from whatever fields are present in StatsIncrementFields,
+    // defaulting missing values to 0 so $inc is always valid
+    const $inc = {
+      totalDuration: duration ?? 0,
+      ...Object.fromEntries(
+        Object.entries(incrementFields).map(([k, v]) => [k, v ?? 0]),
+      ),
+    };
 
     for (const granularity of granularities) {
       const key = getStatsKey(data.serviceId, data.date, granularity);
@@ -30,16 +40,7 @@ Meteor.methods({
           },
 
           // Increment/Update fields
-          $inc: {
-            // Completed Service fields
-            numCompletedAppointments: data.inc?.numCompletedAppointments ?? 0,
-            totalDuration: duration ?? 0,
-            estimatedWaitTime: data.inc?.estimatedWaitTime ?? 0,
-            actualWaitTime: data.inc?.actualWaitTime ?? 0,
-
-            // Cancellations
-            numCancellations: data.inc?.numCancellations ?? 0,
-          },
+          $inc,
         },
       );
     }
