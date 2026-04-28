@@ -1,5 +1,6 @@
 import { Meteor } from "meteor/meteor";
-import { StatsCollection } from "/imports/api/stats";
+import { StatsCollection, StatsGranularity } from "/imports/api/stats";
+import { formateDateToLocaleMonth } from "/imports/utils/utils";
 
 export interface StatsData {
   serviceId: string;
@@ -14,57 +15,77 @@ export interface StatsData {
 }
 
 Meteor.methods({
-  async "stats.initialise"(data: StatsData): Promise<string> {
-    const key = getStatsKey(data.serviceId, data.date);
-
-    await StatsCollection.upsertAsync(
-      { _id: key },
-      {
-        $setOnInsert: {
-          _id: key,
-          serviceId: data.serviceId,
-          date: data.date,
-          count: 0,
-          totalDuration: 0,
-          estimatedWaitTime: 0,
-          actualWaitTime: 0,
-        },
-      },
-    );
-
-    return key;
-  },
-
   async "stats.update"(data: StatsData) {
-    const id = await initialiseStats(data);
+    const granularities: StatsGranularity[] = ["hourly", "daily", "monthly"];
 
-    // duration in minutes
     const duration: number | undefined =
       data.inc?.startTime && data.inc?.endTime
         ? (data.inc.endTime.getTime() - data.inc.startTime.getTime()) / 60000
         : undefined;
 
-    return StatsCollection.upsertAsync(
-      { _id: id },
-      {
-        // If inc values are not provided, increment by 0 (no change)
-        $inc: {
-          count: data.inc?.isCompleted ? 1 : 0,
-          totalDuration: duration ?? 0,
-          estimatedWaitTime: data.inc?.estimatedWaitTime ?? 0,
-          actualWaitTime: data.inc?.actualWaitTime ?? 0,
+    for (const granularity of granularities) {
+      const key = getStatsKey(data.serviceId, data.date, granularity);
+
+      await StatsCollection.upsertAsync(
+        { _id: key },
+        {
+          // Set these when creating a new document
+          $setOnInsert: {
+            _id: key,
+            serviceId: data.serviceId,
+            granularity,
+            date: getPeriodStart(data.date, granularity),
+          },
+
+          // Increment/Update fields
+          $inc: {
+            count: data.inc?.isCompleted ? 1 : 0,
+            totalDuration: duration ?? 0,
+            estimatedWaitTime: data.inc?.estimatedWaitTime ?? 0,
+            actualWaitTime: data.inc?.actualWaitTime ?? 0,
+          },
         },
-      },
-    );
+      );
+    }
   },
 });
 
-function getStatsKey(serviceId: string, date: Date): string {
-  return `${serviceId}-${date.toISOString().split("T")[0]}`;
+function getStatsKey(
+  serviceId: string,
+  date: Date,
+  granularity: StatsGranularity,
+): string {
+  const year = date.getFullYear();
+  const month = formateDateToLocaleMonth(date);
+  const day = date.getDate();
+  const hour = date.getHours();
+
+  switch (granularity) {
+    case "hourly":
+      return `${serviceId}-${year}-${month}-${day}-${hour}`;
+    case "daily":
+      return `${serviceId}-${year}-${month}-${day}`;
+    case "monthly":
+      return `${serviceId}-${year}-${month}`;
+    default:
+      throw new Error(`Invalid granularity: ${granularity}`);
+  }
 }
 
-async function initialiseStats(data: StatsData): Promise<string> {
-  return Meteor.callAsync("stats.initialise", data);
+function getPeriodStart(date: Date, granularity: StatsGranularity): Date {
+  const d = new Date(date);
+  switch (granularity) {
+    case "hourly":
+      d.setMinutes(0, 0, 0);
+      return d;
+    case "daily":
+      d.setHours(0, 0, 0, 0);
+      return d;
+    case "monthly":
+      d.setDate(1);
+      d.setHours(0, 0, 0, 0);
+      return d;
+  }
 }
 
 export async function updateStats(data: StatsData): Promise<void> {

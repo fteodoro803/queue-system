@@ -1,11 +1,14 @@
 import { Mongo } from "meteor/mongo";
 
+export type StatsGranularity = "hourly" | "daily" | "monthly";
+
 // Key is serviceId + date (e.g. "service1-2024-06-01")
 // all time fields are in minutes
 export interface Stats {
   _id: string;
   serviceId: string;
   date: Date;
+  granularity: StatsGranularity;
   count: number; // number of appointments for the service
   totalDuration: number; // service duration
   estimatedWaitTime: number; // given by system when the queue entry is created
