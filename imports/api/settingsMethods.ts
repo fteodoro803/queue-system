@@ -129,6 +129,11 @@ if (Meteor.isServer) {
       return true;
     },
 
+    async "dev.clearStats"() {
+      await StatsCollection.removeAsync({});
+      return true;
+    },
+
     async "dev.clearAllData"() {
       await Promise.all([
         QueueEntryCollection.removeAsync({}),
@@ -250,6 +255,10 @@ export async function seedDemoData() {
 
 export async function clearQueueEntries() {
   return Meteor.callAsync("dev.clearQueueEntries") as Promise<boolean>;
+}
+
+export async function clearStats() {
+  return Meteor.callAsync("dev.clearStats") as Promise<boolean>;
 }
 
 export async function clearAllData() {
