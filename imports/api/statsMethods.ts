@@ -59,10 +59,11 @@ function getStatsKey(
   const month = formateDateToLocaleMonth(date);
   const day = date.getDate();
   const hour = date.getHours();
+  const amPm: string = hour % 12 === 0 ? "am" : "pm";
 
   switch (granularity) {
     case "hourly":
-      return `${serviceId}-${year}-${month}-${day}-${hour}`;
+      return `${serviceId}-${year}-${month}-${day}-${hour}${amPm}`;
     case "daily":
       return `${serviceId}-${year}-${month}-${day}`;
     case "monthly":
