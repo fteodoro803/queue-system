@@ -1,5 +1,6 @@
 import { Stats } from "/imports/api/stats";
 import { Service } from "/imports/api/service";
+import { StatsGranularity } from "/imports/api/stats";
 
 /**
  * Groups an array of items by a key, merging items that share the same key.
@@ -55,14 +56,22 @@ const groupBy = <T, K extends string>(
   );
 };
 
-const filteredByService = (service: Service | undefined, stats: Stats[]) =>
-  service ? stats.filter((stat) => stat.serviceId === service._id) : stats;
+const filteredByService = (
+  service: Service | undefined,
+  stats: Stats[],
+  granularity: StatsGranularity,
+) =>
+  (service
+    ? stats.filter((stat) => stat.serviceId === service._id)
+    : stats
+  ).filter((stat) => stat.granularity === granularity);
 
 /**
  * Calculates average service time per day, optionally filtered by a specific service.
  *
  * @param stats - Array of Stats objects containing service time data.
  * @param service - Optional Service object to filter the stats by a specific service.
+ * @param granularity
  * @returns An array of DataPoint objects sorted by date ascending.
  *
  * @example
@@ -75,6 +84,7 @@ const filteredByService = (service: Service | undefined, stats: Stats[]) =>
 export const getAverageServiceTime = (
   stats: Stats[],
   service?: Service,
+  granularity: StatsGranularity = "daily",
 ): { date: Date; avgWaitTime: number }[] => {
   // Early return if stats array is empty or if any stat is missing required fields
   if (stats.length === 0) return [];
@@ -89,7 +99,7 @@ export const getAverageServiceTime = (
   }
 
   // 1. Filter stats if a service is specified, otherwise use all stats
-  const filtered = filteredByService(service, stats);
+  const filtered = filteredByService(service, stats, granularity);
 
   // 2. Group by date, summing totalDuration and count across all services per day
   const groupedData = groupBy(
@@ -124,11 +134,13 @@ export const getAverageServiceTime = (
  *
  * @param stats - Array of Stats objects containing queue entry data.
  * @param service - Optional Service object to filter the stats by a specific service.
+ * @param granularity
  * @returns An array of DataPoint objects sorted by date ascending.
  */
 export const getQueueCount = (
   stats: Stats[],
   service?: Service,
+  granularity: StatsGranularity = "daily",
 ): { date: Date; count: number }[] => {
   // Early return if stats array is empty or if any stat is missing required fields
   if (stats.length === 0) return [];
@@ -138,7 +150,7 @@ export const getQueueCount = (
   }
 
   // 1. Filter stats if a service is specified, otherwise use all stats
-  const filtered = filteredByService(service, stats);
+  const filtered = filteredByService(service, stats, granularity);
 
   // 2. Group by date, summing count across all services per day
   const groupedData = groupBy(
@@ -168,6 +180,7 @@ export const getQueueCount = (
  *
  * @param stats - Array of Stats objects containing wait time data.
  * @param service - Optional Service object to filter the stats by a specific service.
+ * @param granularity
  * @returns An array of DataPoint objects sorted by date ascending.
  *         Positive values indicate estimated times were longer than actual (good prediction).
  *         Negative values indicate estimated times were shorter than actual (underestimated).
@@ -182,6 +195,7 @@ export const getQueueCount = (
 export const getWaitTimeDifference = (
   stats: Stats[],
   service?: Service,
+  granularity: StatsGranularity = "daily",
 ): { date: Date; difference: number }[] => {
   // Early return if stats array is empty or if any stat is missing required fields
   if (stats.length === 0) return [];
@@ -199,7 +213,7 @@ export const getWaitTimeDifference = (
   }
 
   // 1. Filter stats if a service is specified, otherwise use all stats
-  const filtered = filteredByService(service, stats);
+  const filtered = filteredByService(service, stats, granularity);
 
   // 2. Group by date, summing wait times and count across all services per day
   const groupedData = groupBy(

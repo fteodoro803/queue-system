@@ -98,10 +98,13 @@ export const getStatsQuery = (
   startDate.setDate(startDate.getDate() - daysBack);
 
   return StatsCollection.find({
-    serviceId,
-    date: {
-      $gte: startDate,
-      $lte: date,
+      serviceId,
+      granularity: "daily",
+      date: {
+        $gte: startDate,
+        $lte: date,
+      },
     },
-  });
+    { sort: { date: -1 } },
+  );
 };
