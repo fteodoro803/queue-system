@@ -39,33 +39,61 @@ export const ProviderServicesTable = ({
     return <Loading />;
   }
 
+  // Availability modal does not show cost, so use a roomier table there.
+  const isSimple = !displayCost;
+
   return (
-    <div className="overflow-x-auto">
-      <table className="table table-xs">
+    <div
+      className={`overflow-x-auto ${isSimple ? "rounded-lg border border-base-300" : ""}`}
+    >
+      <table
+        className={isSimple ? "table table-sm table-fixed" : "table table-xs"}
+      >
         {/* Head */}
-        <thead>
+        <thead className={isSimple ? "bg-base-200/60" : ""}>
           <tr>
-            <th className="w-1/6 text-center">Name</th>
-            {displayCost && <th className="w-1/6 text-center">Cost (PHP)</th>}
-            <th className="w-1/6 text-center">Enabled</th>
+            <th className={isSimple ? "text-center pl-4" : "w-1/6 text-center"}>
+              {isSimple ? "Service" : "Name"}
+            </th>
+            {displayCost && (
+              <th className={isSimple ? "text-right" : "w-1/6 text-center"}>
+                Cost (PHP)
+              </th>
+            )}
+            <th className={isSimple ? "w-20 text-center" : "w-1/6 text-center"}>
+              Enabled
+            </th>
           </tr>
         </thead>
         <tbody>
           {services.map((service) => {
-            const modalId: string = `my_modal_${service._id}}`;
             return (
-              <tr key={modalId} className="hover:bg-base-300 text-center">
+              <tr
+                key={service._id}
+                className={
+                  isSimple
+                    ? "hover:bg-base-200/60"
+                    : "hover:bg-base-300 text-center"
+                }
+                onClick={() => handleToggleService(service)}
+              >
                 {/* Name */}
-                <td>{service.name}</td>
+                <td className={isSimple ? "font-medium pl-4 text-center" : ""}>
+                  {service.name}
+                </td>
 
                 {/* Cost */}
-                {displayCost && <td>{service.cost ?? "-"}</td>}
+                {displayCost && (
+                  <td className={isSimple ? "text-right" : ""}>
+                    {service.cost ?? "-"}
+                  </td>
+                )}
 
                 {/* Toggle Button */}
-                <td>
+                <td className={isSimple ? "text-center w-20" : ""}>
                   <input
                     type="checkbox"
-                    className="toggle toggle-success toggle-xs"
+                    className={`toggle toggle-success ${isSimple ? "toggle-sm" : "toggle-xs"}`}
                     checked={isServiceEnabled(service._id)}
                     onChange={() => handleToggleService(service)}
                   />
