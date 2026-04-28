@@ -107,24 +107,9 @@ Meteor.methods({
         $set: { providerId },
       });
     }
-
-    // 4. Update Stats
-    const estimatedWaitTime: number | undefined =
-      entry.initialEstimatedWaitTime ?? undefined;
-    const actualWaitTime: number =
-      (time.getTime() - entry.createdAt.getTime()) / 60000; // in minutes
-    await updateStats({
-      serviceId: entry.serviceId,
-      date: time,
-      inc: {
-        isCompleted: true,
-        estimatedWaitTime: estimatedWaitTime,
-        actualWaitTime: actualWaitTime,
-      },
-    });
   },
 
-  // Completes a Service
+  // Completes a Service and update stats
   async "queueEntry.completeService"(id: string, time: Date) {
     const entry: QueueEntry | undefined =
       await QueueEntryCollection.findOneAsync(id);
@@ -157,11 +142,18 @@ Meteor.methods({
     const startTime: Date = entry.start;
     const endTime: Date = time;
 
+    const estimatedWaitTime: number | undefined =
+      entry.initialEstimatedWaitTime ?? undefined;
+    const actualWaitTime: number =
+      (startTime.getTime() - entry.createdAt.getTime()) / 60000; // in minutes
+
     await updateStats({
       serviceId: entry.serviceId,
       date: entry.start,
       inc: {
-        isCompleted: true,
+        count: 1,
+        estimatedWaitTime: estimatedWaitTime,
+        actualWaitTime: actualWaitTime,
         startTime,
         endTime,
       },

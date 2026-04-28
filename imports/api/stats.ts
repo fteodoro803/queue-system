@@ -7,7 +7,7 @@ export type StatsGranularity = "hourly" | "daily" | "monthly";
 export interface Stats {
   _id: string;
   serviceId: string;
-  date: Date;
+  date: Date; // the start time of the entry
   granularity: StatsGranularity;
   count: number; // number of appointments for the service
   totalDuration: number; // service duration

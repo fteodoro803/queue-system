@@ -6,7 +6,7 @@ export interface StatsData {
   serviceId: string;
   date: Date;
   inc?: {
-    isCompleted?: boolean;
+    count?: number;
     startTime?: Date;
     endTime?: Date;
     estimatedWaitTime?: number;
@@ -39,7 +39,7 @@ Meteor.methods({
 
           // Increment/Update fields
           $inc: {
-            count: data.inc?.isCompleted ? 1 : 0,
+            count: data.inc?.count ?? 0,
             totalDuration: duration ?? 0,
             estimatedWaitTime: data.inc?.estimatedWaitTime ?? 0,
             actualWaitTime: data.inc?.actualWaitTime ?? 0,
