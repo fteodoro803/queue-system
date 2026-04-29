@@ -136,13 +136,15 @@ export const getStatsByRange = ({
   serviceId,
   startDate,
   endDate,
-  granularity = "daily",
+  view,
 }: {
   serviceId?: string;
   startDate?: Date;
   endDate?: Date;
   granularity?: StatsGranularity;
+  view: "month" | "year";
 }): Mongo.Cursor<Stats, Stats> => {
+  const granularity: StatsGranularity = view === "year" ? "monthly" : "daily";
   const startPeriod = startDate
     ? getPeriodStart(startDate, granularity)
     : undefined;
@@ -172,9 +174,11 @@ export const getStatsByDate = ({
   serviceId?: string;
   date: Date;
 }): Mongo.Cursor<Stats, Stats> => {
-  const granularity = "daily";
-  const start = getPeriodStart(date, granularity);
-  const end = getPeriodEnd(date, granularity);
+  const start = new Date(date);
+  const granularity: StatsGranularity = "hourly";
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 1);
 
   return StatsCollection.find(
     {

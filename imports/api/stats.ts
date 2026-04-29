@@ -1,6 +1,8 @@
 import { Mongo } from "meteor/mongo";
 
+// TODO: mapper between granularities and view windows
 export type StatsGranularity = "hourly" | "daily" | "monthly";
+export type ViewWindow = "day" | "month" | "year";
 
 // Fields that are metadata (never incremented directly)
 type StatsMetaFields =

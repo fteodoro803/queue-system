@@ -1,4 +1,4 @@
-import { Stats } from "/imports/api/stats";
+import { Stats, ViewWindow } from "/imports/api/stats";
 import { Service } from "/imports/api/service";
 import { StatsGranularity } from "/imports/api/stats";
 
@@ -71,7 +71,7 @@ const filteredByService = (
  *
  * @param stats - Array of Stats objects containing service time data.
  * @param service - Optional Service object to filter the stats by a specific service.
- * @param granularity
+ * @param view
  * @returns An array of DataPoint objects sorted by date ascending.
  *
  * @example
@@ -83,9 +83,11 @@ const filteredByService = (
  */
 export const getAverageServiceTime = (
   stats: Stats[],
+  view: ViewWindow,
   service?: Service,
-  granularity: StatsGranularity = "daily",
 ): { date: Date; avgWaitTime: number }[] => {
+  const granularity = viewToGranularity(view);
+
   // Early return if stats array is empty or if any stat is missing required fields
   if (stats.length === 0) return [];
   if (
@@ -133,15 +135,17 @@ export const getAverageServiceTime = (
  * Calculates total queue entries per day, optionally filtered by a specific service.
  *
  * @param stats - Array of Stats objects containing queue entry data.
+ * @param view
  * @param service - Optional Service object to filter the stats by a specific service.
- * @param granularity
  * @returns An array of DataPoint objects sorted by date ascending.
  */
 export const getQueueCount = (
   stats: Stats[],
+  view: ViewWindow,
   service?: Service,
-  granularity: StatsGranularity = "daily",
 ): { date: Date; count: number }[] => {
+  const granularity = viewToGranularity(view);
+
   // Early return if stats array is empty or if any stat is missing required fields
   if (stats.length === 0) return [];
   if (stats.some((stat) => !stat.date || !stat.numCompletedAppointments)) {
@@ -179,8 +183,8 @@ export const getQueueCount = (
  * optionally filtered by a specific service.
  *
  * @param stats - Array of Stats objects containing wait time data.
+ * @param view
  * @param service - Optional Service object to filter the stats by a specific service.
- * @param granularity
  * @returns An array of DataPoint objects sorted by date ascending.
  *         Positive values indicate estimated times were longer than actual (good prediction).
  *         Negative values indicate estimated times were shorter than actual (underestimated).
@@ -194,9 +198,11 @@ export const getQueueCount = (
  */
 export const getWaitTimeDifference = (
   stats: Stats[],
+  view: ViewWindow,
   service?: Service,
-  granularity: StatsGranularity = "daily",
 ): { date: Date; difference: number }[] => {
+  const granularity = viewToGranularity(view);
+
   // Early return if stats array is empty or if any stat is missing required fields
   if (stats.length === 0) return [];
   if (
@@ -245,4 +251,17 @@ export const getWaitTimeDifference = (
     .sort((a, b) => a.date.getTime() - b.date.getTime()); // sort by date
 
   return result;
+};
+
+const viewToGranularity = (view: ViewWindow): StatsGranularity => {
+  switch (view) {
+    case "day":
+      return "hourly";
+    case "month":
+      return "daily";
+    case "year":
+      return "monthly";
+    default:
+      throw new Error(`Invalid view: ${view}`);
+  }
 };

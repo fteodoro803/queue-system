@@ -19,8 +19,8 @@ import {
 } from "/imports/utils/statsUtils";
 import { AxisDomain } from "recharts/types/util/types";
 import { getStatsByDate, getStatsByRange } from "/imports/api/statsMethods";
-import { StatsGranularity } from "/imports/api/stats";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
+import { ViewWindow } from "/imports/api/stats";
 
 export const Statistics = () => {
   const now = useDateTime();
@@ -31,22 +31,23 @@ export const Statistics = () => {
   const [selectedService, setSelectedService] = useState<Service | undefined>();
   const [minDate, setMinDate] = useState<Date | undefined>();
   const [maxDate, setMaxDate] = useState<Date | undefined>(now);
-  const [granularity, setGranularity] = useState<StatsGranularity>("daily");
+  const [view, setView] = useState<ViewWindow>("month");
 
   const isStatsLoading = useSubscribe("stats"); // TODO: subscribe to specific stats
   const stats = useFind(
     () =>
-      granularity !== "daily"
-        ? getStatsByRange({
+      view === "day"
+        ? getStatsByDate({
+            serviceId: selectedService?._id,
+            date: maxDate ?? now, // if no maxDate, use now
+          })
+        : getStatsByRange({
             serviceId: selectedService?._id,
             startDate: minDate, // if no minDate, get all history
             endDate: maxDate, // if no maxDate, up to now
-          })
-        : getStatsByDate({
-            serviceId: selectedService?._id,
-            date: maxDate ?? now, // if no maxDate, use now
+            view,
           }),
-    [minDate, maxDate, selectedService?._id, granularity],
+    [minDate, maxDate, selectedService?._id, view],
   );
 
   // Reset date filters based on Granularity
@@ -55,31 +56,34 @@ export const Statistics = () => {
     setMinDate(undefined);
     setMaxDate(now);
 
-    //  month granularity
-    if (granularity === "monthly") {
+    if (view === "month") {
       const thirtyDaysAgo = new Date(now);
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       setMinDate(thirtyDaysAgo);
     }
 
-    // hour
-    if (granularity === "hourly") {
-      const startOfDay = new Date(now);
-      const endOfDay = new Date(now);
-      startOfDay.setHours(0, 0, 0, 0);
-      setMinDate(startOfDay);
-      endOfDay.setHours(23, 59, 59, 999);
-      setMaxDate(endOfDay);
+    if (view === "year") {
+      const oneYearAgo = new Date(now);
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      setMinDate(oneYearAgo);
     }
-  }, [granularity]);
+  }, [view]);
 
   if (isServicesLoading() || isStatsLoading()) {
     return <Loading />;
   }
 
-  const queueCount = getQueueCount(stats, selectedService);
-  const averageServiceTime = getAverageServiceTime(stats, selectedService);
-  const waitTimeDifference = getWaitTimeDifference(stats, selectedService);
+  const queueCount = getQueueCount(stats, view, selectedService);
+  const averageServiceTime = getAverageServiceTime(
+    stats,
+    view,
+    selectedService,
+  );
+  const waitTimeDifference = getWaitTimeDifference(
+    stats,
+    view,
+    selectedService,
+  );
 
   return (
     <>
@@ -91,12 +95,9 @@ export const Statistics = () => {
           setSelectedService={setSelectedService}
         />
 
-        <GranularitySelect
-          granularity={granularity}
-          setGranularity={setGranularity}
-        />
+        <GranularitySelect granularity={view} setGranularity={setView} />
 
-        {granularity === "daily" ? (
+        {view === "day" ? (
           <DateSelect date={maxDate} setDate={setMaxDate} />
         ) : (
           <DateRangeSelect
@@ -108,9 +109,9 @@ export const Statistics = () => {
         )}
       </div>
 
-      {/*Daily Queue Entries*/}
+      {/* Queue Entries*/}
       <div>
-        <h2 className="text-2xl font-bold mt-2">Daily Queue Entries</h2>
+        <h2 className="text-2xl font-bold mt-2">Queue Entries</h2>
         <QueueCountChart data={queueCount} />
       </div>
 
@@ -142,12 +143,13 @@ export const Statistics = () => {
   );
 };
 
+// TODO: change this to viewSelect
 const GranularitySelect = ({
   granularity,
   setGranularity,
 }: {
-  granularity: StatsGranularity;
-  setGranularity: (value: StatsGranularity) => void;
+  granularity: ViewWindow;
+  setGranularity: (value: ViewWindow) => void;
 }) => {
   return (
     <fieldset className="fieldset">
@@ -155,11 +157,11 @@ const GranularitySelect = ({
       <select
         value={granularity}
         className="select"
-        onChange={(e) => setGranularity(e.target.value as StatsGranularity)}
+        onChange={(e) => setGranularity(e.target.value as ViewWindow)}
       >
-        <option value="hourly">Hourly</option>
-        <option value="daily">Daily</option>
-        <option value="monthly">Monthly</option>
+        <option value="day">Day</option>
+        <option value="month">Month</option>
+        <option value="year">Year</option>
       </select>
     </fieldset>
   );
@@ -290,10 +292,10 @@ export const QueueCountChart = ({
       <LineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
-          dataKey="date"
-          tickFormatter={(date: Date) =>
-            date.toLocaleDateString(undefined, { dateStyle: "short" })
-          }
+          // dataKey="date"
+          // tickFormatter={(date: Date) =>
+          //   date.toLocaleDateString(undefined, { dateStyle: "short" })
+          // }
           domain={xDomain}
         />
         <YAxis
