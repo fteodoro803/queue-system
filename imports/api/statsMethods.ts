@@ -87,6 +87,21 @@ function getPeriodStart(date: Date, granularity: StatsGranularity): Date {
   }
 }
 
+function getPeriodEnd(date: Date, granularity: StatsGranularity): Date {
+  const d = getPeriodStart(date, granularity); // start of current period
+  switch (granularity) {
+    case "hourly":
+      d.setHours(d.getHours() + 1);
+      return d;
+    case "daily":
+      d.setDate(d.getDate() + 1);
+      return d;
+    case "monthly":
+      d.setMonth(d.getMonth() + 1);
+      return d;
+  }
+}
+
 export async function updateStats(data: StatsData): Promise<void> {
   await Meteor.callAsync("stats.update", data);
 }
@@ -115,7 +130,9 @@ export const getStatsQuery = (
 
 // TODO: this and the regular getStatsQuery i feel could be better merged or separated. Could be named getStats
 // This gets either general stats for all services, or stats for a specific service over a date range, with specific granularity
-export const getFullStats = ({
+// Inclusive of startDate, exclusive of endDate (i.e. [startDate, endDate))/
+// TODO: untested
+export const getStatsByRange = ({
   serviceId,
   startDate,
   endDate,
@@ -126,17 +143,44 @@ export const getFullStats = ({
   endDate?: Date;
   granularity?: StatsGranularity;
 }): Mongo.Cursor<Stats, Stats> => {
+  const startPeriod = startDate
+    ? getPeriodStart(startDate, granularity)
+    : undefined;
+  const endPeriod = endDate ? getPeriodEnd(endDate, granularity) : undefined;
+
   return StatsCollection.find(
     {
       ...(serviceId && { serviceId }), // only filter by serviceId if it's provided
       granularity,
-      ...(startDate &&
-        endDate && {
+      ...(startPeriod &&
+        endPeriod && {
           date: {
-            $gte: startDate,
-            $lte: endDate,
+            $gte: startPeriod,
+            $lt: endPeriod,
           },
         }),
+    },
+    { sort: { date: -1 } },
+  );
+};
+
+// TODO: untested
+export const getStatsByDate = ({
+  serviceId,
+  date,
+}: {
+  serviceId?: string;
+  date: Date;
+}): Mongo.Cursor<Stats, Stats> => {
+  const granularity = "daily";
+  const start = getPeriodStart(date, granularity);
+  const end = getPeriodEnd(date, granularity);
+
+  return StatsCollection.find(
+    {
+      ...(serviceId && { serviceId }),
+      granularity,
+      date: { $gte: start, $lt: end },
     },
     { sort: { date: -1 } },
   );

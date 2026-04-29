@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Loading } from "/imports/ui/components/Loading";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Service, ServicesCollection } from "/imports/api/service";
@@ -18,27 +18,60 @@ import {
   getWaitTimeDifference,
 } from "/imports/utils/statsUtils";
 import { AxisDomain } from "recharts/types/util/types";
-import { getFullStats } from "/imports/api/statsMethods";
+import { getStatsByDate, getStatsByRange } from "/imports/api/statsMethods";
+import { StatsGranularity } from "/imports/api/stats";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
 
 export const Statistics = () => {
+  const now = useDateTime();
   const isServicesLoading = useSubscribe("services");
   const services = useFind(() =>
     ServicesCollection.find({}, { sort: { name: 1 } }),
   );
   const [selectedService, setSelectedService] = useState<Service | undefined>();
   const [minDate, setMinDate] = useState<Date | undefined>();
-  const [maxDate, setMaxDate] = useState<Date | undefined>();
+  const [maxDate, setMaxDate] = useState<Date | undefined>(now);
+  const [granularity, setGranularity] = useState<StatsGranularity>("daily");
 
-  const isStatsLoading = useSubscribe("stats");
+  const isStatsLoading = useSubscribe("stats"); // TODO: subscribe to specific stats
   const stats = useFind(
     () =>
-      getFullStats({
-        serviceId: selectedService?._id,
-        startDate: minDate, // if no minDate, get all history
-        endDate: maxDate, // if no maxDate, up to now
-      }),
-    [minDate, maxDate],
+      granularity !== "daily"
+        ? getStatsByRange({
+            serviceId: selectedService?._id,
+            startDate: minDate, // if no minDate, get all history
+            endDate: maxDate, // if no maxDate, up to now
+          })
+        : getStatsByDate({
+            serviceId: selectedService?._id,
+            date: maxDate ?? now, // if no maxDate, use now
+          }),
+    [minDate, maxDate, selectedService?._id, granularity],
   );
+
+  // Reset date filters based on Granularity
+  useEffect(() => {
+    // Reset date filters when granularity changes
+    setMinDate(undefined);
+    setMaxDate(now);
+
+    //  month granularity
+    if (granularity === "monthly") {
+      const thirtyDaysAgo = new Date(now);
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      setMinDate(thirtyDaysAgo);
+    }
+
+    // hour
+    if (granularity === "hourly") {
+      const startOfDay = new Date(now);
+      const endOfDay = new Date(now);
+      startOfDay.setHours(0, 0, 0, 0);
+      setMinDate(startOfDay);
+      endOfDay.setHours(23, 59, 59, 999);
+      setMaxDate(endOfDay);
+    }
+  }, [granularity]);
 
   if (isServicesLoading() || isStatsLoading()) {
     return <Loading />;
@@ -58,12 +91,21 @@ export const Statistics = () => {
           setSelectedService={setSelectedService}
         />
 
-        <DateRangeSelect
-          minDate={minDate}
-          maxDate={maxDate}
-          setMinDate={setMinDate}
-          setMaxDate={setMaxDate}
+        <GranularitySelect
+          granularity={granularity}
+          setGranularity={setGranularity}
         />
+
+        {granularity === "daily" ? (
+          <DateSelect date={maxDate} setDate={setMaxDate} />
+        ) : (
+          <DateRangeSelect
+            minDate={minDate}
+            maxDate={maxDate}
+            setMinDate={setMinDate}
+            setMaxDate={setMaxDate}
+          />
+        )}
       </div>
 
       {/*Daily Queue Entries*/}
@@ -100,6 +142,29 @@ export const Statistics = () => {
   );
 };
 
+const GranularitySelect = ({
+  granularity,
+  setGranularity,
+}: {
+  granularity: StatsGranularity;
+  setGranularity: (value: StatsGranularity) => void;
+}) => {
+  return (
+    <fieldset className="fieldset">
+      <legend className="fieldset-legend">Select Granularity</legend>
+      <select
+        value={granularity}
+        className="select"
+        onChange={(e) => setGranularity(e.target.value as StatsGranularity)}
+      >
+        <option value="hourly">Hourly</option>
+        <option value="daily">Daily</option>
+        <option value="monthly">Monthly</option>
+      </select>
+    </fieldset>
+  );
+};
+
 const ServiceSelect = ({
   services,
   setSelectedService,
@@ -132,6 +197,30 @@ const ServiceSelect = ({
       </select>
       <span className="label">Optional</span>
     </fieldset>
+  );
+};
+
+const DateSelect = ({
+  date,
+  setDate,
+}: {
+  date?: Date;
+  setDate: (date: Date | undefined) => void;
+}) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDate = e.target.value ? new Date(e.target.value) : undefined;
+    setDate(newDate);
+  };
+
+  return (
+    <div>
+      <input
+        type="date"
+        className="input"
+        value={date ? date.toISOString().split("T")[0] : ""}
+        onChange={handleChange}
+      />
+    </div>
   );
 };
 
