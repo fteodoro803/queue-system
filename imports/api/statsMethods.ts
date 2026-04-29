@@ -1,5 +1,7 @@
 import { Meteor } from "meteor/meteor";
+import { Mongo } from "meteor/mongo";
 import {
+  Stats,
   StatsCollection,
   StatsData,
   StatsGranularity,
@@ -89,6 +91,7 @@ export async function updateStats(data: StatsData): Promise<void> {
   await Meteor.callAsync("stats.update", data);
 }
 
+// Get stats for a service for the last x days
 export const getStatsQuery = (
   serviceId: string,
   date: Date,
@@ -97,13 +100,43 @@ export const getStatsQuery = (
   const startDate = new Date(date);
   startDate.setDate(startDate.getDate() - daysBack);
 
-  return StatsCollection.find({
+  return StatsCollection.find(
+    {
       serviceId,
       granularity: "daily",
       date: {
         $gte: startDate,
         $lte: date,
       },
+    },
+    { sort: { date: -1 } },
+  );
+};
+
+// TODO: this and the regular getStatsQuery i feel could be better merged or separated. Could be named getStats
+// This gets either general stats for all services, or stats for a specific service over a date range, with specific granularity
+export const getFullStats = ({
+  serviceId,
+  startDate,
+  endDate,
+  granularity = "daily",
+}: {
+  serviceId?: string;
+  startDate?: Date;
+  endDate?: Date;
+  granularity?: StatsGranularity;
+}): Mongo.Cursor<Stats, Stats> => {
+  return StatsCollection.find(
+    {
+      ...(serviceId && { serviceId }), // only filter by serviceId if it's provided
+      granularity,
+      ...(startDate &&
+        endDate && {
+          date: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        }),
     },
     { sort: { date: -1 } },
   );

@@ -12,13 +12,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { StatsCollection } from "/imports/api/stats";
 import {
   getAverageServiceTime,
   getQueueCount,
   getWaitTimeDifference,
 } from "/imports/utils/statsUtils";
 import { AxisDomain } from "recharts/types/util/types";
+import { getFullStats } from "/imports/api/statsMethods";
 
 export const Statistics = () => {
   const isServicesLoading = useSubscribe("services");
@@ -26,11 +26,19 @@ export const Statistics = () => {
     ServicesCollection.find({}, { sort: { name: 1 } }),
   );
   const [selectedService, setSelectedService] = useState<Service | undefined>();
+  const [minDate, setMinDate] = useState<Date | undefined>();
+  const [maxDate, setMaxDate] = useState<Date | undefined>();
 
   const isStatsLoading = useSubscribe("stats");
-  const stats = useFind(() => StatsCollection.find());
-
-  // const [timePeriod, setTimePeriod] = useState
+  const stats = useFind(
+    () =>
+      getFullStats({
+        serviceId: selectedService?._id,
+        startDate: minDate, // if no minDate, get all history
+        endDate: maxDate, // if no maxDate, up to now
+      }),
+    [minDate, maxDate],
+  );
 
   if (isServicesLoading() || isStatsLoading()) {
     return <Loading />;
@@ -44,10 +52,17 @@ export const Statistics = () => {
     <>
       <h1 className="text-3xl font-bold">Statistics</h1>
 
-      <div className={"mt-4"}>
+      <div className={"mt-4 "}>
         <ServiceSelect
           services={services}
           setSelectedService={setSelectedService}
+        />
+
+        <DateRangeSelect
+          minDate={minDate}
+          maxDate={maxDate}
+          setMinDate={setMinDate}
+          setMaxDate={setMaxDate}
         />
       </div>
 
@@ -115,6 +130,55 @@ const ServiceSelect = ({
           </option>
         ))}
       </select>
+      <span className="label">Optional</span>
+    </fieldset>
+  );
+};
+
+const DateRangeSelect = ({
+  minDate,
+  setMinDate,
+  maxDate,
+  setMaxDate,
+}: {
+  minDate?: Date;
+  setMinDate: (date: Date | undefined) => void;
+  maxDate?: Date;
+  setMaxDate: (date: Date | undefined) => void;
+}) => {
+  const handleMinDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = e.target.value ? new Date(e.target.value) : undefined;
+    setMinDate(date);
+  };
+
+  const handleMaxDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = e.target.value ? new Date(e.target.value) : undefined;
+    setMaxDate(date);
+  };
+
+  return (
+    <fieldset className="fieldset">
+      {/*<legend className="fieldset-legend">Select a Date Range</legend>*/}
+      <div className="flex gap-4">
+        <div>
+          <label className="label">From:</label>
+          <input
+            type="date"
+            className="input"
+            value={minDate ? minDate.toISOString().split("T")[0] : ""}
+            onChange={handleMinDateChange}
+          />
+        </div>
+        <div>
+          <label className="label">To:</label>
+          <input
+            type="date"
+            className="input"
+            value={maxDate ? maxDate.toISOString().split("T")[0] : ""}
+            onChange={handleMaxDateChange}
+          />
+        </div>
+      </div>
       <span className="label">Optional</span>
     </fieldset>
   );

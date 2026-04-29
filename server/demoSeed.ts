@@ -266,7 +266,7 @@ async function insertDemoData(): Promise<void> {
     createdAt: minutesAgo(70),
   });
 
-  // Seed one rolling month of stats with all granularities.
+  // Seed the full current calendar month of stats with all granularities.
   const seededDailyGeneral = buildDailyStatsForService({
     serviceType: "general",
     now,
@@ -299,26 +299,27 @@ function buildDailyStatsForService({
   const baseDuration = serviceType === "general" ? 23 : 13;
   const cancellationRate = serviceType === "general" ? 0.11 : 0.07;
   const rows: SeedDailyStats[] = [];
+  const datesInMonth = getUtcDatesForCurrentMonth(now);
 
-  for (let daysAgo = 29; daysAgo >= 0; daysAgo--) {
-    const d = new Date(now);
-    d.setUTCDate(d.getUTCDate() - daysAgo);
-    d.setUTCHours(0, 0, 0, 0);
+  for (const [dayIndex, d] of datesInMonth.entries()) {
+    const patternIndex = dayIndex;
 
     const weekday = d.getUTCDay();
     const weekdayBase = weekdayCompletions[weekday];
-    const waveA = Math.sin((daysAgo + (serviceType === "general" ? 2 : 5)) / 3.4);
-    const waveB = Math.cos((daysAgo + weekday) / 5.2);
+    const waveA = Math.sin(
+      (patternIndex + (serviceType === "general" ? 2 : 5)) / 3.4,
+    );
+    const waveB = Math.cos((patternIndex + weekday) / 5.2);
     const weekdayDrift = weekday >= 5 ? -0.08 : weekday <= 2 ? 0.06 : 0;
     const demandFactor = 1 + weekdayDrift + waveA * 0.12 + waveB * 0.06;
-    const noise = ((daysAgo * 7 + weekday * 3) % 5) - 2;
+    const noise = ((patternIndex * 7 + weekday * 3) % 5) - 2;
     const numCompletedAppointments = Math.max(
       5,
       Math.round(weekdayBase * demandFactor + noise),
     );
 
     const durationWave =
-      Math.sin((daysAgo + 1) / (serviceType === "general" ? 4.2 : 3.3)) *
+      Math.sin((patternIndex + 1) / (serviceType === "general" ? 4.2 : 3.3)) *
       (serviceType === "general" ? 3.2 : 2.1);
     const weekdayDurationBias =
       serviceType === "general"
@@ -336,7 +337,8 @@ function buildDailyStatsForService({
     const pressure =
       numCompletedAppointments / (serviceType === "general" ? 18 : 16);
     const estimateBiasWave =
-      Math.sin((daysAgo + (serviceType === "general" ? 0 : 7)) / 6) * 1.8;
+      Math.sin((patternIndex + (serviceType === "general" ? 0 : 7)) / 6) *
+      1.8;
     const estimatedAvgWait =
       serviceType === "general"
         ? 13 + pressure * 8 + estimateBiasWave
@@ -366,6 +368,26 @@ function buildDailyStatsForService({
   }
 
   return rows;
+}
+
+function getUtcDatesForCurrentMonth(now: Date): Date[] {
+  const monthStart = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
+  );
+  const nextMonthStart = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1),
+  );
+  const dates: Date[] = [];
+
+  for (
+    let cursor = new Date(monthStart);
+    cursor < nextMonthStart;
+    cursor.setUTCDate(cursor.getUTCDate() + 1)
+  ) {
+    dates.push(new Date(cursor));
+  }
+
+  return dates;
 }
 
 async function insertGranularStats(
