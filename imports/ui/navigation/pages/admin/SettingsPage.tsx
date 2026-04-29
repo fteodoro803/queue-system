@@ -25,6 +25,7 @@ import {
   setEndOfDay,
 } from "/imports/api/settingsMethods";
 import { styles } from "/imports/utils/styles";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
 
 type BooleanFlagKey = Exclude<
   keyof Omit<Flags, "_id">,
@@ -32,6 +33,7 @@ type BooleanFlagKey = Exclude<
 >;
 
 export const SettingsPage = () => {
+  const now = useDateTime();
   const isSettingsLoading = useSubscribe("settings");
   const settings = useFind(() =>
     SettingsCollection.find({ _id: "app_settings" }),
@@ -202,7 +204,7 @@ export const SettingsPage = () => {
   const handleSeedDemoData = async () => {
     setIsSeeding(true);
     try {
-      await seedDemoData();
+      await seedDemoData(now);
     } catch {
       // Intentionally silent: no visible feedback for dev utility action.
     } finally {

@@ -118,9 +118,9 @@ Meteor.methods({
 
 if (Meteor.isServer) {
   Meteor.methods({
-    async "dev.seedDemoData"() {
+    async "dev.seedDemoData"(date: Date) {
       const { forceReseedDemoData } = await import("/server/demoSeed");
-      await forceReseedDemoData();
+      await forceReseedDemoData(date);
       return true;
     },
 
@@ -249,8 +249,8 @@ export async function setMultiplier(multiplier: number) {
   return Meteor.callAsync("flags.setMultiplier", multiplier);
 }
 
-export async function seedDemoData() {
-  return Meteor.callAsync("dev.seedDemoData") as Promise<boolean>;
+export async function seedDemoData(date: Date) {
+  return Meteor.callAsync("dev.seedDemoData", date) as Promise<boolean>;
 }
 
 export async function clearQueueEntries() {

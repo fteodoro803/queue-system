@@ -15,49 +15,10 @@ type SeedDailyStats = {
   actualWaitTime: number;
 };
 
-async function hasAnyBusinessData(): Promise<boolean> {
-  const [
-    existingService,
-    existingProvider,
-    existingPatient,
-    existingQueueEntry,
-    existingAppointment,
-    existingStats,
-  ] = await Promise.all([
-    ServicesCollection.findOneAsync({}),
-    ProviderCollection.findOneAsync({}),
-    PatientsCollection.findOneAsync({}),
-    QueueEntryCollection.findOneAsync({}),
-    AppointmentsCollection.findOneAsync({}),
-    StatsCollection.findOneAsync({}),
-  ]);
-
-  return Boolean(
-    existingService ||
-    existingProvider ||
-    existingPatient ||
-    existingQueueEntry ||
-    existingAppointment ||
-    existingStats,
-  );
-}
-
-/**
- * Seeds demo data only when the main business collections are all empty.
- */
-export async function seedDemoDataIfEmpty(): Promise<boolean> {
-  if (await hasAnyBusinessData()) {
-    return false;
-  }
-
-  await insertDemoData();
-  return true;
-}
-
 /**
  * Clears seeded business collections and inserts a fresh demo dataset.
  */
-export async function forceReseedDemoData(): Promise<void> {
+export async function forceReseedDemoData(date: Date): Promise<void> {
   await QueueEntryCollection.removeAsync({});
   await AppointmentsCollection.removeAsync({});
   await ProviderCollection.removeAsync({});
@@ -65,11 +26,11 @@ export async function forceReseedDemoData(): Promise<void> {
   await ServicesCollection.removeAsync({});
   await CountersCollection.removeAsync({});
   await StatsCollection.removeAsync({});
-  await insertDemoData();
+  await insertDemoData(date);
 }
 
-async function insertDemoData(): Promise<void> {
-  const now = new Date();
+async function insertDemoData(date: Date): Promise<void> {
+  const now = date;
   const minutesAgo = (minutes: number) =>
     new Date(now.getTime() - minutes * 60 * 1000);
 
@@ -277,10 +238,7 @@ async function insertDemoData(): Promise<void> {
   });
 
   await insertGranularStats("seed-service-general", seededDailyGeneral);
-  await insertGranularStats(
-    "seed-service-vaccination",
-    seededDailyVaccination,
-  );
+  await insertGranularStats("seed-service-vaccination", seededDailyVaccination);
 
   return;
 }
@@ -337,8 +295,7 @@ function buildDailyStatsForService({
     const pressure =
       numCompletedAppointments / (serviceType === "general" ? 18 : 16);
     const estimateBiasWave =
-      Math.sin((patternIndex + (serviceType === "general" ? 0 : 7)) / 6) *
-      1.8;
+      Math.sin((patternIndex + (serviceType === "general" ? 0 : 7)) / 6) * 1.8;
     const estimatedAvgWait =
       serviceType === "general"
         ? 13 + pressure * 8 + estimateBiasWave
@@ -347,13 +304,18 @@ function buildDailyStatsForService({
       serviceType === "general"
         ? [1.2, 0.6, -0.4, -1.1, -0.8, 0.5, 1.4][weekday]
         : [-1.0, -0.6, 0.4, 0.9, 1.8, 0.7, -0.2][weekday];
-    const actualAvgWait = Math.max(3, estimatedAvgWait + actualSkew + waveB * 1.1);
+    const actualAvgWait = Math.max(
+      3,
+      estimatedAvgWait + actualSkew + waveB * 1.1,
+    );
 
     const numCancellations = Math.max(
       0,
       Math.round(
         numCompletedAppointments *
-          (cancellationRate + (weekday >= 5 ? 0.02 : 0) + (waveA > 0.7 ? 0.01 : 0)),
+          (cancellationRate +
+            (weekday >= 5 ? 0.02 : 0) +
+            (waveA > 0.7 ? 0.01 : 0)),
       ),
     );
 
@@ -361,7 +323,9 @@ function buildDailyStatsForService({
       date: d,
       numCompletedAppointments,
       totalDuration,
-      estimatedWaitTime: Math.round(numCompletedAppointments * estimatedAvgWait),
+      estimatedWaitTime: Math.round(
+        numCompletedAppointments * estimatedAvgWait,
+      ),
       actualWaitTime: Math.round(numCompletedAppointments * actualAvgWait),
       numCancellations,
     });
@@ -414,7 +378,10 @@ async function insertGranularStats(
       row.numCompletedAppointments,
       hourWeights,
     );
-    const durationByHour = splitIntegerByWeights(row.totalDuration, hourWeights);
+    const durationByHour = splitIntegerByWeights(
+      row.totalDuration,
+      hourWeights,
+    );
     const estimatedByHour = splitIntegerByWeights(
       row.estimatedWaitTime,
       hourWeights,
