@@ -77,8 +77,8 @@ export function calculateQueueTime({
 
   // Service duration
   const serviceDuration =
-    stats && stats.count > 0
-      ? stats.totalDuration / stats.count
+    stats && stats.numCompletedAppointments > 0
+      ? stats.totalDuration / stats.numCompletedAppointments
       : service.duration;
 
   // Build lane finish times

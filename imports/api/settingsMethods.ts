@@ -118,14 +118,19 @@ Meteor.methods({
 
 if (Meteor.isServer) {
   Meteor.methods({
-    async "dev.seedDemoData"() {
+    async "dev.seedDemoData"(date: Date) {
       const { forceReseedDemoData } = await import("/server/demoSeed");
-      await forceReseedDemoData();
+      await forceReseedDemoData(date);
       return true;
     },
 
     async "dev.clearQueueEntries"() {
       await QueueEntryCollection.removeAsync({});
+      return true;
+    },
+
+    async "dev.clearStats"() {
+      await StatsCollection.removeAsync({});
       return true;
     },
 
@@ -244,12 +249,16 @@ export async function setMultiplier(multiplier: number) {
   return Meteor.callAsync("flags.setMultiplier", multiplier);
 }
 
-export async function seedDemoData() {
-  return Meteor.callAsync("dev.seedDemoData") as Promise<boolean>;
+export async function seedDemoData(date: Date) {
+  return Meteor.callAsync("dev.seedDemoData", date) as Promise<boolean>;
 }
 
 export async function clearQueueEntries() {
   return Meteor.callAsync("dev.clearQueueEntries") as Promise<boolean>;
+}
+
+export async function clearStats() {
+  return Meteor.callAsync("dev.clearStats") as Promise<boolean>;
 }
 
 export async function clearAllData() {

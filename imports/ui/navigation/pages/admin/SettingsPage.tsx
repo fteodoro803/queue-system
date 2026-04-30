@@ -11,6 +11,7 @@ import { Loading } from "/imports/ui/components/Loading";
 import {
   clearAllData,
   clearQueueEntries,
+  clearStats,
   setAcceptQueueAfterHours,
   setAppTheme,
   seedDemoData,
@@ -24,6 +25,7 @@ import {
   setEndOfDay,
 } from "/imports/api/settingsMethods";
 import { styles } from "/imports/utils/styles";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
 
 type BooleanFlagKey = Exclude<
   keyof Omit<Flags, "_id">,
@@ -31,6 +33,7 @@ type BooleanFlagKey = Exclude<
 >;
 
 export const SettingsPage = () => {
+  const now = useDateTime();
   const isSettingsLoading = useSubscribe("settings");
   const settings = useFind(() =>
     SettingsCollection.find({ _id: "app_settings" }),
@@ -59,6 +62,7 @@ export const SettingsPage = () => {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isSeeding, setIsSeeding] = useState(false);
   const [isClearingQueue, setIsClearingQueue] = useState(false);
+  const [isClearingStats, setIsClearingStats] = useState(false);
   const [isClearingAllData, setIsClearingAllData] = useState(false);
 
   // Fill settings from db
@@ -200,7 +204,7 @@ export const SettingsPage = () => {
   const handleSeedDemoData = async () => {
     setIsSeeding(true);
     try {
-      await seedDemoData();
+      await seedDemoData(now);
     } catch {
       // Intentionally silent: no visible feedback for dev utility action.
     } finally {
@@ -216,6 +220,17 @@ export const SettingsPage = () => {
       // Intentionally silent: no visible feedback for dev utility action.
     } finally {
       setIsClearingQueue(false);
+    }
+  };
+
+  const handleClearStats = async () => {
+    setIsClearingStats(true);
+    try {
+      await clearStats();
+    } catch {
+      // Intentionally silent: no visible feedback for dev utility action.
+    } finally {
+      setIsClearingStats(false);
     }
   };
 
@@ -512,8 +527,7 @@ export const SettingsPage = () => {
             <div>
               <p className="font-medium">Clear Queue Entries</p>
               <p className="text-xs opacity-60">
-                Deletes all current queue entries without touching services,
-                providers, or patients.
+                Deletes all current queue entries.
               </p>
             </div>
             <button
@@ -523,6 +537,23 @@ export const SettingsPage = () => {
               disabled={isClearingQueue}
             >
               {isClearingQueue ? "Clearing..." : "Clear Queue"}
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="font-medium">Clear Stats</p>
+              <p className="text-xs opacity-60">
+                Deletes all statistics records without touching queue entries.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-error btn-sm"
+              onClick={handleClearStats}
+              disabled={isClearingStats}
+            >
+              {isClearingStats ? "Clearing..." : "Clear Stats"}
             </button>
           </div>
 

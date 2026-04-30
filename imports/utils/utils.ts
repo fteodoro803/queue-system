@@ -82,6 +82,14 @@ export function formatDateToLocale(date: Date, seconds?: boolean): string {
   });
 }
 
+export function formateDateToLocaleMonth(date: Date): string {
+  return date
+    .toLocaleDateString("en-US", {
+      month: "short",
+    })
+    .toLowerCase();
+}
+
 // Converts a date to a specified number of months later
 export function addMonths(date: Date, months: number): Date {
   const newDate = new Date(date);

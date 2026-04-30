@@ -1,5 +1,75 @@
-import { Stats } from "/imports/api/stats";
+import { Stats, ViewWindow } from "/imports/api/stats";
 import { Service } from "/imports/api/service";
+import { StatsGranularity } from "/imports/api/stats";
+
+type AggregationConfig<TAcc, TResult extends { date: Date }> = {
+  validate: (stat: Stats) => boolean;
+  initial: () => TAcc;
+  accumulate: (acc: TAcc, item: Stats) => TAcc;
+  finalize: (date: Date, acc: TAcc) => TResult;
+};
+
+/**
+ * Generic chart data builder that filters, groups, and aggregates stats
+ * into a sorted array of data points for use in charts.
+ *
+ * @template TAcc - The accumulator type used during grouping (intermediate state)
+ * @template TResult - The final output type, must include a `date` field for sorting
+ *
+ * @param stats - Raw stats documents from the database
+ * @param view - The time window determining which granularity to use (e.g. daily, monthly)
+ * @param service - Optional service to filter stats by. If undefined, all services are combined
+ * @param config - Aggregation config defining how to validate, accumulate, and finalize data
+ * @returns A sorted array of TResult objects, ascending by date. Returns [] if stats is empty
+ * or any stat fails validation.
+ *
+ * @example
+ * // The total completed appointments per day for a specific service
+ * buildChartData(stats, view, service, {
+ *   validate: (stat) => stat.date != null && stat.numCompletedAppointments != null,
+ *   initial: () => ({ numCompletedAppointments: 0 }),
+ *   accumulate: (acc, item) => ({
+ *     numCompletedAppointments: acc.numCompletedAppointments + item.numCompletedAppointments,
+ *   }),
+ *   finalize: (date, acc) => ({ date, count: acc.numCompletedAppointments }),
+ * });
+ */
+export const buildChartData = <TAcc, TResult extends { date: Date }>(
+  stats: Stats[],
+  view: ViewWindow,
+  service: Service | undefined,
+  config: AggregationConfig<TAcc, TResult>,
+): TResult[] => {
+  if (stats.length === 0) return [];
+
+  // 1. Determine required granularity based on the view window
+  const granularity = viewToGranularity(view);
+
+  // 2. Validate that all stats have the necessary fields for the chosen metric
+  // TODO: warn about missing fields, or skip invalid entries instead of returning empty array?
+  if (stats.some((stat) => !config.validate(stat))) {
+    console.warn("Some stats are missing required fields");
+    return [];
+  }
+
+  // 3. Filter stats by service and granularity
+  const filtered = filteredByService(service, stats, granularity);
+
+  // 4. Group stats by date and aggregate using the provided accumulate function
+  const grouped = groupBy(
+    filtered,
+    (stat) => stat.date.toDateString(),
+    (acc, item) =>
+      config.accumulate(acc as unknown as TAcc, item) as unknown as Stats,
+  );
+
+  // 5. Convert the aggregated data into the desired output format and sort by date
+  return Object.entries(grouped)
+    .map(([date, data]) =>
+      config.finalize(new Date(date), data as unknown as TAcc),
+    )
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+};
 
 /**
  * Groups an array of items by a key, merging items that share the same key.
@@ -55,172 +125,27 @@ const groupBy = <T, K extends string>(
   );
 };
 
-const filteredByService = (service: Service | undefined, stats: Stats[]) =>
-  service ? stats.filter((stat) => stat.serviceId === service._id) : stats;
-
-/**
- * Calculates average service time per day, optionally filtered by a specific service.
- *
- * @param stats - Array of Stats objects containing service time data.
- * @param service - Optional Service object to filter the stats by a specific service.
- * @returns An array of DataPoint objects sorted by date ascending.
- *
- * @example
- * // All services combined
- * getAverageServiceTime({ stats })
- *
- * // Filtered to one service
- * getAverageServiceTime({ stats, service: selectedService })
- */
-export const getAverageServiceTime = (
+// Filters stats by service and granularity. If service is undefined, includes all services.
+const filteredByService = (
+  service: Service | undefined,
   stats: Stats[],
-  service?: Service,
-): { date: Date; avgWaitTime: number }[] => {
-  // Early return if stats array is empty or if any stat is missing required fields
-  if (stats.length === 0) return [];
-  if (stats.some((stat) => !stat.date || !stat.totalDuration || !stat.count)) {
-    console.warn("Some stats are missing required fields");
-    return [];
+  granularity: StatsGranularity,
+) =>
+  (service
+    ? stats.filter((stat) => stat.serviceId === service._id)
+    : stats
+  ).filter((stat) => stat.granularity === granularity);
+
+// Maps a view window to the corresponding stats granularity
+const viewToGranularity = (view: ViewWindow): StatsGranularity => {
+  switch (view) {
+    case "day":
+      return "hourly";
+    case "month":
+      return "daily";
+    case "year":
+      return "monthly";
+    default:
+      throw new Error(`Invalid view: ${view}`);
   }
-
-  // 1. Filter stats if a service is specified, otherwise use all stats
-  const filtered = filteredByService(service, stats);
-
-  // 2. Group by date, summing totalDuration and count across all services per day
-  const groupedData = groupBy(
-    filtered,
-    (stat) => stat.date.toISOString(), // group by date string
-    (acc, item) => ({
-      ...acc,
-      totalDuration: acc.totalDuration + item.totalDuration,
-      count: acc.count + item.count,
-    }),
-  );
-
-  // 3. Convert grouped object to a sorted DataPoint array
-  const result: { date: Date; avgWaitTime: number }[] = Object.entries(
-    groupedData,
-  )
-    .map(([date, data]) => ({
-      date: new Date(date),
-      avgWaitTime:
-        data.count > 0 ? Math.round(data.totalDuration / data.count) : 0,
-    }))
-    .sort((a, b) => a.date.getTime() - b.date.getTime()); // sort by date
-
-  return result;
 };
-
-/**
- * Calculates total queue entries per day, optionally filtered by a specific service.
- *
- * @param stats - Array of Stats objects containing queue entry data.
- * @param service - Optional Service object to filter the stats by a specific service.
- * @returns An array of DataPoint objects sorted by date ascending.
- */
-export const getQueueCount = (
-  stats: Stats[],
-  service?: Service,
-): { date: Date; count: number }[] => {
-  // Early return if stats array is empty or if any stat is missing required fields
-  if (stats.length === 0) return [];
-  if (stats.some((stat) => !stat.date || !stat.count)) {
-    console.warn("Some stats are missing required fields");
-    return [];
-  }
-
-  // 1. Filter stats if a service is specified, otherwise use all stats
-  const filtered = filteredByService(service, stats);
-
-  // 2. Group by date, summing count across all services per day
-  const groupedData = groupBy(
-    filtered,
-    (stat) => stat.date.toISOString(), // group by date string
-    (acc, item) => ({
-      ...acc,
-      count: acc.count + item.count,
-    }),
-  );
-
-  // 3. Convert grouped object to a sorted DataPoint array
-  const result: { date: Date; count: number }[] = Object.entries(groupedData)
-    .map(([date, data]) => ({
-      date: new Date(date),
-      count: data.count,
-    }))
-    .sort((a, b) => a.date.getTime() - b.date.getTime()); // sort by date
-
-  return result;
-};
-
-/**
- * Calculates the difference between average estimated and actual wait times per day,
- * optionally filtered by a specific service.
- *
- * @param stats - Array of Stats objects containing wait time data.
- * @param service - Optional Service object to filter the stats by a specific service.
- * @returns An array of DataPoint objects sorted by date ascending.
- *         Positive values indicate estimated times were longer than actual (good prediction).
- *         Negative values indicate estimated times were shorter than actual (underestimated).
- *
- * @example
- * // All services combined
- * getWaitTimeDifference({ stats })
- *
- * // Filtered to one service
- * getWaitTimeDifference({ stats, service: selectedService })
- */
-export const getWaitTimeDifference = (
-  stats: Stats[],
-  service?: Service,
-): { date: Date; difference: number }[] => {
-  // Early return if stats array is empty or if any stat is missing required fields
-  if (stats.length === 0) return [];
-  if (
-    stats.some(
-      (stat) =>
-        !stat.date ||
-        !stat.count ||
-        stat.estimatedWaitTime === undefined ||
-        stat.actualWaitTime === undefined,
-    )
-  ) {
-    console.warn("Some stats are missing required wait time fields");
-    return [];
-  }
-
-  // 1. Filter stats if a service is specified, otherwise use all stats
-  const filtered = filteredByService(service, stats);
-
-  // 2. Group by date, summing wait times and count across all services per day
-  const groupedData = groupBy(
-    filtered,
-    (stat) => stat.date.toISOString(), // group by date string
-    (acc, item) => ({
-      ...acc,
-      estimatedWaitTime:
-        acc.estimatedWaitTime + item.estimatedWaitTime,
-      actualWaitTime: acc.actualWaitTime + item.actualWaitTime,
-      count: acc.count + item.count,
-    }),
-  );
-
-  // 3. Convert grouped object to a sorted DataPoint array
-  const result: { date: Date; difference: number }[] = Object.entries(
-    groupedData,
-  )
-    .map(([date, data]) => ({
-      date: new Date(date),
-      difference:
-        data.count > 0
-          ? Math.round(
-              data.estimatedWaitTime / data.count -
-                data.actualWaitTime / data.count,
-            )
-          : 0,
-    }))
-    .sort((a, b) => a.date.getTime() - b.date.getTime()); // sort by date
-
-  return result;
-};
-

@@ -107,24 +107,9 @@ Meteor.methods({
         $set: { providerId },
       });
     }
-
-    // 4. Update Stats
-    const estimatedWaitTime: number | undefined =
-      entry.initialEstimatedWaitTime ?? undefined;
-    const actualWaitTime: number =
-      (time.getTime() - entry.createdAt.getTime()) / 60000; // in minutes
-    await updateStats({
-      serviceId: entry.serviceId,
-      date: time,
-      inc: {
-        isCompleted: true,
-        estimatedWaitTime: estimatedWaitTime,
-        actualWaitTime: actualWaitTime,
-      },
-    });
   },
 
-  // Completes a Service
+  // Completes a Service and update stats
   async "queueEntry.completeService"(id: string, time: Date) {
     const entry: QueueEntry | undefined =
       await QueueEntryCollection.findOneAsync(id);
@@ -135,7 +120,7 @@ Meteor.methods({
     // Only entries that are in-progress can be completed
     if (!entry.start || entry.status !== "in-progress") {
       throw new Meteor.Error(
-        "Cannot complete a service that  has not been started/is not in-progress",
+        "Cannot complete a service that has not been started/is not in-progress",
       );
     }
 
@@ -157,11 +142,18 @@ Meteor.methods({
     const startTime: Date = entry.start;
     const endTime: Date = time;
 
+    const estimatedWaitTime: number | undefined =
+      entry.initialEstimatedWaitTime ?? undefined;
+    const actualWaitTime: number =
+      (startTime.getTime() - entry.createdAt.getTime()) / 60000; // in minutes
+
     await updateStats({
       serviceId: entry.serviceId,
       date: entry.start,
       inc: {
-        isCompleted: true,
+        numCompletedAppointments: 1,
+        estimatedWaitTime: estimatedWaitTime,
+        actualWaitTime: actualWaitTime,
         startTime,
         endTime,
       },
@@ -181,12 +173,20 @@ Meteor.methods({
       $set: {
         status: "cancelled",
         position: null, // Set position to null to indicate it's being served
-        end: time,
       },
     });
 
     // 2. Update positions of entries behind the dequeued entry
     await updatePositions(entry);
+
+    // 3. Update stats
+    await updateStats({
+      serviceId: entry.serviceId,
+      date: time,
+      inc: {
+        numCancellations: 1,
+      },
+    });
   },
 });
 

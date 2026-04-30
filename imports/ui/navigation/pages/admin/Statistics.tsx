@@ -1,65 +1,125 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Loading } from "/imports/ui/components/Loading";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Service, ServicesCollection } from "/imports/api/service";
 import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import { StatsCollection } from "/imports/api/stats";
+  getAverageServiceTimeChartData,
+  getQueueCountChartData,
+  getWaitTimeDifferenceChartData,
+} from "/imports/utils/chartData";
+import { getStatsByDate, getStatsByRange } from "/imports/api/statsMethods";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
+import { ViewWindow } from "/imports/api/stats";
 import {
-  getAverageServiceTime,
-  getQueueCount,
-  getWaitTimeDifference,
-} from "/imports/utils/statsUtils";
-import { AxisDomain } from "recharts/types/util/types";
+  QueueCountChart,
+  ServiceTimeChart,
+  WaitTimeDifferenceChart,
+} from "/imports/ui/components/Charts";
 
 export const Statistics = () => {
+  const now = useDateTime();
   const isServicesLoading = useSubscribe("services");
   const services = useFind(() =>
     ServicesCollection.find({}, { sort: { name: 1 } }),
   );
   const [selectedService, setSelectedService] = useState<Service | undefined>();
+  const [minDate, setMinDate] = useState<Date | undefined>();
+  const [maxDate, setMaxDate] = useState<Date | undefined>(now);
+  const [view, setView] = useState<ViewWindow>("month");
 
-  const isStatsLoading = useSubscribe("stats");
-  const stats = useFind(() => StatsCollection.find());
+  const isStatsLoading = useSubscribe("stats"); // TODO: subscribe to specific stats
+  const stats = useFind(
+    () =>
+      view === "day"
+        ? getStatsByDate({
+            serviceId: selectedService?._id,
+            date: maxDate ?? now, // if no maxDate, use now
+          })
+        : getStatsByRange({
+            serviceId: selectedService?._id,
+            startDate: minDate, // if no minDate, get all history
+            endDate: maxDate, // if no maxDate, up to now
+            view,
+          }),
+    [minDate, maxDate, selectedService?._id, view],
+  );
 
-  // const [timePeriod, setTimePeriod] = useState
+  // Reset date filters based on Granularity
+  useEffect(() => {
+    // Reset date filters when granularity changes
+    setMinDate(undefined);
+    setMaxDate(now);
+
+    if (view === "month") {
+      const thirtyDaysAgo = new Date(now);
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      setMinDate(thirtyDaysAgo);
+    }
+
+    if (view === "year") {
+      const oneYearAgo = new Date(now);
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      setMinDate(oneYearAgo);
+    }
+  }, [view]);
 
   if (isServicesLoading() || isStatsLoading()) {
     return <Loading />;
   }
 
-  const queueCount = getQueueCount(stats, selectedService);
-  const averageServiceTime = getAverageServiceTime(stats, selectedService);
-  const waitTimeDifference = getWaitTimeDifference(stats, selectedService);
+  // Chart Data
+  const queueCount = getQueueCountChartData(stats, view, selectedService);
+  const averageServiceTime = getAverageServiceTimeChartData(
+    stats,
+    view,
+    selectedService,
+  );
+  const waitTimeDifference = getWaitTimeDifferenceChartData(
+    stats,
+    view,
+    selectedService,
+  );
 
   return (
     <>
       <h1 className="text-3xl font-bold">Statistics</h1>
 
-      <div className={"mt-4"}>
+      <div className={"mt-4 "}>
         <ServiceSelect
           services={services}
           setSelectedService={setSelectedService}
         />
+
+        <ViewWindowSelect view={view} setView={setView} />
+
+        {view === "day" ? (
+          <DateSelect date={maxDate} setDate={setMaxDate} />
+        ) : (
+          <DateRangeSelect
+            minDate={minDate}
+            maxDate={maxDate}
+            setMinDate={setMinDate}
+            setMaxDate={setMaxDate}
+          />
+        )}
       </div>
 
-      {/*Daily Queue Entries*/}
+      {/* Queue Entries*/}
       <div>
-        <h2 className="text-2xl font-bold mt-2">Daily Queue Entries</h2>
+        <h2 className="text-2xl font-bold mt-2">Queue Entries</h2>
         <QueueCountChart data={queueCount} />
       </div>
 
       {/*Average Service Time*/}
       <div>
         <h2 className="text-2xl font-bold mt-2">Average Service Time</h2>
-        <ServiceTimeChart data={averageServiceTime} />
+        <p className="text-sm text-base-content/60 mb-2">
+          Red dashed line is the listed service time.
+        </p>
+        <ServiceTimeChart
+          data={averageServiceTime}
+          serviceDuration={selectedService?.duration}
+        />
       </div>
 
       {/*Wait Time Difference*/}
@@ -75,6 +135,29 @@ export const Statistics = () => {
         <WaitTimeDifferenceChart data={waitTimeDifference} />
       </div>
     </>
+  );
+};
+
+const ViewWindowSelect = ({
+  view,
+  setView,
+}: {
+  view: ViewWindow;
+  setView: (value: ViewWindow) => void;
+}) => {
+  return (
+    <fieldset className="fieldset">
+      <legend className="fieldset-legend">Select Granularity</legend>
+      <select
+        value={view}
+        className="select"
+        onChange={(e) => setView(e.target.value as ViewWindow)}
+      >
+        <option value="day">Day</option>
+        <option value="month">Month</option>
+        {/*<option value="year">Year</option>*/}
+      </select>
+    </fieldset>
   );
 };
 
@@ -113,121 +196,75 @@ const ServiceSelect = ({
   );
 };
 
-export const QueueCountChart = ({
-  data,
-  maxX,
-  maxY,
+const DateSelect = ({
+  date,
+  setDate,
 }: {
-  data: { date: Date; count: number }[];
-  maxX?: number;
-  maxY?: number;
+  date?: Date;
+  setDate: (date: Date | undefined) => void;
 }) => {
-  const xDomain: AxisDomain = maxX ? [0, maxX] : [0, "auto"];
-  const yDomain: AxisDomain = maxY ? [0, maxY] : [0, "auto"];
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDate = e.target.value ? new Date(e.target.value) : undefined;
+    setDate(newDate);
+  };
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="date"
-          tickFormatter={(date: Date) =>
-            date.toLocaleDateString(undefined, { dateStyle: "short" })
-          }
-          domain={xDomain}
-        />
-        <YAxis
-          domain={yDomain}
-          label={{ value: "count", angle: -90, position: "insideLeft" }}
-        />
-        <Tooltip />
-        <Line
-          type="monotone"
-          dataKey="count"
-          stroke="#8884d8"
-          strokeWidth={2}
-          dot={false}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div>
+      <input
+        type="date"
+        className="input"
+        value={date ? date.toISOString().split("T")[0] : ""}
+        onChange={handleChange}
+      />
+    </div>
   );
 };
 
-export const ServiceTimeChart = ({
-  data,
-  maxX,
-  maxY,
+const DateRangeSelect = ({
+  minDate,
+  setMinDate,
+  maxDate,
+  setMaxDate,
 }: {
-  data: { date: Date; avgWaitTime: number }[];
-  maxX?: number;
-  maxY?: number;
+  minDate?: Date;
+  setMinDate: (date: Date | undefined) => void;
+  maxDate?: Date;
+  setMaxDate: (date: Date | undefined) => void;
 }) => {
-  const xDomain: AxisDomain = maxX ? [0, maxX] : [0, "auto"];
-  const yDomain: AxisDomain = maxY ? [0, maxY] : [0, "auto"];
+  const handleMinDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = e.target.value ? new Date(e.target.value) : undefined;
+    setMinDate(date);
+  };
+
+  const handleMaxDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = e.target.value ? new Date(e.target.value) : undefined;
+    setMaxDate(date);
+  };
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="date"
-          tickFormatter={(date: Date) =>
-            date.toLocaleDateString(undefined, { dateStyle: "short" })
-          }
-          domain={xDomain}
-        />
-        <YAxis
-          domain={yDomain}
-          label={{ value: "mins", angle: -90, position: "insideLeft" }}
-        />
-        <Tooltip />
-        <Line
-          type="monotone"
-          dataKey="avgWaitTime"
-          stroke="#8884d8"
-          strokeWidth={2}
-          dot={false}
-        />
-      </LineChart>
-    </ResponsiveContainer>
-  );
-};
-
-export const WaitTimeDifferenceChart = ({
-  data,
-  maxX,
-  maxY,
-}: {
-  data: { date: Date; difference: number }[];
-  maxX?: number;
-  maxY?: number;
-}) => {
-  const xDomain: AxisDomain = maxX ? [0, maxX] : [0, "auto"];
-  const yDomain: AxisDomain = maxY ? [0, maxY] : ["auto", "auto"];
-
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="date"
-          tickFormatter={(date: Date) =>
-            date.toLocaleDateString(undefined, { dateStyle: "short" })
-          }
-          domain={xDomain}
-        />
-        <YAxis
-          domain={yDomain}
-          label={{ value: "minutes", angle: -90, position: "insideLeft" }}
-        />
-        <Line
-          type="monotone"
-          dataKey="difference"
-          stroke="#82ca9d"
-          strokeWidth={2}
-          dot={false}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <fieldset className="fieldset">
+      {/*<legend className="fieldset-legend">Select a Date Range</legend>*/}
+      <div className="flex gap-4">
+        <div>
+          <label className="label">From:</label>
+          <input
+            type="date"
+            className="input"
+            value={minDate ? minDate.toISOString().split("T")[0] : ""}
+            onChange={handleMinDateChange}
+          />
+        </div>
+        <div>
+          <label className="label">To:</label>
+          <input
+            type="date"
+            className="input"
+            value={maxDate ? maxDate.toISOString().split("T")[0] : ""}
+            onChange={handleMaxDateChange}
+          />
+        </div>
+      </div>
+      <span className="label">Optional</span>
+    </fieldset>
   );
 };

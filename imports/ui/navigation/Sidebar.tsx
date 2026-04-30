@@ -109,13 +109,6 @@ export const Sidebar = () => {
                   icon={PresentationChartLineIcon}
                 />
 
-                {/*Stats Button*/}
-                <NavLinkItem
-                  link="/admin/statistics"
-                  label="Statistics"
-                  icon={ChartPieIcon}
-                />
-
                 {/*Appointments Button*/}
                 {flags.ENABLE_TEST_FEATURES && (
                   <NavLinkItem
@@ -153,6 +146,22 @@ export const Sidebar = () => {
                   link="/admin/providers"
                   label="Service Providers"
                   icon={IdentificationIcon}
+                />
+
+                {/*Stats Button*/}
+                {flags.ENABLE_TEST_FEATURES && (
+                  <NavLinkItem
+                    link="/admin/statistics"
+                    label="Actual Statistics"
+                    icon={ChartPieIcon}
+                  />
+                )}
+
+                {/* Statistics Demo Button */}
+                <NavLinkItem
+                  link="/admin/statistics-demo"
+                  label="Statistics"
+                  icon={ChartPieIcon}
                 />
 
                 {/* Test Page Button */}
