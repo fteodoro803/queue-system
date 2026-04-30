@@ -20,10 +20,12 @@ function makeStats(partial?: Partial<Stats>): Stats {
     _id: "service-1-2026-02-01",
     serviceId: "service-1",
     date: new Date(2026, 1, 1),
+    granularity: "daily",
     numCompletedAppointments: 1,
     totalDuration: 30,
     estimatedWaitTime: 30,
     actualWaitTime: 25,
+    numCancellations: 0,
     ...partial,
   };
 }
