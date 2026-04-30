@@ -30,12 +30,9 @@ export const Queue = () => {
   const isProvidersLoading = useSubscribe("providers");
   const providers = useFind(() => ProviderCollection.find({}));
 
-  const patientIds = queueEntries.map((e) => e.patientId);
-  const isPatientsLoading = useSubscribe("patients.byIds", patientIds);
-  const patients = useFind(
-    () => PatientsCollection.find({ _id: { $in: patientIds } }),
-    [queueEntries.length],
-  );
+  // TODO: fetch patients relevant to the queue entries
+  const isPatientsLoading = useSubscribe("patients");
+  const patients = useFind(() => PatientsCollection.find({}));
   const patientMap: Map<string, Patient> = new Map(
     patients.map((p) => [p._id, p]),
   );
