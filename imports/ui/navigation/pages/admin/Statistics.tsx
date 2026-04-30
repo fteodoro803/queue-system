@@ -13,10 +13,10 @@ import {
   YAxis,
 } from "recharts";
 import {
-  getAverageServiceTime,
-  getQueueCount,
-  getWaitTimeDifference,
-} from "/imports/utils/statsUtils";
+  getAverageServiceTimeChartData,
+  getQueueCountChartData,
+  getWaitTimeDifferenceChartData,
+} from "/imports/utils/chartData";
 import { AxisDomain } from "recharts/types/util/types";
 import { getStatsByDate, getStatsByRange } from "/imports/api/statsMethods";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
@@ -73,13 +73,14 @@ export const Statistics = () => {
     return <Loading />;
   }
 
-  const queueCount = getQueueCount(stats, view, selectedService);
-  const averageServiceTime = getAverageServiceTime(
+  // Chart Data
+  const queueCount = getQueueCountChartData(stats, view, selectedService);
+  const averageServiceTime = getAverageServiceTimeChartData(
     stats,
     view,
     selectedService,
   );
-  const waitTimeDifference = getWaitTimeDifference(
+  const waitTimeDifference = getWaitTimeDifferenceChartData(
     stats,
     view,
     selectedService,
