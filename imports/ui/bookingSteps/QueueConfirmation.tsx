@@ -11,20 +11,37 @@ import {
   UserIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
+import { QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
+import { useFind, useSubscribe } from "meteor/react-meteor-data";
+import { Loading } from "/imports/ui/components/Loading";
+import { getStatsQuery } from "/imports/api/statsMethods";
+import { calculateQueueTime } from "/imports/utils/queueUtils";
+import { ProviderCollection } from "/imports/api/provider";
+import { convertMinutesToTime } from "/imports/utils/utils";
 
 export const QueueConfirmation = ({
   patient,
   service,
   setQueueEntry,
 }: {
-  patient: Patient | undefined;
-  service: Service | undefined;
+  patient: Patient;
+  service: Service;
   setQueueEntry: (entry: QueueEntryData) => void;
 }) => {
   const now = useDateTime();
-  const isPriority = (service?.priority ?? 0) > 1;
-  const hasEmail = patient?.email != undefined ? true : false;
-  const hasNumber = patient?.number != undefined ? true : false;
+  const isQueueLoading = useSubscribe("queue");
+  const queue = useFind(() =>
+    QueueEntryCollection.find({ serviceId: service._id }),
+  );
+  const isStatsLoading = useSubscribe("stats");
+  const stats = useFind(() => getStatsQuery(service._id, now), [service._id]);
+
+  const isProvidersLoading = useSubscribe("providers");
+  const providers = useFind(() => ProviderCollection.find({})); // TODO: optimize to only fetch providers relevant to the service
+
+  const isPriority = (service.priority ?? 0) > 1;
+  const hasEmail = patient.email != undefined;
+  const hasNumber = patient.number != undefined;
 
   // Handlers
   const handleSubmit = async () => {
@@ -37,6 +54,54 @@ export const QueueConfirmation = ({
 
     setQueueEntry(newQueueEntry);
   };
+
+  if (isQueueLoading() || isStatsLoading() || isProvidersLoading()) {
+    return <Loading />;
+  }
+
+  const waitingOrReady = queue.filter(
+    (entry) =>
+      entry.serviceId === service._id &&
+      (entry.status === "waiting" || entry.status === "ready") &&
+      entry.position != null,
+  );
+
+  const maxPosition = waitingOrReady.reduce(
+    (max, entry) => Math.max(max, entry.position ?? 0),
+    0,
+  );
+  const simulatedPosition = maxPosition + 1;
+
+  // Simulate the pending entry so this estimate matches post-enqueue QueueDetails behavior.
+  const simulatedQueueEntry: QueueEntry = {
+    _id: "simulated-queue-entry",
+    displayId: "PENDING",
+    patientId: patient._id,
+    serviceId: service._id,
+    providerId: null,
+    position: simulatedPosition,
+    status: "waiting",
+    initialEstimatedWaitTime: null,
+    readyAt: null,
+    start: null,
+    end: null,
+    createdAt: now,
+  };
+
+  const simulatedQueue = [...queue, simulatedQueueEntry];
+
+  // Calculate estimated wait time
+  const result = calculateQueueTime({
+    queue: simulatedQueue,
+    queueEntry: simulatedQueueEntry,
+    service: service,
+    providers,
+    currentTime: now,
+    stats: stats && stats.length > 0 ? stats[0] : undefined,
+  });
+  const queueTime = result.ok
+    ? `${convertMinutesToTime(result.time)} min`
+    : undefined;
 
   return (
     <div className="flex flex-col gap-4">
@@ -53,7 +118,7 @@ export const QueueConfirmation = ({
           </div>
           <span className="text-base-content/30">·</span>
           <span className="text-sm font-semibold">
-            {patient?.name ?? "None"}
+            {patient.name ?? "None"}
           </span>
         </div>
 
@@ -65,7 +130,7 @@ export const QueueConfirmation = ({
             </div>
             <span className="text-base-content/30">·</span>
             <span className="text-sm font-semibold">
-              {patient?.number ?? "None"}
+              {patient.number ?? "None"}
             </span>
           </div>
         )}
@@ -78,7 +143,7 @@ export const QueueConfirmation = ({
             </div>
             <span className="text-base-content/30">·</span>
             <span className="text-sm font-semibold">
-              {patient?.email ?? "None"}
+              {patient.email ?? "None"}
             </span>
           </div>
         )}
@@ -90,7 +155,7 @@ export const QueueConfirmation = ({
           </div>
           <span className="text-base-content/30">·</span>
           <span className="text-sm font-semibold">
-            {service?.name ?? "None"}
+            {service.name ?? "None"}
           </span>
         </div>
 
@@ -109,6 +174,17 @@ export const QueueConfirmation = ({
           </span>
         </div>
       </div>
+
+      {/* Queue Time estimate */}
+      {result.ok && (
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-warning/10 ring-1 ring-warning/30 text-warning">
+          <ExclamationTriangleIcon className="h-4 w-4 shrink-0" />
+          <span className="text-sm font-medium">
+            Estimated wait time:{" "}
+            <span className="font-semibold">{queueTime}</span>
+          </span>
+        </div>
+      )}
 
       {/* Priority warning */}
       {isPriority && (

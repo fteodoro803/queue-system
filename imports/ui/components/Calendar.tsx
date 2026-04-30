@@ -1,10 +1,14 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { DayPicker, Matcher } from "react-day-picker";
 import "react-day-picker/src/style.css";
 import { styles } from "/imports/utils/styles";
-import { Flags, SettingsCollection } from "/imports/api/settings";
-import { Loading } from "/imports/ui/components/Loading";
-import { useFind, useSubscribe } from "meteor/react-meteor-data";
+import { useDateTime } from "/imports/contexts/DateTimeContext";
 
 // TODO: add tagalog localisation
 interface CalendarProps {
@@ -22,20 +26,33 @@ export const Calendar = ({
   disabledDates,
   previousDatesDisabled,
 }: CalendarProps) => {
-  const isSettingsLoading = useSubscribe("settings");
-  const flags = useFind(() =>
-    SettingsCollection.find({ _id: "app_flags" }),
-  )[0] as Flags | undefined;
-  const testDate: Date | undefined = flags?.USE_TEST_DATE
-    ? flags?.TEST_DATE
-    : undefined;
+  // 1) Read the app's current effective time from DateTimeContext.
+  //    This means Calendar now follows USE_TEST_DATE / FREEZE_TIME too,
+  //    instead of reading settings flags on its own.
+  const today = useDateTime();
 
-  const today: Date = testDate ?? new Date();
-  const [month, setMonth] = useState<Date>(
-    testDate ?? startMonth ?? new Date(),
+  // 2) Derive the first day of the currently active month.
+  //    We memoize using year + month only, so this does NOT recompute every second,
+  //    only when the visible month actually changes.
+  const currentMonth = useMemo(
+    () => new Date(today.getFullYear(), today.getMonth(), 1),
+    [today.getFullYear(), today.getMonth()],
   );
 
-  // Date Options
+  // 3) Keep the calendar's currently displayed month in local state.
+  //    - startMonth wins if the parent supplies one
+  //    - otherwise we default to the month from the shared app time
+  const [month, setMonth] = useState<Date>(startMonth ?? currentMonth);
+
+  // 4) If startMonth changes, or the app clock moves into a different month,
+  //    re-sync the visible month.
+  useEffect(() => {
+    setMonth(startMonth ?? currentMonth);
+  }, [startMonth, currentMonth]);
+
+  // 5) Build the disabled-date rules.
+  //    When previousDatesDisabled is true, dates before "today" are disabled,
+  //    and "today" here respects the shared simulated clock.
   const previousDates = { before: today };
   const combinedDisabledDates: Matcher[] = [
     disabledDates ?? [],
@@ -44,20 +61,17 @@ export const Calendar = ({
     .flat()
     .filter(Boolean) as Matcher[];
 
-  if (isSettingsLoading()) return <Loading />;
-  if (!flags) return <Loading />;
 
   return (
     <DayPicker
       className={`react-day-picker ${styles.outline}`}
-      /* --- Modifiers --- */
       mode="single"
       selected={date}
       onSelect={setDate}
       month={month} // the visible month on the calendar
       onMonthChange={setMonth}
       today={today}
-      /* --- Style --- */
+
       disabled={combinedDisabledDates}
       ISOWeek={true} // week starts on Monday
       fixedWeeks={true} // consistent window size
