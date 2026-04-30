@@ -58,7 +58,7 @@ export const buildChartData = <TAcc, TResult extends { date: Date }>(
   // 4. Group stats by date and aggregate using the provided accumulate function
   const grouped = groupBy(
     filtered,
-    (stat) => stat.date.toISOString(),
+    (stat) => stat.date.toDateString(),
     (acc, item) =>
       config.accumulate(acc as unknown as TAcc, item) as unknown as Stats,
   );

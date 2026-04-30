@@ -3,24 +3,18 @@ import { Loading } from "/imports/ui/components/Loading";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Service, ServicesCollection } from "/imports/api/service";
 import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ReferenceLine,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import {
   getAverageServiceTimeChartData,
   getQueueCountChartData,
   getWaitTimeDifferenceChartData,
 } from "/imports/utils/chartData";
-import { AxisDomain } from "recharts/types/util/types";
 import { getStatsByDate, getStatsByRange } from "/imports/api/statsMethods";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { ViewWindow } from "/imports/api/stats";
+import {
+  QueueCountChart,
+  ServiceTimeChart,
+  WaitTimeDifferenceChart,
+} from "/imports/ui/components/Charts";
 
 export const Statistics = () => {
   const now = useDateTime();
@@ -96,7 +90,7 @@ export const Statistics = () => {
           setSelectedService={setSelectedService}
         />
 
-        <GranularitySelect granularity={view} setGranularity={setView} />
+        <ViewWindowSelect view={view} setView={setView} />
 
         {view === "day" ? (
           <DateSelect date={maxDate} setDate={setMaxDate} />
@@ -144,25 +138,24 @@ export const Statistics = () => {
   );
 };
 
-// TODO: change this to viewSelect
-const GranularitySelect = ({
-  granularity,
-  setGranularity,
+const ViewWindowSelect = ({
+  view,
+  setView,
 }: {
-  granularity: ViewWindow;
-  setGranularity: (value: ViewWindow) => void;
+  view: ViewWindow;
+  setView: (value: ViewWindow) => void;
 }) => {
   return (
     <fieldset className="fieldset">
       <legend className="fieldset-legend">Select Granularity</legend>
       <select
-        value={granularity}
+        value={view}
         className="select"
-        onChange={(e) => setGranularity(e.target.value as ViewWindow)}
+        onChange={(e) => setView(e.target.value as ViewWindow)}
       >
         <option value="day">Day</option>
         <option value="month">Month</option>
-        <option value="year">Year</option>
+        {/*<option value="year">Year</option>*/}
       </select>
     </fieldset>
   );
@@ -273,139 +266,5 @@ const DateRangeSelect = ({
       </div>
       <span className="label">Optional</span>
     </fieldset>
-  );
-};
-
-export const QueueCountChart = ({
-  data,
-  maxX,
-  maxY,
-}: {
-  data: { date: Date; count: number }[];
-  maxX?: number;
-  maxY?: number;
-}) => {
-  const xDomain: AxisDomain = maxX ? [0, maxX] : [0, "auto"];
-  const yDomain: AxisDomain = maxY ? [0, maxY] : [0, "auto"];
-
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          // dataKey="date"
-          // tickFormatter={(date: Date) =>
-          //   date.toLocaleDateString(undefined, { dateStyle: "short" })
-          // }
-          domain={xDomain}
-        />
-        <YAxis
-          domain={yDomain}
-          label={{ value: "count", angle: -90, position: "insideLeft" }}
-        />
-        <Tooltip />
-        <Line
-          type="monotone"
-          dataKey="count"
-          stroke="#8884d8"
-          strokeWidth={2}
-          dot={false}
-        />
-      </LineChart>
-    </ResponsiveContainer>
-  );
-};
-
-export const ServiceTimeChart = ({
-  data,
-  serviceDuration,
-  multiplier = 1.5,
-}: {
-  data: { date: Date; avgWaitTime: number }[];
-  serviceDuration?: number;
-  multiplier?: number;
-}) => {
-  const xDomain: AxisDomain = [0, "auto"];
-  const yDomain: AxisDomain = serviceDuration
-    ? [0, serviceDuration * multiplier]
-    : [0, "auto"];
-
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="date"
-          tickFormatter={(date: Date) =>
-            date.toLocaleDateString(undefined, { dateStyle: "short" })
-          }
-          domain={xDomain}
-        />
-        <YAxis
-          domain={yDomain}
-          label={{ value: "mins", angle: -90, position: "insideLeft" }}
-        />
-        <Tooltip />
-
-        {/*Reference Line - listed service duration*/}
-        {serviceDuration && (
-          <ReferenceLine
-            y={serviceDuration}
-            stroke="#ff7300"
-            strokeDasharray="4 4"
-            label={{
-              value: `${serviceDuration}mins`,
-              position: "insideTopRight",
-              fontSize: 12,
-            }}
-          />
-        )}
-
-        <Line
-          type="monotone"
-          dataKey="avgWaitTime"
-          stroke="#8884d8"
-          strokeWidth={2}
-          dot={false}
-        />
-      </LineChart>
-    </ResponsiveContainer>
-  );
-};
-
-export const WaitTimeDifferenceChart = ({
-  data,
-  maxY,
-}: {
-  data: { date: Date; difference: number }[];
-  maxY?: number;
-}) => {
-  const xDomain: AxisDomain = [0, "auto"];
-  const yDomain: AxisDomain = maxY ? [0, maxY] : ["auto", "auto"];
-
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="date"
-          tickFormatter={(date: Date) =>
-            date.toLocaleDateString(undefined, { dateStyle: "short" })
-          }
-          domain={xDomain}
-        />
-        <YAxis
-          domain={yDomain}
-          label={{ value: "minutes", angle: -90, position: "insideLeft" }}
-        />
-        <Line
-          type="monotone"
-          dataKey="difference"
-          stroke="#82ca9d"
-          strokeWidth={2}
-          dot={false}
-        />
-      </LineChart>
-    </ResponsiveContainer>
   );
 };
