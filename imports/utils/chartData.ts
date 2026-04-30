@@ -24,7 +24,7 @@ export const getAverageServiceTimeChartData = (
 ): { date: Date; avgWaitTime: number }[] => {
   return buildChartData(stats, view, service, {
     validate: (stat) =>
-      !!stat.date &&
+      stat.date !== undefined &&
       stat.totalDuration !== undefined &&
       stat.numCompletedAppointments !== undefined,
 
@@ -53,7 +53,8 @@ export const getQueueCountChartData = (
   service?: Service,
 ): { date: Date; count: number }[] => {
   return buildChartData(stats, view, service, {
-    validate: (stat) => !!stat.date && !!stat.numCompletedAppointments,
+    validate: (stat) =>
+      stat.date !== undefined && stat.numCompletedAppointments !== undefined,
 
     initial: () => ({ numCompletedAppointments: 0 }),
 
@@ -87,10 +88,10 @@ export const getWaitTimeDifferenceChartData = (
 
   return buildChartData(stats, view, service, {
     validate: (stat) =>
-      !!stat.date &&
-      !!stat.numCompletedAppointments &&
-      !!stat.estimatedWaitTime &&
-      !!stat.actualWaitTime,
+      stat.date !== undefined &&
+      stat.numCompletedAppointments !== undefined &&
+      stat.estimatedWaitTime !== undefined &&
+      stat.actualWaitTime !== undefined,
 
     initial: () => ({
       numCompletedAppointments: 0,
