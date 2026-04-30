@@ -81,6 +81,45 @@ const filteredByService = (
  * // Filtered to one service
  * getAverageServiceTime({ stats, service: selectedService })
  */
+
+type AggregationConfig<TAcc, TResult extends { date: Date }> = {
+  validate: (stat: Stats) => boolean;
+  initial: () => TAcc;
+  accumulate: (acc: TAcc, item: Stats) => TAcc;
+  finalize: (date: Date, acc: TAcc) => TResult;
+};
+
+const buildChartData = <TAcc, TResult extends { date: Date }>(
+  stats: Stats[],
+  view: ViewWindow,
+  service: Service | undefined,
+  config: AggregationConfig<TAcc, TResult>,
+): TResult[] => {
+  const granularity = viewToGranularity(view);
+
+  if (stats.length === 0) return [];
+
+  if (stats.some((stat) => !config.validate(stat))) {
+    console.warn("Some stats are missing required fields");
+    return [];
+  }
+
+  const filtered = filteredByService(service, stats, granularity);
+
+  const grouped = groupBy(
+    filtered,
+    (stat) => stat.date.toISOString(),
+    (acc, item) =>
+      config.accumulate(acc as unknown as TAcc, item) as unknown as Stats,
+  );
+
+  return Object.entries(grouped)
+    .map(([date, data]) =>
+      config.finalize(new Date(date), data as unknown as TAcc),
+    )
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+};
+
 export const getAverageServiceTime = (
   stats: Stats[],
   view: ViewWindow,
