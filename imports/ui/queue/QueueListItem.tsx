@@ -206,7 +206,6 @@ const ActionButtons = ({
 
   return (
     <div>
-      {/* NEW */}
       <div className="join flex">
         {/* Main Button */}
         {status === "waiting" ? (
