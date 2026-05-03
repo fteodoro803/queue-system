@@ -202,6 +202,8 @@ const ActionButtons = ({
   setOpenCancelModal: (bool: boolean) => void;
   isProviderAvailable: boolean;
 }) => {
+  const flexGrowth: string = "flex-1 min-w-25";
+
   return (
     <div>
       {/* NEW */}
@@ -209,21 +211,21 @@ const ActionButtons = ({
         {/* Main Button */}
         {status === "waiting" ? (
           <button
-            className="join-item btn"
+            className={`join-item btn ${flexGrowth}`}
             onClick={() => setOpenCheckInModal(true)}
           >
             Check-in
           </button>
         ) : status === "ready" ? (
           <button
-            className="join-item btn"
+            className={`join-item btn ${flexGrowth}`}
             onClick={() => setOpenStartModal(true)}
           >
             Start
           </button>
         ) : (
           <button
-            className="join-item btn"
+            className={`join-item btn ${flexGrowth}`}
             onClick={() => setOpenEndModal(true)}
           >
             Finish
@@ -232,7 +234,7 @@ const ActionButtons = ({
 
         {/* Dropdown Button */}
         <div className="dropdown dropdown-end">
-          <button tabIndex={0} role="button" className="join-item btn">
+          <button tabIndex={0} role="button" className="join-item btn px-2">
             <ChevronDownIcon className="size-3" />
           </button>
           <ul
