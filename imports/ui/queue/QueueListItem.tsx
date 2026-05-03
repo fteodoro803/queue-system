@@ -1,13 +1,9 @@
 import React, { useState } from "react";
-import { QueueEntry } from "/imports/api/queueEntry";
+import { QueueEntry, QueueStatus } from "/imports/api/queueEntry";
 import {
   ClipboardDocumentListIcon,
-  PlayIcon,
-  StopIcon,
-  XMarkIcon,
   ClockIcon,
   IdentificationIcon,
-  CheckIcon,
 } from "@heroicons/react/24/outline";
 import { QueueIcon } from "/imports/ui/components/QueueIcon";
 import { convertMinutesToTime, formatDateToLocale } from "/imports/utils/utils";
@@ -21,6 +17,7 @@ import {
 } from "/imports/ui/queue/ConfirmActionModal";
 import { Patient } from "/imports/api/patient";
 import { Service } from "/imports/api/service";
+import { ChevronDownIcon } from "@heroicons/react/24/solid";
 
 interface QueueListItemProps {
   entry: QueueEntry;
@@ -198,7 +195,7 @@ const ActionButtons = ({
   setOpenCancelModal,
   isProviderAvailable,
 }: {
-  status: string;
+  status: QueueStatus;
   setOpenCheckInModal: (bool: boolean) => void;
   setOpenStartModal: (bool: boolean) => void;
   setOpenEndModal: (bool: boolean) => void;
@@ -207,47 +204,57 @@ const ActionButtons = ({
 }) => {
   return (
     <div>
-      {/* Check-in Button */}
-      {status === "waiting" && (
-        <button
-          className="btn btn-square btn-ghost"
-          onClick={() => {
-            setOpenCheckInModal(true);
-          }}
-        >
-          <CheckIcon className="w-6" />
-        </button>
-      )}
-      {/* Start Button */}
-      {status === "ready" && (
-        <button
-          className="btn btn-square btn-ghost"
-          disabled={!isProviderAvailable}
-          onClick={() => {
-            setOpenStartModal(true);
-          }}
-        >
-          <PlayIcon className="w-6" />
-        </button>
-      )}
-      {/* Complete Button */}
-      {status === "in-progress" && (
-        <button
-          className="btn btn-square btn-ghost"
-          onClick={() => setOpenEndModal(true)}
-        >
-          <StopIcon className="w-6" />
-        </button>
-      )}
-      {/* Cancel Button */}
-      {status !== "in-progress" && (
-        <button
-          className="btn btn-square btn-ghost"
-          onClick={() => setOpenCancelModal(true)}
-        >
-          <XMarkIcon className="w-6" />
-        </button>
-      )}
+      {/* NEW */}
+      <div className="join flex">
+        {/* Main Button */}
+        {status === "waiting" ? (
+          <button
+            className="join-item btn"
+            onClick={() => setOpenCheckInModal(true)}
+          >
+            Check-in
+          </button>
+        ) : status === "ready" ? (
+          <button
+            className="join-item btn"
+            onClick={() => setOpenStartModal(true)}
+          >
+            Start
+          </button>
+        ) : (
+          <button
+            className="join-item btn"
+            onClick={() => setOpenEndModal(true)}
+          >
+            Finish
+          </button>
+        )}
+
+        {/* Dropdown Button */}
+        <div className="dropdown dropdown-end">
+          <button tabIndex={0} role="button" className="join-item btn">
+            <ChevronDownIcon className="size-3" />
+          </button>
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+          >
+            {/* Check in and Start */}
+            {status === "waiting" && isProviderAvailable && (
+              <li>
+                <a onClick={() => setOpenStartModal(true)}>
+                  Check-in and Start
+                </a>
+              </li>
+            )}
+
+            {/* Cancel */}
+            <li>
+              <a onClick={() => setOpenCancelModal(true)}>Cancel</a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };
