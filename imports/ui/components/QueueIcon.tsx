@@ -3,10 +3,11 @@ import { QueueEntry } from "/imports/api/queueEntry";
 
 interface QueueIconProps {
   entry: QueueEntry;
-  size?: number; // optional, default square size
+  className?: string; // use for responsive Tailwind sizing e.g. "w-14 h-14 md:w-[70px] md:h-[70px]"
 }
 
-export const QueueIcon = ({ entry, size = 70 }: QueueIconProps) => {
+export const QueueIcon = ({ entry, className }: QueueIconProps) => {
+  const size: number = 70; // used if no className argument size provided
   const position: string =
     entry.status === "completed"
       ? "✓"
@@ -22,8 +23,8 @@ export const QueueIcon = ({ entry, size = 70 }: QueueIconProps) => {
         isInProgress
           ? "bg-success/15 text-success"
           : "bg-primary/10 text-primary"
-      }`}
-      style={{ width: size, height: size }}
+      } ${className ?? ""}`}
+      style={className ? undefined : { width: size, height: size }}
     >
       {isInProgress ? (
         <span className="loading loading-dots loading-xl"></span>
