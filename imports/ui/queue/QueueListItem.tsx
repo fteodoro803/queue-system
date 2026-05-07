@@ -59,11 +59,15 @@ export const QueueListItem = ({
     position && availableProviders && position <= availableProviders,
   );
 
-  const border: string = "border-b border-base-300 last:border-b-0";
+  const border: string =
+    "after:absolute after:bottom-0 after:left-8 after:right-8 after:h-px after:bg-base-300/60 last:after:hidden";
 
   return (
     <>
-      <li className={`px-4 py-3 hover:bg-base-200 ${border}`} key={entry._id}>
+      <li
+        className={`relative px-4 py-3 hover:bg-base-200 ${border}`}
+        key={entry._id}
+      >
         {/* Mobile layout  */}
         <div className="flex min-w-0 flex-col gap-2 md:hidden">
           {/* Top Area */}
