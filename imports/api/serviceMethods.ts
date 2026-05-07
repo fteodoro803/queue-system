@@ -1,5 +1,13 @@
 import { Meteor } from "meteor/meteor";
-import { ServicesCollection } from "/imports/api/service";
+import {
+  SERVICE_SHORTCODE_MAX_LENGTH,
+  SERVICE_SHORTCODE_MIN_LENGTH,
+  ServicesCollection,
+} from "/imports/api/service";
+import {
+  isValidShortcode,
+  normaliseShortcode,
+} from "/imports/utils/serviceUtils";
 
 // ---- Interfaces ----
 export interface ServiceData {
@@ -16,12 +24,20 @@ Meteor.methods({
   // Adds service type to the database
   // Returns the ID of the newly created service document
   "services.insert"(data: ServiceData): Promise<string> {
+    const normalisedShortcode = normaliseShortcode(data.shortcode);
+    if (!isValidShortcode(normalisedShortcode)) {
+      throw new Meteor.Error(
+        "validation-error",
+        `Shortcode must be between ${SERVICE_SHORTCODE_MIN_LENGTH} and ${SERVICE_SHORTCODE_MAX_LENGTH} characters.`,
+      );
+    }
+
     return ServicesCollection.insertAsync({
-      name: data.name,
-      shortcode: data.shortcode,
+      name: data.name.trim(),
+      shortcode: normalisedShortcode,
       cost: data.cost ?? null,
       duration: data.duration,
-      description: data.description,
+      description: data.description.trim(),
       priority: data.priority ?? 1, // default priority
       createdAt: new Date(),
     });
@@ -36,7 +52,16 @@ Meteor.methods({
     const updates: Partial<ServiceData> = {};
 
     if (data.name !== undefined) updates.name = data.name.trim();
-    if (data.shortcode !== undefined) updates.shortcode = data.shortcode.trim();
+    if (data.shortcode !== undefined) {
+      const normalisedShortcode = normaliseShortcode(data.shortcode);
+      if (!isValidShortcode(normalisedShortcode)) {
+        throw new Meteor.Error(
+          "validation-error",
+          `Shortcode must be between ${SERVICE_SHORTCODE_MIN_LENGTH} and ${SERVICE_SHORTCODE_MAX_LENGTH} characters.`,
+        );
+      }
+      updates.shortcode = normalisedShortcode;
+    }
     if (data.description !== undefined)
       updates.description = data.description.trim();
     if (data.duration !== undefined) updates.duration = data.duration;

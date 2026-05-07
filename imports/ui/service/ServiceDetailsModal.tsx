@@ -114,7 +114,7 @@ export const ServiceDetailsModal = ({
             <Field
               value={name}
               onChange={setName}
-              additionalAttributes="input input-bordered w-full bg-base-100"
+              additionalAttributes="input input-ghost bg-base-100"
               mode="editable"
               type="text"
               placeholder="N/A"
@@ -129,7 +129,7 @@ export const ServiceDetailsModal = ({
             <Field
               value={duration}
               onChange={setDuration}
-              additionalAttributes="input input-bordered w-full bg-base-100"
+              additionalAttributes="input input-ghost bg-base-100"
               type="number"
               placeholder="N/A"
               icon={ClockIcon}
@@ -145,7 +145,7 @@ export const ServiceDetailsModal = ({
             <Field
               value={cost}
               onChange={setCost}
-              additionalAttributes="input input-bordered w-full bg-base-100"
+              additionalAttributes="input input-ghost bg-base-100"
               type="number"
               placeholder="N/A"
               icon={BanknotesIcon}
@@ -161,7 +161,7 @@ export const ServiceDetailsModal = ({
             <Field
               value={description}
               onChange={setDescription}
-              additionalAttributes="input input-bordered w-full bg-base-100"
+              additionalAttributes="input input-ghost bg-base-100"
               type="text"
               placeholder="N/A"
               icon={ChatBubbleBottomCenterIcon}

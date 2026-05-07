@@ -105,7 +105,7 @@ export const ProviderDetailsModal = ({
             <NameField
               value={name}
               onChange={setName}
-              additionalAttributes="input input-bordered w-full bg-base-100"
+              additionalAttributes="input-ghost bg-base-100"
               placeholder="N/A"
               mode="editable"
             />
@@ -119,7 +119,7 @@ export const ProviderDetailsModal = ({
             <EmailField
               value={email}
               onChange={setEmail}
-              additionalAttributes="input-bordered bg-base-100"
+              additionalAttributes="input-ghost bg-base-100"
               placeholder="N/A"
               mode="editable"
             />
@@ -133,7 +133,7 @@ export const ProviderDetailsModal = ({
             <NumberField
               value={number}
               onChange={setNumber}
-              additionalAttributes="input-bordered bg-base-100"
+              additionalAttributes="input-ghost bg-base-100"
               placeholder="N/A"
               mode="editable"
             />
