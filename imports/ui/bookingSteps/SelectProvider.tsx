@@ -61,7 +61,7 @@ export const SelectProvider = ({
         </li>
         {/* Any */}
         <li
-          className="list-row hover:bg-base-300"
+          className="list-row rounded-none bg-base/50 hover:bg-base-200"
           onClick={() => {
             setProvider(undefined);
           }}

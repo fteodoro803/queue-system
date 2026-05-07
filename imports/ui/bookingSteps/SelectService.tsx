@@ -25,7 +25,7 @@ export const SelectService = ({
         </li>
         {services.map((s) => (
           <li
-            className="list-row rounded-none hover:bg-base-300"
+            className="list-row rounded-none bg-base/50 hover:bg-base-200"
             key={s._id}
             onClick={() => {
               setService(s);
