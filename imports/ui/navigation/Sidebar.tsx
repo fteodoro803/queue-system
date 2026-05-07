@@ -76,7 +76,7 @@ export const Sidebar = () => {
         />
 
         {/* Main content area */}
-        <div className="drawer-content flex flex-col bg-base-200">
+        <div className="drawer-content flex flex-col min-h-screen bg-base-200">
           <div className="p-6 lg:p-8">
             <Outlet />
           </div>

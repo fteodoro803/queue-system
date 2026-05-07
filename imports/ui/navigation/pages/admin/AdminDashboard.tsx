@@ -37,9 +37,6 @@ export const AdminDashboard = () => {
   const endOfDay: string = settings?.end_of_day;
   const [isWorkdayModalOpen, setWorkdayModalOpen] = useState(false);
 
-  // Services
-  // const services = useFind(() => ServicesCollection.find({}));
-
   // Providers
   const providers = useFind(() => ProviderCollection.find({}));
 
@@ -60,22 +57,6 @@ export const AdminDashboard = () => {
     isProvidersLoading()
   )
     return <Loading />;
-
-  // const selectedService = services[0]; // TODO: make this dynamic based on user selection
-  // const serviceEfficiency =
-  //   selectedService?.avgDuration != null
-  //     ? Math.ceil(
-  //         (selectedService.duration / selectedService.avgDuration) * 100,
-  //       )
-  //     : undefined;
-  //
-  // const getEfficiencyLabel = (score: number) => {
-  //   if (score >= 115) return "well ahead of schedule";
-  //   if (score >= 105) return "beating expectations";
-  //   if (score >= 95) return "meeting expectations";
-  //   if (score >= 80) return "review workload";
-  //   return "needs attention";
-  // };
 
   return (
     <>
@@ -146,22 +127,6 @@ export const AdminDashboard = () => {
                   icon={IdentificationIcon}
                 />
               </div>
-
-              {/* Performance Card */}
-              {/*<div className="my-4">*/}
-              {/*  <DashboardCard*/}
-              {/*    header="Performance Score"*/}
-              {/*    body={*/}
-              {/*      serviceEfficiency != null ? `${serviceEfficiency}%` : "N/A"*/}
-              {/*    }*/}
-              {/*    footer={*/}
-              {/*      serviceEfficiency != null*/}
-              {/*        ? getEfficiencyLabel(serviceEfficiency)*/}
-              {/*        : "No data yet"*/}
-              {/*    }*/}
-              {/*    icon={ChartBarIcon}*/}
-              {/*  />*/}
-              {/*</div>*/}
             </>
           )}
         </div>
