@@ -108,13 +108,9 @@ export const AdminDashboard = () => {
               body={
                 <div>
                   {dayStarted ? (
-                    <p className="text-success-content text-center border border-success bg-success rounded px-2 py-0.5">
-                      Open
-                    </p>
+                    <p className="text-success text-center">Open</p>
                   ) : (
-                    <p className="text-error-content text-center border border-error bg-error rounded px-2 py-0.5">
-                      Closed
-                    </p>
+                    <p className="text-error text-center">Closed</p>
                   )}
                 </div>
               }
