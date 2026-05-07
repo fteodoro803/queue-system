@@ -59,9 +59,11 @@ export const QueueListItem = ({
     position && availableProviders && position <= availableProviders,
   );
 
+  const border: string = "border-b border-base-300 last:border-b-0";
+
   return (
     <>
-      <li className="px-4 py-3 hover:bg-base-200" key={entry._id}>
+      <li className={`px-4 py-3 hover:bg-base-200 ${border}`} key={entry._id}>
         {/* Mobile layout  */}
         <div className="flex min-w-0 flex-col gap-2 md:hidden">
           {/* Top Area */}
