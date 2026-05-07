@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { QueueEntry, QueueStatus } from "/imports/api/queueEntry";
 import {
+  CheckIcon,
   ClipboardDocumentListIcon,
   ClockIcon,
   IdentificationIcon,
+  PlayIcon,
+  StopIcon,
+  WifiIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { QueueIcon } from "/imports/ui/components/QueueIcon";
 import { convertMinutesToTime, formatDateToLocale } from "/imports/utils/utils";
@@ -89,21 +94,24 @@ export const QueueListItem = ({
           <div className="flex flex-col items-start gap-x-4 gap-y-1 py-1">
             {/* Patient Badge */}
             {admin && (
-              <div
-                className={`badge badge-soft shrink-0 capitalize ${statusBadgeMap[entry.status]}`}
-              >
-                {entry.status}
+              <div className="flex items-center gap-1">
+                <WifiIcon className={`${iconSize} shrink-0`} />
+                <div
+                  className={`badge badge-soft shrink-0 capitalize ${statusBadgeMap[entry.status]}`}
+                >
+                  {entry.status}
+                </div>
               </div>
             )}
 
             {admin && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-4">
                 <IdentificationIcon className={`${iconSize} shrink-0`} />
                 <p className={textSize}>{entry.displayId}</p>
               </div>
             )}
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-4">
               <ClipboardDocumentListIcon className={`${iconSize} shrink-0`} />
               <p
                 className={`${textSize} ${isHighPriority ? "text-error animate-pulse" : ""}`}
@@ -112,12 +120,12 @@ export const QueueListItem = ({
               </p>
             </div>
 
-            <TimeStatus entry={entry} timeUntil={timeUntil} />
+            <TimeStatus entry={entry} timeUntil={timeUntil} gap={4} />
           </div>
 
           {admin && (
             <div className="w-full">
-              <ActionButtons
+              <MobileActionButtons
                 status={entry.status}
                 setOpenCheckInModal={setOpenCheckInModal}
                 setOpenStartModal={setOpenStartModal}
@@ -130,57 +138,71 @@ export const QueueListItem = ({
           )}
         </div>
 
-        {/* Desktop layout: left icon, right top/bottom content */}
-        <div className="hidden min-w-0 items-start gap-4 md:flex">
+        {/* Desktop layout: left icon, middle content, right badge/buttons */}
+        <div className="hidden md:flex w-full min-w-0 items-center gap-4">
+          {/* Icon */}
           <div className="shrink-0 tabular-nums">
-            <QueueIcon entry={entry} className="h-17.5 w-17.5" />
+            <QueueIcon entry={entry} />
           </div>
 
-          <div className="flex min-w-0 flex-1 flex-col gap-2 py-1">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="card-title min-w-0 truncate leading-tight">
-                  {admin ? patient.name : entry.displayId}
-                </div>
+          {/* Details Column */}
+          <div className="min-w-0 flex-1">
+            {/* Header */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="card-title truncate">
+                {admin ? patient.name : entry.displayId}
               </div>
-
-              <div className="flex shrink-0 items-center gap-3">
-                <div
-                  className={`badge badge-soft capitalize ${statusBadgeMap[entry.status]}`}
-                >
-                  {entry.status}
-                </div>
-                {admin && (
-                  <ActionButtons
-                    status={entry.status}
-                    setOpenCheckInModal={setOpenCheckInModal}
-                    setOpenStartModal={setOpenStartModal}
-                    setOpenEndModal={setOpenEndModal}
-                    setOpenCancelModal={setOpenCancelModal}
-                    isProviderAvailable={isProviderAvailable}
-                  />
-                )}
+              <div
+                className={`badge badge-soft md:hidden ${statusBadgeMap[entry.status]}`}
+              >
+                {entry.status}
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            {/* Body */}
+            <div className="flex flex-wrap items-center sm:gap-1 md:gap-4 py-1">
+              {/* ID */}
               {admin && (
                 <div className="flex items-center gap-1">
-                  <IdentificationIcon className={`${iconSize} shrink-0`} />
+                  <IdentificationIcon className={iconSize} />
                   <p className={textSize}>{entry.displayId}</p>
                 </div>
               )}
 
+              {/* Service */}
               <div className="flex items-center gap-1">
-                <ClipboardDocumentListIcon className={`${iconSize} shrink-0`} />
+                <ClipboardDocumentListIcon className={iconSize} />
                 <p
                   className={`${textSize} ${isHighPriority ? "text-error animate-pulse" : ""}`}
                 >
                   {service.name}
                 </p>
               </div>
+
+              {/* Time Status */}
               <TimeStatus entry={entry} timeUntil={timeUntil} />
             </div>
+          </div>
+
+          {/* Buttons and Status Badge*/}
+          <div className="flex items-center gap-4">
+            {/* Status */}
+            <div
+              className={`badge badge-soft ml-auto hidden md:inline-flex ${statusBadgeMap[entry.status]}`}
+            >
+              {entry.status}
+            </div>
+            {/* Buttons */}
+            {admin && (
+              <DesktopActionButtons
+                status={entry.status}
+                setOpenCheckInModal={setOpenCheckInModal}
+                setOpenStartModal={setOpenStartModal}
+                setOpenEndModal={setOpenEndModal}
+                setOpenCancelModal={setOpenCancelModal}
+                isProviderAvailable={isProviderAvailable}
+              />
+            )}
           </div>
         </div>
       </li>
@@ -205,16 +227,18 @@ export const QueueListItem = ({
 const TimeStatus = ({
   entry,
   timeUntil,
+  gap = 1,
 }: {
   entry: QueueEntry;
   timeUntil?: QueueTimeResult;
+  gap?: number;
 }) => {
   return (
     <>
       {/* Estimated Time Until */}
       {(entry.status === "waiting" || entry.status === "ready") &&
         timeUntil && (
-          <div className="flex items-center gap-1">
+          <div className={`flex items-center gap-${gap}`}>
             <ClockIcon className={iconSize} />
             <p className={textSize}>
               {timeUntil && timeUntil.ok
@@ -226,7 +250,7 @@ const TimeStatus = ({
 
       {/* Started */}
       {entry.start && !entry.end && (
-        <div className="flex items-center gap-1">
+        <div className={`flex items-center gap-${gap}`}>
           <ClockIcon className={iconSize} />
           <p className={textSize}>
             {entry.start ? `${formatDateToLocale(entry.start)}-present` : "N/A"}
@@ -236,7 +260,7 @@ const TimeStatus = ({
 
       {/* Completed */}
       {entry.start && entry.end && (
-        <div className="flex items-center gap-1">
+        <div className={`flex items-center gap-${gap}`}>
           <ClockIcon className={iconSize} />
           <p className={textSize}>
             {entry.start && entry.end
@@ -249,7 +273,7 @@ const TimeStatus = ({
   );
 };
 
-const ActionButtons = ({
+const MobileActionButtons = ({
   status,
   setOpenCheckInModal,
   setOpenStartModal,
@@ -320,6 +344,68 @@ const ActionButtons = ({
           </ul>
         </div>
       </div>
+    </div>
+  );
+};
+
+const DesktopActionButtons = ({
+  status,
+  setOpenCheckInModal,
+  setOpenStartModal,
+  setOpenEndModal,
+  setOpenCancelModal,
+  isProviderAvailable,
+}: {
+  status: string;
+  setOpenCheckInModal: (bool: boolean) => void;
+  setOpenStartModal: (bool: boolean) => void;
+  setOpenEndModal: (bool: boolean) => void;
+  setOpenCancelModal: (bool: boolean) => void;
+  isProviderAvailable: boolean;
+}) => {
+  return (
+    <div>
+      {/* Check-in Button */}
+      {status === "waiting" && (
+        <button
+          className="btn btn-square btn-ghost"
+          onClick={() => {
+            setOpenCheckInModal(true);
+          }}
+        >
+          <CheckIcon className="w-6" />
+        </button>
+      )}
+      {/* Start Button */}
+      {status === "ready" && (
+        <button
+          className="btn btn-square btn-ghost"
+          disabled={!isProviderAvailable}
+          onClick={() => {
+            setOpenStartModal(true);
+          }}
+        >
+          <PlayIcon className="w-6" />
+        </button>
+      )}
+      {/* Complete Button */}
+      {status === "in-progress" && (
+        <button
+          className="btn btn-square btn-ghost"
+          onClick={() => setOpenEndModal(true)}
+        >
+          <StopIcon className="w-6" />
+        </button>
+      )}
+      {/* Cancel Button */}
+      {status !== "in-progress" && (
+        <button
+          className="btn btn-square btn-ghost"
+          onClick={() => setOpenCancelModal(true)}
+        >
+          <XMarkIcon className="w-6" />
+        </button>
+      )}
     </div>
   );
 };
