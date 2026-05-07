@@ -250,9 +250,9 @@ export const QueueManagement = () => {
         />
 
         {/* Upcoming and Ongoing Queue */}
-        <div className="tab-content border-base-300 bg-base-100 p-10">
+        <div className="tab-content border-base-300 bg-base-100 p-4 sm:p-10">
           {selectedService ? (
-            <>
+            <div className={"flex flex-col gap-4"}>
               <div className="">
                 <div key={selectedService._id} className="mb-6">
                   <h2 className="text-2xl font-bold">Ongoing</h2>
@@ -282,7 +282,7 @@ export const QueueManagement = () => {
                   />
                 </div>
               </div>
-            </>
+            </div>
           ) : (
             <div className="py-8 text-center text-sm opacity-60">
               No services available.
@@ -297,7 +297,7 @@ export const QueueManagement = () => {
           className="tab"
           aria-label="Finished"
         />
-        <div className="tab-content border-base-300 bg-base-100 p-10">
+        <div className="tab-content border-base-300 bg-base-100 p-4 sm:p-10">
           {selectedService ? (
             <>
               <div className="">
@@ -329,7 +329,7 @@ export const QueueManagement = () => {
           className="tab"
           aria-label="Cancelled"
         />
-        <div className="tab-content border-base-300 bg-base-100 p-10">
+        <div className="tab-content border-base-300 bg-base-100 p-4 sm:p-10">
           {selectedService ? (
             <>
               <div className="">
