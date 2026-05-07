@@ -269,8 +269,7 @@ async function generateDisplayId(service: Service): Promise<string> {
 
   // 4. Combine initials and count to generate ID (e.g., "AB-12")
   const numStr = `${String(nextNum).padStart(2, "0")}`;
-  const serviceStr = `${service.shortcode.toUpperCase()}`;
-  const displayId = `${serviceStr}-${numStr}`;
+  const displayId = `${service.shortcode}-${numStr}`;
 
   return displayId;
 }

@@ -1,5 +1,13 @@
 import React, { useState } from "react";
+import {
+  SERVICE_SHORTCODE_MAX_LENGTH,
+  SERVICE_SHORTCODE_MIN_LENGTH,
+} from "/imports/api/service";
 import { insertService } from "/imports/api/serviceMethods";
+import {
+  isValidShortcode,
+  normaliseShortcode,
+} from "/imports/utils/serviceUtils";
 
 interface AddServiceModalProps {
   open: boolean;
@@ -13,6 +21,7 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState(1);
   const [cost, setCost] = useState("");
+  const [shortcodeError, setShortcodeError] = useState<string>("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,14 +30,23 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
     const durationNum: number = parseInt(duration);
     const costNum: number | null = cost ? parseInt(cost) : null;
 
-    // Early return if name is emtpy, or duration and cost are NaN
+    // Early return if name is empty, or duration and cost are NaN
     if (!name || name.length == 0) return;
     if (isNaN(durationNum)) return;
     if (costNum !== null && isNaN(costNum)) return;
 
+    const normalisedShortCode: string = normaliseShortcode(shortcode);
+    if (!isValidShortcode(normalisedShortCode)) {
+      setShortcodeError(
+        `Shortcode must be between ${SERVICE_SHORTCODE_MIN_LENGTH} and ${SERVICE_SHORTCODE_MAX_LENGTH} characters.`,
+      );
+      return;
+    }
+    setShortcodeError("");
+
     await insertService({
       name,
-      shortcode,
+      shortcode: normalisedShortCode,
       cost: costNum,
       duration: durationNum,
       description,
@@ -41,6 +59,7 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
     setDuration("");
     setCost("");
     setDescription("");
+    setShortcodeError("");
     setOpen(false);
     setPriority(0);
   };
@@ -76,15 +95,25 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
             />
 
             {/* Shortcode Field */}
-            <label className="label">Shortcode *</label>
+            <label className="label">
+              Shortcode (must be between {SERVICE_SHORTCODE_MIN_LENGTH}-
+              {SERVICE_SHORTCODE_MAX_LENGTH} characters)
+            </label>
             <input
               required
               type="text"
               className="input"
               placeholder="SA"
               value={shortcode}
-              onChange={(e) => setShortcode(e.target.value)}
+              maxLength={SERVICE_SHORTCODE_MAX_LENGTH}
+              onChange={(e) => {
+                setShortcode(e.target.value);
+                if (shortcodeError) setShortcodeError("");
+              }}
             />
+            {shortcodeError && (
+              <p className="label text-error">{shortcodeError}</p>
+            )}
 
             {/* Duration Field*/}
             <label className="label">Duration (in minutes) *</label>
