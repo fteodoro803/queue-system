@@ -84,9 +84,9 @@ export const AdminDashboard = () => {
 
         {/* Dashboard Cards */}
         {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-6"> */}
-        <div className="flex flex-wrap gap-4 justify-start mt-6">
+        <div className="flex flex-wrap gap-4 justify-start my-8">
           {/* Calendar Dashboard Card */}
-          <div className="my-4">
+          <div>
             <DashboardCard
               header={now.toLocaleDateString(undefined, {
                 weekday: "long",
@@ -102,7 +102,7 @@ export const AdminDashboard = () => {
           </div>
 
           {/* Workday Dashboard Card */}
-          <div className="my-4 cursor-pointer">
+          <div className="cursor-pointer">
             <DashboardCard
               header="Workday"
               body={
@@ -129,7 +129,7 @@ export const AdminDashboard = () => {
           {/* Queue Dashboard Card */}
           {dayStarted && (
             <>
-              <div className="my-4">
+              <div>
                 <DashboardCard
                   header="In Queue"
                   body={queue.filter((q) => q.status === "waiting").length}
@@ -139,7 +139,7 @@ export const AdminDashboard = () => {
               </div>
 
               {/* Available Doctors Card */}
-              <div className="my-4">
+              <div>
                 <DashboardCard
                   header="Available Providers"
                   body={

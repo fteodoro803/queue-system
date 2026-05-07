@@ -181,8 +181,10 @@ export const QueueManagement = () => {
 
       {selectedService && (
         <>
-          <div className="flex flex-wrap gap-4 justify-start mt-6">
-            <div className="my-4">
+          {/* Dashboard Cards */}
+          <div className="flex flex-wrap gap-4 justify-start my-8">
+            {/* Queue Card */}
+            <div>
               <DashboardCard
                 header="In Queue"
                 body={
@@ -196,7 +198,7 @@ export const QueueManagement = () => {
 
             {/* Available Doctors Card */}
             <div
-              className="my-4 cursor-pointer"
+              className="cursor-pointer"
               onClick={() => setProviderAvailabilityModalOpen(true)}
             >
               <DashboardCard
@@ -209,8 +211,7 @@ export const QueueManagement = () => {
 
             {/* Queue Time Card */}
             {/* Total Service time is total queue time + service duration for last entry in queue */}
-
-            <div className="my-4">
+            <div>
               <DashboardCard
                 header="Est. Service Time"
                 body={
