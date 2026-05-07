@@ -104,7 +104,6 @@ export const QueueManagement = () => {
     );
   }, [selectedService]);
 
-  // TODO: Currently doesnt account for specific services, this is just assuming 1 service
   const activeProviders = providers.filter(
     (p) =>
       p.active &&
@@ -160,7 +159,7 @@ export const QueueManagement = () => {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
         <h1 className="text-3xl font-bold">Queue Management</h1>
         <button
-          className="btn btn-primary"
+          className="btn btn-primary w-full sm:w-auto"
           onClick={() => setQueueEntryModalOpen(true)}
         >
           + Join Queue
@@ -176,15 +175,16 @@ export const QueueManagement = () => {
               <DashboardCard
                 header="In Queue"
                 body={
-                  presentQueueEntries.filter((q) => q.status === "waiting")
-                    .length
+                  presentQueueEntries.filter(
+                    (q) => q.status === "waiting" || q.status === "ready",
+                  ).length
                 }
                 footer={`Completed: ${presentQueueEntries.filter((q) => q.status === "completed").length}`}
                 icon={NumberedListIcon}
               />
             </div>
 
-            {/* Available Doctors Card */}
+            {/* Available Providers Card */}
             <div
               className="cursor-pointer"
               onClick={() => setProviderAvailabilityModalOpen(true)}

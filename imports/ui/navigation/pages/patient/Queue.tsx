@@ -10,6 +10,11 @@ import { Patient, PatientsCollection } from "/imports/api/patient";
 import { ServiceSelector } from "/imports/ui/components/ServiceSelector";
 import { getStatsQuery } from "/imports/api/statsMethods";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
+import { DashboardCard } from "/imports/ui/components/DashboardCard";
+import {
+  IdentificationIcon,
+  NumberedListIcon,
+} from "@heroicons/react/24/outline";
 
 export const Queue = () => {
   const now = useDateTime();
@@ -28,7 +33,17 @@ export const Queue = () => {
   const [selectedService, setSelectedService] = useState<Service | undefined>();
 
   const isProvidersLoading = useSubscribe("providers");
-  const providers = useFind(() => ProviderCollection.find({}));
+  let providers = useFind(
+    () =>
+      selectedService
+        ? ProviderCollection.find({
+            services: {
+              $elemMatch: { id: selectedService._id, enabled: true },
+            },
+          })
+        : ProviderCollection.find({}),
+    [selectedService?._id],
+  );
 
   // TODO: fetch patients relevant to the queue entries
   const isPatientsLoading = useSubscribe("patients");
@@ -67,6 +82,23 @@ export const Queue = () => {
     });
   }, [services]);
 
+  // Update providers based on selected service
+  useEffect(() => {
+    if (!selectedService) return;
+
+    providers = providers.filter((provider) =>
+      provider.services.some((service) => service.id === selectedService._id),
+    );
+  }, [selectedService]);
+
+  const activeProviders = providers.filter(
+    (p) =>
+      p.active &&
+      p.services.some((s) => s.id === selectedService?._id && s.enabled),
+  );
+  const availableProviders = providers.filter((p) => p.available).length;
+  const unavailableProviders = activeProviders.length - availableProviders;
+
   if (
     isQueueEntryLoading() ||
     isServicesLoading() ||
@@ -79,17 +111,49 @@ export const Queue = () => {
 
   return (
     <>
-      <div className="flex justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
         <h1 className="text-3xl font-bold">Queue</h1>
         <div className="flex gap-1">
           <button
-            className="btn btn-primary"
+            className="btn btn-primary w-full sm:w-auto"
             onClick={() => setModalOpen(true)}
           >
             + Join Queue
           </button>
         </div>
       </div>
+
+      {/* Cards */}
+      {selectedService && (
+        <>
+          {/* Dashboard Cards */}
+          <div className="flex flex-wrap gap-4 justify-start my-8">
+            {/* Queue Card */}
+            <div>
+              <DashboardCard
+                header="In Queue"
+                body={
+                  queueEntries.filter(
+                    (q) => q.status === "waiting" || q.status === "ready",
+                  ).length
+                }
+                footer={`Completed: ${queueEntries.filter((q) => q.status === "completed").length}`}
+                icon={NumberedListIcon}
+              />
+            </div>
+
+            {/* Available Providers Card */}
+            <div>
+              <DashboardCard
+                header="Available Providers"
+                body={availableProviders}
+                footer={`Unavailable: ${unavailableProviders}`}
+                icon={IdentificationIcon}
+              />
+            </div>
+          </div>{" "}
+        </>
+      )}
 
       <div className={"mt-4"}>
         <ServiceSelector
