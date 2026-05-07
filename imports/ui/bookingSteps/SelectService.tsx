@@ -19,13 +19,13 @@ export const SelectService = ({
 
   return (
     <div>
-      <ul className="list bg-base-100 rounded-box shadow-md">
-        <li className="p-4 pb-2 text-xs opacity-60 tracking-wide flex">
+      <ul className="list rounded-box bg-base-100 shadow-md">
+        <li className="p-4 pb-2 text-xs bg-base-200 opacity-60 tracking-wide flex">
           Services
         </li>
         {services.map((s) => (
           <li
-            className="list-row hover:bg-base-300"
+            className="list-row rounded-none bg-base/50 hover:bg-base-200"
             key={s._id}
             onClick={() => {
               setService(s);

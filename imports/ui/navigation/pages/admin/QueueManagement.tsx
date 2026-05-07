@@ -19,7 +19,6 @@ import {
 } from "/imports/utils/utils";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { Settings, SettingsCollection } from "/imports/api/settings";
-import { resetCounter } from "/imports/api/countersMethods";
 import { ProviderCollection } from "/imports/api/provider";
 import { Patient, PatientsCollection } from "/imports/api/patient";
 import { calculateQueueTime, QueueTimeResult } from "/imports/utils/queueUtils";
@@ -105,7 +104,6 @@ export const QueueManagement = () => {
     );
   }, [selectedService]);
 
-  // TODO: Currently doesnt account for specific services, this is just assuming 1 service
   const activeProviders = providers.filter(
     (p) =>
       p.active &&
@@ -158,45 +156,37 @@ export const QueueManagement = () => {
 
   return (
     <>
-      <div className="flex justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
         <h1 className="text-3xl font-bold">Queue Management</h1>
-        <div className="flex gap-1">
-          {/* TODO: move this to queue management settings later? */}
-          <button
-            className="btn btn-primary"
-            onClick={async () => {
-              await resetCounter();
-            }}
-          >
-            - Clear Counter
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => setQueueEntryModalOpen(true)}
-          >
-            + Join Queue
-          </button>
-        </div>
+        <button
+          className="btn btn-primary w-full sm:w-auto"
+          onClick={() => setQueueEntryModalOpen(true)}
+        >
+          + Join Queue
+        </button>
       </div>
 
       {selectedService && (
         <>
-          <div className="flex flex-wrap gap-4 justify-start mt-6">
-            <div className="my-4">
+          {/* Dashboard Cards */}
+          <div className="flex flex-wrap gap-4 justify-start my-8">
+            {/* Queue Card */}
+            <div>
               <DashboardCard
                 header="In Queue"
                 body={
-                  presentQueueEntries.filter((q) => q.status === "waiting")
-                    .length
+                  presentQueueEntries.filter(
+                    (q) => q.status === "waiting" || q.status === "ready",
+                  ).length
                 }
                 footer={`Completed: ${presentQueueEntries.filter((q) => q.status === "completed").length}`}
                 icon={NumberedListIcon}
               />
             </div>
 
-            {/* Available Doctors Card */}
+            {/* Available Providers Card */}
             <div
-              className="my-4 cursor-pointer"
+              className="cursor-pointer"
               onClick={() => setProviderAvailabilityModalOpen(true)}
             >
               <DashboardCard
@@ -209,8 +199,7 @@ export const QueueManagement = () => {
 
             {/* Queue Time Card */}
             {/* Total Service time is total queue time + service duration for last entry in queue */}
-
-            <div className="my-4">
+            <div>
               <DashboardCard
                 header="Est. Service Time"
                 body={
@@ -238,7 +227,7 @@ export const QueueManagement = () => {
 
       {/* Tab Groups */}
       {/* name of each tab group should be unique */}
-      <div className="tabs tabs-border justify-center">
+      <div className="tabs tabs-border justify-center mt-4">
         {/* Upcoming and Ongoing Queue Entries */}
         <input
           type="radio"
@@ -249,9 +238,9 @@ export const QueueManagement = () => {
         />
 
         {/* Upcoming and Ongoing Queue */}
-        <div className="tab-content border-base-300 bg-base-100 p-10">
+        <div className="tab-content border-base-300 bg-base-100 p-4 sm:p-10">
           {selectedService ? (
-            <>
+            <div className={"flex flex-col gap-4"}>
               <div className="">
                 <div key={selectedService._id} className="mb-6">
                   <h2 className="text-2xl font-bold">Ongoing</h2>
@@ -281,7 +270,7 @@ export const QueueManagement = () => {
                   />
                 </div>
               </div>
-            </>
+            </div>
           ) : (
             <div className="py-8 text-center text-sm opacity-60">
               No services available.
@@ -296,7 +285,7 @@ export const QueueManagement = () => {
           className="tab"
           aria-label="Finished"
         />
-        <div className="tab-content border-base-300 bg-base-100 p-10">
+        <div className="tab-content border-base-300 bg-base-100 p-4 sm:p-10">
           {selectedService ? (
             <>
               <div className="">
@@ -328,7 +317,7 @@ export const QueueManagement = () => {
           className="tab"
           aria-label="Cancelled"
         />
-        <div className="tab-content border-base-300 bg-base-100 p-10">
+        <div className="tab-content border-base-300 bg-base-100 p-4 sm:p-10">
           {selectedService ? (
             <>
               <div className="">

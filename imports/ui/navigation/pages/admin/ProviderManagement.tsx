@@ -8,10 +8,10 @@ export const ProviderManagement = () => {
 
   return (
     <>
-      <div className="flex justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
         <h1 className="text-3xl font-bold">Service Providers</h1>
         <button
-          className="btn btn-primary"
+          className="btn btn-primary w-full sm:w-auto"
           onClick={() => setAddServiceProviderModalOpen(true)}
         >
           + New Provider

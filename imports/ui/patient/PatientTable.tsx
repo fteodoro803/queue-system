@@ -32,44 +32,52 @@ export const PatientTable = () => {
   }
 
   return (
-    <div className={`min-w-2xl max-w-7xl mx-auto px-8 py-8`}>
-      <table className={`table ${styles.outline} rounded-xl overflow-hidden`}>
-        {/* head */}
-        <thead className="bg-base-300">
-          <tr>
-            <th></th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Number</th>
-          </tr>
-        </thead>
-        <tbody>
-          {patients.map((p) => {
-            const modalId: string = `my_modal_${p._id}`;
-            return (
-              <tr
-                key={modalId}
-                className="bg-base-100 hover:bg-base-300 cursor-pointer"
-                onClick={() => handleSelect(p)}
-              >
-                {/*Avatar*/}
-                <th>
-                  <Avatar profile={p} />
-                </th>
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="overflow-x-auto rounded-xl">
+        <table
+          className={`table w-full min-w-160 ${styles.outline} rounded-xl overflow-hidden`}
+        >
+          {/* head */}
+          <thead className="bg-base-300 text-xs sm:text-sm">
+            <tr>
+              <th></th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Number</th>
+            </tr>
+          </thead>
+          <tbody>
+            {patients.map((p) => {
+              const modalId: string = `my_modal_${p._id}`;
+              return (
+                <tr
+                  key={modalId}
+                  className="bg-base-100 hover:bg-base-300 cursor-pointer"
+                  onClick={() => handleSelect(p)}
+                >
+                  {/*Avatar*/}
+                  <th className="w-14">
+                    <Avatar profile={p} />
+                  </th>
 
-                {/*Name*/}
-                <td>{p.name}</td>
+                  {/*Name*/}
+                  <td className="max-w-48 truncate" title={p.name}>
+                    {p.name}
+                  </td>
 
-                {/*Email*/}
-                <td>{p.email ? p.email : "-"}</td>
+                  {/*Email*/}
+                  <td className="max-w-64 truncate" title={p.email ?? "-"}>
+                    {p.email ? p.email : "-"}
+                  </td>
 
-                {/*Number*/}
-                <td>{p.number ? p.number : "-"}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                  {/*Number*/}
+                  <td className="whitespace-nowrap">{p.number ? p.number : "-"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {selectedPatient && (
         <PatientDetailsModal

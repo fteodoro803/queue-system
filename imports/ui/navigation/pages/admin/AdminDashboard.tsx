@@ -37,9 +37,6 @@ export const AdminDashboard = () => {
   const endOfDay: string = settings?.end_of_day;
   const [isWorkdayModalOpen, setWorkdayModalOpen] = useState(false);
 
-  // Services
-  // const services = useFind(() => ServicesCollection.find({}));
-
   // Providers
   const providers = useFind(() => ProviderCollection.find({}));
 
@@ -61,22 +58,6 @@ export const AdminDashboard = () => {
   )
     return <Loading />;
 
-  // const selectedService = services[0]; // TODO: make this dynamic based on user selection
-  // const serviceEfficiency =
-  //   selectedService?.avgDuration != null
-  //     ? Math.ceil(
-  //         (selectedService.duration / selectedService.avgDuration) * 100,
-  //       )
-  //     : undefined;
-  //
-  // const getEfficiencyLabel = (score: number) => {
-  //   if (score >= 115) return "well ahead of schedule";
-  //   if (score >= 105) return "beating expectations";
-  //   if (score >= 95) return "meeting expectations";
-  //   if (score >= 80) return "review workload";
-  //   return "needs attention";
-  // };
-
   return (
     <>
       <div>
@@ -84,9 +65,9 @@ export const AdminDashboard = () => {
 
         {/* Dashboard Cards */}
         {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-6"> */}
-        <div className="flex flex-wrap gap-4 justify-start mt-6">
+        <div className="flex flex-wrap gap-4 justify-start my-8">
           {/* Calendar Dashboard Card */}
-          <div className="my-4">
+          <div>
             <DashboardCard
               header={now.toLocaleDateString(undefined, {
                 weekday: "long",
@@ -102,19 +83,15 @@ export const AdminDashboard = () => {
           </div>
 
           {/* Workday Dashboard Card */}
-          <div className="my-4 cursor-pointer">
+          <div className="cursor-pointer">
             <DashboardCard
               header="Workday"
               body={
                 <div>
                   {dayStarted ? (
-                    <p className="text-success-content text-center border border-success bg-success rounded px-2 py-0.5">
-                      Open
-                    </p>
+                    <p className="text-success text-center">Open</p>
                   ) : (
-                    <p className="text-error-content text-center border border-error bg-error rounded px-2 py-0.5">
-                      Closed
-                    </p>
+                    <p className="text-error text-center">Closed</p>
                   )}
                 </div>
               }
@@ -129,7 +106,7 @@ export const AdminDashboard = () => {
           {/* Queue Dashboard Card */}
           {dayStarted && (
             <>
-              <div className="my-4">
+              <div>
                 <DashboardCard
                   header="In Queue"
                   body={queue.filter((q) => q.status === "waiting").length}
@@ -139,7 +116,7 @@ export const AdminDashboard = () => {
               </div>
 
               {/* Available Doctors Card */}
-              <div className="my-4">
+              <div>
                 <DashboardCard
                   header="Available Providers"
                   body={
@@ -150,22 +127,6 @@ export const AdminDashboard = () => {
                   icon={IdentificationIcon}
                 />
               </div>
-
-              {/* Performance Card */}
-              {/*<div className="my-4">*/}
-              {/*  <DashboardCard*/}
-              {/*    header="Performance Score"*/}
-              {/*    body={*/}
-              {/*      serviceEfficiency != null ? `${serviceEfficiency}%` : "N/A"*/}
-              {/*    }*/}
-              {/*    footer={*/}
-              {/*      serviceEfficiency != null*/}
-              {/*        ? getEfficiencyLabel(serviceEfficiency)*/}
-              {/*        : "No data yet"*/}
-              {/*    }*/}
-              {/*    icon={ChartBarIcon}*/}
-              {/*  />*/}
-              {/*</div>*/}
             </>
           )}
         </div>

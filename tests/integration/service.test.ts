@@ -1,12 +1,36 @@
 import { assert } from "chai";
 import { Meteor } from "meteor/meteor";
-import { ServicesCollection } from "/imports/api/service";
+import {
+  SERVICE_SHORTCODE_MAX_LENGTH,
+  ServicesCollection,
+} from "/imports/api/service";
 import { insertService, updateService } from "/imports/api/serviceMethods";
 
 if (Meteor.isServer) {
   describe("[INTEGRATION] serviceMethods", function () {
     beforeEach(async () => {
       await ServicesCollection.removeAsync({});
+    });
+
+    describe("insertService()", function () {
+      it("throws validation-error when shortcode exceeds max length", async () => {
+        const invalidShortcode = "X".repeat(SERVICE_SHORTCODE_MAX_LENGTH + 1);
+
+        try {
+          await insertService({
+            name: "General Consultation",
+            shortcode: invalidShortcode,
+            duration: 30,
+            description: "Initial consult",
+            priority: 1,
+            cost: 500,
+          });
+          assert.fail("Expected insertService to throw validation-error");
+        } catch (e) {
+          assert.instanceOf(e, Meteor.Error);
+          assert.equal((e as Meteor.Error).error, "validation-error");
+        }
+      });
     });
 
     describe("updateService()", function () {
@@ -42,6 +66,27 @@ if (Meteor.isServer) {
         } catch (e) {
           assert.instanceOf(e, Meteor.Error);
           assert.equal((e as Meteor.Error).error, "not-found");
+        }
+      });
+
+      it("throws validation-error when shortcode exceeds max length", async () => {
+        const serviceId = await insertService({
+          name: "General Consultation",
+          shortcode: "GC",
+          duration: 30,
+          description: "Initial consult",
+          priority: 1,
+          cost: 500,
+        });
+
+        const invalidShortcode = "X".repeat(SERVICE_SHORTCODE_MAX_LENGTH + 1);
+
+        try {
+          await updateService(serviceId, { shortcode: invalidShortcode });
+          assert.fail("Expected updateService to throw validation-error");
+        } catch (e) {
+          assert.instanceOf(e, Meteor.Error);
+          assert.equal((e as Meteor.Error).error, "validation-error");
         }
       });
     });
