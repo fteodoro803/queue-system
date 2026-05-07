@@ -33,40 +33,45 @@ export const ServiceTable = () => {
   }
 
   return (
-    <div className="min-w-2xl max-w-7xl mx-auto px-8 py-8">
-      <table className={`table ${styles.outline} rounded-xl overflow-hidden`}>
-        {/* head */}
-        <thead className="bg-base-300">
-          <tr>
-            <th>Name</th>
-            <th>Duration (mins)</th>
-            <th>Cost (PHP)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {services.map((s) => {
-            const modalId: string = `my_modal_${s._id}`;
-            return (
-              <tr
-                key={modalId}
-                className="bg-base-100 hover:bg-base-300 cursor-pointer"
-                onClick={() => handleSelect(s)}
-              >
-                {/*Name*/}
-                <td>
-                  {s.name} ({s.shortcode})
-                </td>
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="overflow-x-auto rounded-xl">
+        <table
+          className={`table w-full min-w-xl ${styles.outline} rounded-xl overflow-hidden`}
+        >
+          {/* head */}
+          <thead className="bg-base-300 text-xs sm:text-sm">
+            <tr>
+              <th>Name</th>
+              <th>Duration (mins)</th>
+              <th>Cost (PHP)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {services.map((s) => {
+              const modalId: string = `my_modal_${s._id}`;
+              const serviceName = `${s.name} (${s.shortcode})`;
+              return (
+                <tr
+                  key={modalId}
+                  className="bg-base-100 hover:bg-base-300 cursor-pointer"
+                  onClick={() => handleSelect(s)}
+                >
+                  {/*Name*/}
+                  <td className="max-w-72 truncate" title={serviceName}>
+                    {serviceName}
+                  </td>
 
-                {/*Duration*/}
-                <td>{s.duration ? s.duration : "-"}</td>
+                  {/*Duration*/}
+                  <td className="whitespace-nowrap">{s.duration ? s.duration : "-"}</td>
 
-                {/*Cost*/}
-                <td>{s.cost ? s.cost : "-"}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                  {/*Cost*/}
+                  <td className="whitespace-nowrap">{s.cost ? s.cost : "-"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* Modal */}
       {selectedService && (
