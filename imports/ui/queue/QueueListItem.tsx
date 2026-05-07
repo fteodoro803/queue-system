@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { QueueEntry, QueueStatus } from "/imports/api/queueEntry";
 import {
   CheckIcon,
-  ClipboardDocumentListIcon,
   ClockIcon,
   IdentificationIcon,
   PlayIcon,
@@ -31,6 +30,7 @@ interface QueueListItemProps {
   timeUntil?: QueueTimeResult;
   availableProviders?: number;
   admin?: boolean;
+  showService?: boolean;
 }
 
 const iconSize: string = "size-5";
@@ -64,22 +64,30 @@ export const QueueListItem = ({
       <li className="px-4 py-3 hover:bg-base-200" key={entry._id}>
         {/* Mobile layout  */}
         <div className="flex min-w-0 flex-col gap-2 md:hidden">
-          {/* Top */}
+          {/* Top Area */}
           <div className="flex min-w-0 items-center gap-3">
-            {/* Top Left */}
-            {/* Queue Icon */}
+            {/* Left */}
             <div className="shrink-0 tabular-nums">
-              <QueueIcon entry={entry} className="h-14 w-14" />
+              {/* Queue Icon */}
+              <QueueIcon
+                entry={entry}
+                className="h-14 w-14"
+                isHighPriority={isHighPriority}
+              />
             </div>
 
-            {/* Top Right*/}
+            {/* Right*/}
             <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
-              {/* Name / Display ID */}
-              <div className="card-title min-w-0 leading-tight">
-                {admin ? patient.name : entry.displayId}
+              <div className="flex flex-col gap-1">
+                {/* Name / Display ID */}
+                <div className="card-title min-w-0 leading-tight truncate">
+                  {admin ? patient.name : entry.displayId}
+                </div>
+                {/* Time Remaining when not Admin*/}
+                {!admin && <TimeStatus entry={entry} timeUntil={timeUntil} />}
               </div>
 
-              {/* Patient Badge */}
+              {/* Status Badge when not Admin */}
               {!admin && (
                 <div
                   className={`badge badge-soft shrink-0 capitalize ${statusBadgeMap[entry.status]}`}
@@ -90,51 +98,42 @@ export const QueueListItem = ({
             </div>
           </div>
 
-          {/* Bottom Details */}
-          <div className="flex flex-col items-start gap-x-4 gap-y-1 py-1">
-            {/* Patient Badge */}
-            {admin && (
-              <div className="flex items-center gap-1">
-                <WifiIcon className={`${iconSize} shrink-0`} />
-                <div
-                  className={`badge badge-soft shrink-0 capitalize ${statusBadgeMap[entry.status]}`}
-                >
-                  {entry.status}
-                </div>
-              </div>
-            )}
-
-            {admin && (
-              <div className="flex items-center gap-4">
-                <IdentificationIcon className={`${iconSize} shrink-0`} />
-                <p className={textSize}>{entry.displayId}</p>
-              </div>
-            )}
-
-            <div className="flex items-center gap-4">
-              <ClipboardDocumentListIcon className={`${iconSize} shrink-0`} />
-              <p
-                className={`${textSize} ${isHighPriority ? "text-error animate-pulse" : ""}`}
-              >
-                {service.name}
-              </p>
-            </div>
-
-            <TimeStatus entry={entry} timeUntil={timeUntil} gap={4} />
-          </div>
-
+          {/* Bottom Admin Details Area */}
           {admin && (
-            <div className="w-full">
-              <MobileActionButtons
-                status={entry.status}
-                setOpenCheckInModal={setOpenCheckInModal}
-                setOpenStartModal={setOpenStartModal}
-                setOpenEndModal={setOpenEndModal}
-                setOpenCancelModal={setOpenCancelModal}
-                isProviderAvailable={isProviderAvailable}
-                fullWidth
-              />
-            </div>
+            <>
+              <div className="flex flex-col items-start gap-x-4 gap-y-1 py-1">
+                {/* Status Badge */}
+                <div className="flex items-center gap-1">
+                  <WifiIcon className={`${iconSize} shrink-0`} />
+                  <div
+                    className={`badge badge-soft shrink-0 capitalize ${statusBadgeMap[entry.status]}`}
+                  >
+                    {entry.status}
+                  </div>
+                </div>
+
+                {/* Display ID */}
+                <div className="flex items-center gap-4">
+                  <IdentificationIcon className={`${iconSize} shrink-0`} />
+                  <p className={textSize}>{entry.displayId}</p>
+                </div>
+
+                {/* Time Status */}
+                <TimeStatus entry={entry} timeUntil={timeUntil} gap={4} />
+              </div>
+
+              <div className="w-full">
+                <MobileActionButtons
+                  status={entry.status}
+                  setOpenCheckInModal={setOpenCheckInModal}
+                  setOpenStartModal={setOpenStartModal}
+                  setOpenEndModal={setOpenEndModal}
+                  setOpenCancelModal={setOpenCancelModal}
+                  isProviderAvailable={isProviderAvailable}
+                  fullWidth
+                />
+              </div>
+            </>
           )}
         </div>
 
@@ -142,7 +141,7 @@ export const QueueListItem = ({
         <div className="hidden md:flex w-full min-w-0 items-center gap-4">
           {/* Icon */}
           <div className="shrink-0 tabular-nums">
-            <QueueIcon entry={entry} />
+            <QueueIcon entry={entry} isHighPriority={isHighPriority} />
           </div>
 
           {/* Details Column */}
@@ -168,16 +167,6 @@ export const QueueListItem = ({
                   <p className={textSize}>{entry.displayId}</p>
                 </div>
               )}
-
-              {/* Service */}
-              <div className="flex items-center gap-1">
-                <ClipboardDocumentListIcon className={iconSize} />
-                <p
-                  className={`${textSize} ${isHighPriority ? "text-error animate-pulse" : ""}`}
-                >
-                  {service.name}
-                </p>
-              </div>
 
               {/* Time Status */}
               <TimeStatus entry={entry} timeUntil={timeUntil} />

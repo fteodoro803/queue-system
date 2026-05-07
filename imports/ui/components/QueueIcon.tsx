@@ -4,9 +4,14 @@ import { QueueEntry } from "/imports/api/queueEntry";
 interface QueueIconProps {
   entry: QueueEntry;
   className?: string; // use for responsive Tailwind sizing e.g. "w-14 h-14 md:w-[70px] md:h-[70px]"
+  isHighPriority?: boolean;
 }
 
-export const QueueIcon = ({ entry, className }: QueueIconProps) => {
+export const QueueIcon = ({
+  entry,
+  className,
+  isHighPriority,
+}: QueueIconProps) => {
   const size: number = 70; // used if no className argument size provided
   const position: string =
     entry.status === "completed"
@@ -20,9 +25,11 @@ export const QueueIcon = ({ entry, className }: QueueIconProps) => {
   return (
     <div
       className={`flex flex-col items-center justify-center rounded-2xl ${
-        isInProgress
-          ? "bg-success/15 text-success"
-          : "bg-primary/10 text-primary"
+        isHighPriority
+          ? "bg-error/15 text-error"
+          : isInProgress
+            ? "bg-success/15 text-success"
+            : "bg-primary/10 text-primary"
       } ${className ?? ""}`}
       style={className ? undefined : { width: size, height: size }}
     >
