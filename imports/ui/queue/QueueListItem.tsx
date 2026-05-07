@@ -70,7 +70,7 @@ export const QueueListItem = ({
             {/* Top Right*/}
             <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
               {/* Name / Display ID */}
-              <div className="card-title min-w-0 truncate leading-tight">
+              <div className="card-title min-w-0 leading-tight">
                 {admin ? patient.name : entry.displayId}
               </div>
 
@@ -90,7 +90,7 @@ export const QueueListItem = ({
             {/* Patient Badge */}
             {admin && (
               <div
-                className={`badge badge-soft shrink-0 mx-auto capitalize ${statusBadgeMap[entry.status]}`}
+                className={`badge badge-soft shrink-0 capitalize ${statusBadgeMap[entry.status]}`}
               >
                 {entry.status}
               </div>
