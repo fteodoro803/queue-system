@@ -36,14 +36,6 @@ export const QueueList = ({
 
   return (
     <ul className="list bg-base-100 rounded-box shadow-md">
-      {/* Header */}
-      <li
-        key={`${service._id}_list_header`}
-        className="p-4 pb-2 text-xs opacity-60 tracking-wide"
-      >
-        {/* {service.name} */}
-      </li>
-
       {/* List of Queue Entries */}
       {filteredQueue.length > 0 ? (
         filteredQueue.map((entry) => {
