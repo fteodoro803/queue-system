@@ -19,7 +19,6 @@ import {
 } from "/imports/utils/utils";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { Settings, SettingsCollection } from "/imports/api/settings";
-import { resetCounter } from "/imports/api/countersMethods";
 import { ProviderCollection } from "/imports/api/provider";
 import { Patient, PatientsCollection } from "/imports/api/patient";
 import { calculateQueueTime, QueueTimeResult } from "/imports/utils/queueUtils";
@@ -158,25 +157,14 @@ export const QueueManagement = () => {
 
   return (
     <>
-      <div className="flex justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
         <h1 className="text-3xl font-bold">Queue Management</h1>
-        <div className="flex gap-1">
-          {/* TODO: move this to queue management settings later? */}
-          <button
-            className="btn btn-primary"
-            onClick={async () => {
-              await resetCounter();
-            }}
-          >
-            - Clear Counter
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => setQueueEntryModalOpen(true)}
-          >
-            + Join Queue
-          </button>
-        </div>
+        <button
+          className="btn btn-primary"
+          onClick={() => setQueueEntryModalOpen(true)}
+        >
+          + Join Queue
+        </button>
       </div>
 
       {selectedService && (
@@ -239,7 +227,7 @@ export const QueueManagement = () => {
 
       {/* Tab Groups */}
       {/* name of each tab group should be unique */}
-      <div className="tabs tabs-border justify-center">
+      <div className="tabs tabs-border justify-center mt-4">
         {/* Upcoming and Ongoing Queue Entries */}
         <input
           type="radio"
