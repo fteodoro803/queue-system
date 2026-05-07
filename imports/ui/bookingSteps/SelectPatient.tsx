@@ -32,7 +32,7 @@ export const SelectPatient = ({
     <div>
       {flags.ENABLE_TEST_FEATURES && (
         <ul className="list bg-base-100 rounded-box shadow-md">
-          <li className="p-4 pb-2 text-xs opacity-60 tracking-wide flex">
+          <li className="p-4 pb-2 text-xs bg-base-200 opacity-60 tracking-wide flex">
             Patients
           </li>
           {patients.map((p) => (

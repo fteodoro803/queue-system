@@ -56,7 +56,9 @@ export const SelectProvider = ({
   return (
     <div>
       <ul className="list bg-base-100 rounded-box shadow-md">
-        <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">Providers</li>
+        <li className="p-4 pb-2 text-xs bg-base-200 opacity-60 tracking-wide">
+          Providers
+        </li>
         {/* Any */}
         <li
           className="list-row hover:bg-base-300"
