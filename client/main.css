@@ -1,13 +1,14 @@
 @import "tailwindcss";
+
 @plugin "daisyui" {
-  themes:
-    light --default,
+    themes: light --default,
     dark,
     corporate,
-    pastel;
+    pastel,
+    silk;
 }
 
 body {
-  /* padding: 10px; */
-  font-family: sans-serif;
+    /* padding: 10px; */
+    font-family: sans-serif;
 }

@@ -3,6 +3,7 @@ import assert from "assert";
 import "./unit/appointmentUtils.test";
 import "./unit/numberUtils.test";
 import "./unit/queueUtils.test";
+import "./unit/themePreview.test";
 import "./integration/appointmentUtils.test";
 import "./integration/patient.test";
 import "./integration/provider.test";

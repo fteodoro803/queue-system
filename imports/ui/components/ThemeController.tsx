@@ -11,7 +11,6 @@ export const ThemeController = ({
     <select
       value={theme}
       onChange={(e) => {
-        document.documentElement.setAttribute("data-theme", e.target.value);
         if (onChange) onChange(e.target.value);
       }}
       className="select select-bordered theme-controller w-full sm:max-w-xs"
@@ -22,6 +21,7 @@ export const ThemeController = ({
       <option value="dark">Dark</option>
       <option value="corporate">Corporate</option>
       <option value="pastel">Pastel</option>
+      <option value="silk">Silk</option>
     </select>
   );
 };

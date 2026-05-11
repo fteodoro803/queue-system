@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ThemeController } from "/imports/ui/components/ThemeController";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import {
@@ -24,6 +24,7 @@ import {
   setStartOfDay,
   setEndOfDay,
 } from "/imports/api/settingsMethods";
+import { shouldRollbackUnsavedTheme } from "/imports/utils/themePreview";
 import { styles } from "/imports/utils/styles";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 
@@ -64,6 +65,8 @@ export const SettingsPage = () => {
   const [isClearingQueue, setIsClearingQueue] = useState(false);
   const [isClearingStats, setIsClearingStats] = useState(false);
   const [isClearingAllData, setIsClearingAllData] = useState(false);
+  const baselineThemeRef = useRef<string | null>(null);
+  const draftThemeRef = useRef(theme);
 
   // Fill settings from db
   useEffect(() => {
@@ -93,9 +96,32 @@ export const SettingsPage = () => {
       setEndOfDayState(newSettings.endOfDay);
       setDraftFlags(cloneFlags(dbFlags));
       setCurrentSettings(newSettings);
+      baselineThemeRef.current = newSettings.theme;
+      draftThemeRef.current = newSettings.theme;
+      applyDocumentTheme(newSettings.theme);
       setSaveError(null);
     }
   }, [settings, flags]);
+
+  useEffect(() => {
+    draftThemeRef.current = theme;
+    applyDocumentTheme(theme);
+  }, [theme]);
+
+  useEffect(() => {
+    if (!currentSettings) return;
+    baselineThemeRef.current = currentSettings.theme;
+  }, [currentSettings]);
+
+  useEffect(() => {
+    return () => {
+      const baselineTheme = baselineThemeRef.current;
+      const draftTheme = draftThemeRef.current;
+      if (!shouldRollbackUnsavedTheme({ baselineTheme, draftTheme })) return;
+      if (!baselineTheme) return;
+      applyDocumentTheme(baselineTheme);
+    };
+  }, []);
 
   // Draft-only handlers (no writes until Save).
   const handleAcceptAfterHoursChange = (value: boolean) => {
@@ -162,6 +188,8 @@ export const SettingsPage = () => {
     if (!currentSettings) return;
     setAcceptAfterHours(currentSettings.acceptAfterHours);
     setTheme(currentSettings.theme);
+    draftThemeRef.current = currentSettings.theme;
+    applyDocumentTheme(currentSettings.theme);
     setStartOfDayState(currentSettings.startOfDay);
     setEndOfDayState(currentSettings.endOfDay);
     setDraftFlags(cloneFlags(currentSettings.developerFlags));
@@ -194,6 +222,9 @@ export const SettingsPage = () => {
       };
       setCurrentSettings(savedBaseline);
       setDraftFlags(cloneFlags(savedBaseline.developerFlags));
+      baselineThemeRef.current = theme;
+      draftThemeRef.current = theme;
+      applyDocumentTheme(theme);
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : "Failed to save");
     } finally {
@@ -636,3 +667,8 @@ const toLocalDatetimeString = (date: Date) => {
   const offset = date.getTimezoneOffset() * 60000;
   return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 };
+
+const applyDocumentTheme = (theme: string) => {
+  document.documentElement.setAttribute("data-theme", theme);
+};
+
