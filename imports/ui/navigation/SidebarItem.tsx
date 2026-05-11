@@ -1,12 +1,12 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { NavLinkItem } from "/imports/ui/navigation/NavLink";
+import { NavLink } from "/imports/ui/navigation/NavLink";
 
 export const SidebarItem = ({
   navLink,
   isTestFlagEnabled,
 }: {
-  navLink: NavLinkItem;
+  navLink: NavLink;
   isTestFlagEnabled: boolean;
 }) => {
   const location = useLocation();

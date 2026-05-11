@@ -12,7 +12,7 @@ import {
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/solid";
 
-export type NavLinkItem = {
+export type NavLink = {
   link: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
@@ -35,6 +35,7 @@ const AdminAppointmentsPage = {
   link: "/admin/appointments",
   label: "Appointments",
   icon: CalendarDaysIcon,
+  isTestOnly: true,
 };
 
 const AdminQueuePage = {
@@ -79,6 +80,7 @@ const AdminTestPage = {
   link: "/admin/test",
   label: "Test Page",
   icon: BugAntIcon,
+  isTestOnly: true,
 };
 
 const AdminSettingsPage = {
@@ -93,7 +95,7 @@ const PatientQueuePage = {
   icon: NumberedListIcon,
 };
 
-export const AdminPages: NavLinkItem[] = [
+export const AdminPages: NavLink[] = [
   LandingPage,
   AdminDashboardPage,
   AdminAppointmentsPage,
@@ -107,4 +109,4 @@ export const AdminPages: NavLinkItem[] = [
   AdminSettingsPage,
 ];
 
-export const PatientPages: NavLinkItem[] = [LandingPage, PatientQueuePage];
+export const PatientPages: NavLink[] = [LandingPage, PatientQueuePage];
