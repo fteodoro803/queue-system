@@ -43,7 +43,7 @@ export const Home = () => {
             {/*  <button className="btn">Employee View</button>*/}
             {/*</Link>*/}
 
-            <Link to="/admin">
+            <Link to="/admin/dashboard">
               <button className="btn">Admin View</button>
             </Link>
           </div>
