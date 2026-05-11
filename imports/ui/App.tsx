@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Home } from "/imports/ui/navigation/pages/Home";
 import { PatientManagement } from "/imports/ui/navigation/pages/admin/PatientManagement";
-import { Sidebar } from "/imports/ui/navigation/Sidebar";
+import { AppLayout } from "/imports/ui/navigation/AppLayout";
 import { AdminDashboard } from "/imports/ui/navigation/pages/admin/AdminDashboard";
 import { ServiceManagement } from "/imports/ui/navigation/pages/admin/ServiceManagement";
 import { AppointmentManagement } from "/imports/ui/navigation/pages/admin/AppointmentManagement";
@@ -19,7 +19,7 @@ export const App = () => (
   <DateTimeProvider>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Sidebar />}>
+        <Route path="/" element={<AppLayout />}>
           <Route index element={<Home />} />
 
           {/* Admin Routes */}

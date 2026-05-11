@@ -7,9 +7,9 @@ import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Flags, SettingsCollection } from "/imports/api/settings";
 import { Loading } from "/imports/ui/components/Loading";
 import { AdminPages, PatientPages } from "/imports/ui/navigation/NavLink";
-import { FloatingActionButton } from "/imports/ui/components/FloatingActionButton";
+import { FloatingActionButton } from "/imports/ui/navigation/FloatingActionButton";
 
-export const Sidebar = () => {
+export const AppLayout = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const isAdmin = location.pathname.startsWith("/admin");
@@ -103,10 +103,10 @@ export const Sidebar = () => {
               <p className="text-sm">{`${now.toLocaleDateString()} ${formatDateToLocale(now, true)}`}</p>
             </div>
 
-            {/*Admin Sidebar*/}
+            {/* Admin Sidebar */}
             {isAdmin && adminPages()}
 
-            {/*Patient Sidebars*/}
+            {/* Patient Sidebar */}
             {isPatient && patientPages()}
           </ul>
         </div>
