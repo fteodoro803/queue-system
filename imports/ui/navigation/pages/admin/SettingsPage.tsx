@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ThemeController } from "/imports/ui/components/ThemeController";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import {
@@ -24,6 +24,7 @@ import {
   setStartOfDay,
   setEndOfDay,
 } from "/imports/api/settingsMethods";
+import { shouldRollbackUnsavedTheme } from "/imports/utils/themePreview";
 import { styles } from "/imports/utils/styles";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 
@@ -64,6 +65,8 @@ export const SettingsPage = () => {
   const [isClearingQueue, setIsClearingQueue] = useState(false);
   const [isClearingStats, setIsClearingStats] = useState(false);
   const [isClearingAllData, setIsClearingAllData] = useState(false);
+  const baselineThemeRef = useRef<string | null>(null);
+  const draftThemeRef = useRef(theme);
 
   // Fill settings from db
   useEffect(() => {
@@ -93,9 +96,32 @@ export const SettingsPage = () => {
       setEndOfDayState(newSettings.endOfDay);
       setDraftFlags(cloneFlags(dbFlags));
       setCurrentSettings(newSettings);
+      baselineThemeRef.current = newSettings.theme;
+      draftThemeRef.current = newSettings.theme;
+      applyDocumentTheme(newSettings.theme);
       setSaveError(null);
     }
   }, [settings, flags]);
+
+  useEffect(() => {
+    draftThemeRef.current = theme;
+    applyDocumentTheme(theme);
+  }, [theme]);
+
+  useEffect(() => {
+    if (!currentSettings) return;
+    baselineThemeRef.current = currentSettings.theme;
+  }, [currentSettings]);
+
+  useEffect(() => {
+    return () => {
+      const baselineTheme = baselineThemeRef.current;
+      const draftTheme = draftThemeRef.current;
+      if (!shouldRollbackUnsavedTheme({ baselineTheme, draftTheme })) return;
+      if (!baselineTheme) return;
+      applyDocumentTheme(baselineTheme);
+    };
+  }, []);
 
   // Draft-only handlers (no writes until Save).
   const handleAcceptAfterHoursChange = (value: boolean) => {
@@ -162,6 +188,8 @@ export const SettingsPage = () => {
     if (!currentSettings) return;
     setAcceptAfterHours(currentSettings.acceptAfterHours);
     setTheme(currentSettings.theme);
+    draftThemeRef.current = currentSettings.theme;
+    applyDocumentTheme(currentSettings.theme);
     setStartOfDayState(currentSettings.startOfDay);
     setEndOfDayState(currentSettings.endOfDay);
     setDraftFlags(cloneFlags(currentSettings.developerFlags));
@@ -194,6 +222,9 @@ export const SettingsPage = () => {
       };
       setCurrentSettings(savedBaseline);
       setDraftFlags(cloneFlags(savedBaseline.developerFlags));
+      baselineThemeRef.current = theme;
+      draftThemeRef.current = theme;
+      applyDocumentTheme(theme);
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : "Failed to save");
     } finally {
@@ -251,24 +282,33 @@ export const SettingsPage = () => {
   };
 
   const isUseTestDateEnabled = draftFlags.USE_TEST_DATE;
-  const developerFlagRowClass =
-    "label w-full cursor-pointer justify-between gap-4";
+  const settingsCardClass = `card bg-base-100 shadow-sm ${styles.outline}`;
+  const settingsFieldLabelClass = "label-text mr-2 font-medium";
+  const settingsToggleRowClass =
+    "label flex w-full cursor-pointer flex-wrap items-start justify-between gap-3";
+  const settingsRowBodyClass = "min-w-0 flex-1";
+  const settingsActionRowClass =
+    "flex flex-wrap items-start justify-between gap-3";
+  const compactFieldClass = "w-full sm:max-w-xs";
+  const nestedDeveloperSectionClass =
+    "space-y-4 sm:ml-6 sm:border-l sm:border-base-300 sm:pl-4";
+  const mobileActionButtonClass = "w-full shrink-0 sm:w-auto";
 
   if (isSettingsLoading()) return <Loading />;
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl">
+    <div className="mx-auto flex w-full min-w-0 max-w-2xl flex-col gap-6">
       <h1 className="text-3xl font-bold">Settings</h1>
 
       {/* General */}
-      <div className={`card bg-base-100 shadow-sm ${styles.outline}`}>
-        <div className="card-body gap-6">
+      <div className={settingsCardClass}>
+        <div className="card-body gap-5 sm:gap-6">
           <h2 className="card-title text-lg">General</h2>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="form-control">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="form-control min-w-0">
               <label className="label">
-                <span className="label-text font-medium mr-2">Start Time</span>
+                <span className={settingsFieldLabelClass}>Start Time</span>
               </label>
               <input
                 type="time"
@@ -278,9 +318,9 @@ export const SettingsPage = () => {
               />
             </div>
 
-            <div className="form-control">
+            <div className="form-control min-w-0">
               <label className="label">
-                <span className="label-text font-medium mr-2">End Time</span>
+                <span className={settingsFieldLabelClass}>End Time</span>
               </label>
               <input
                 type="time"
@@ -300,18 +340,18 @@ export const SettingsPage = () => {
       </div>
 
       {/* Notifications */}
-      <div className={`card bg-base-100 shadow-sm ${styles.outline}`}>
-        <div className="card-body gap-6">
+      <div className={settingsCardClass}>
+        <div className="card-body gap-5 sm:gap-6">
           <h2 className="card-title text-lg">Notifications</h2>
 
           {/* Text Frequency */}
-          <div className="form-control">
+          <div className="form-control min-w-0">
             <label className="label">
-              <span className="label-text font-medium mr-2">
+              <span className={settingsFieldLabelClass}>
                 Text Message Frequency (mins)
               </span>
             </label>
-            <select className="select select-bordered w-full max-w-xs">
+            <select className={`select select-bordered ${compactFieldClass}`}>
               <option value="15">15</option>
               <option value="30">30</option>
               <option value="60">60</option>
@@ -319,9 +359,9 @@ export const SettingsPage = () => {
           </div>
 
           {/* Text Message */}
-          <div className="form-control gap-1">
+          <div className="form-control min-w-0 gap-1">
             <label className="label">
-              <span className="label-text font-medium mr-2">
+              <span className={settingsFieldLabelClass}>
                 Text Message Template
               </span>
             </label>
@@ -334,37 +374,37 @@ export const SettingsPage = () => {
       </div>
 
       {/* Queue Settings */}
-      <div className={`card bg-base-100 shadow-sm ${styles.outline}`}>
-        <div className="card-body gap-6">
+      <div className={settingsCardClass}>
+        <div className="card-body gap-5 sm:gap-6">
           <h2 className="card-title text-lg">Queue</h2>
 
           {/* Emergency Settings */}
-          <div className="form-control gap-1">
+          <div className="form-control min-w-0 gap-1">
             <label className="label">
-              <span className="label-text font-medium mr-2">
+              <span className={settingsFieldLabelClass}>
                 Emergency Handling
               </span>
             </label>
-            <select className="select select-bordered w-full max-w-xs">
+            <select className={`select select-bordered ${compactFieldClass}`}>
               <option value="1">Option 1</option>
               <option value="2">Option 2</option>
             </select>
           </div>
 
           {/* Accept after hours */}
-          <div className="form-control">
-            <label className="label cursor-pointer justify-start gap-4">
+          <div className="form-control min-w-0">
+            <label className="label flex cursor-pointer items-start gap-3 sm:gap-4">
               <input
                 type="checkbox"
                 checked={acceptAfterHours}
                 onChange={(e) => handleAcceptAfterHoursChange(e.target.checked)}
-                className="toggle toggle-success"
+                className="toggle toggle-success mt-0.5 shrink-0"
               />
-              <div>
-                <span className="label-text font-medium">
+              <div className="min-w-0">
+                <span className="label-text font-medium leading-snug">
                   Accept Queue Patients After Work Hours
                 </span>
-                <p className="text-xs opacity-60">
+                <p className="text-xs leading-relaxed opacity-60">
                   Warns them if they try to join after hours, but allows them to
                   proceed if they confirm.
                 </p>
@@ -375,12 +415,12 @@ export const SettingsPage = () => {
       </div>
 
       {/* Appearance */}
-      <div className={`card bg-base-100 shadow-sm ${styles.outline}`}>
+      <div className={settingsCardClass}>
         <div className="card-body gap-4">
           <h2 className="card-title text-lg">Appearance</h2>
-          <div className="form-control gap-1">
+          <div className="form-control min-w-0 gap-1">
             <label className="label">
-              <span className="label-text font-medium mr-2">Theme</span>
+              <span className={settingsFieldLabelClass}>Theme</span>
             </label>
             <ThemeController theme={theme} onChange={handleThemeChange} />
           </div>
@@ -388,17 +428,17 @@ export const SettingsPage = () => {
       </div>
 
       {/* Developer Flags */}
-      <div className={`card bg-base-100 shadow-sm ${styles.outline}`}>
-        <div className="card-body gap-4">
+      <div className={settingsCardClass}>
+        <div className="card-body gap-4 sm:gap-5">
           <h2 className="card-title text-lg text-warning">Developer Flags</h2>
 
           {/* Enable Test Pages */}
-          <label className={developerFlagRowClass}>
-            <div>
-              <span className="label-text font-medium">
+          <label className={settingsToggleRowClass}>
+            <div className={settingsRowBodyClass}>
+              <span className="label-text font-medium leading-snug">
                 Enable Test Features
               </span>
-              <p className="text-xs opacity-60">
+              <p className="text-xs leading-relaxed opacity-60">
                 Shows testing features and pages.
               </p>
             </div>
@@ -408,15 +448,17 @@ export const SettingsPage = () => {
               onChange={(e) =>
                 handleFlagChange("ENABLE_TEST_FEATURES", e.target.checked)
               }
-              className="toggle toggle-warning"
+              className="toggle toggle-warning mt-1 shrink-0"
             />
           </label>
 
           {/* Use Test Date */}
-          <label className={developerFlagRowClass}>
-            <div>
-              <span className="label-text font-medium">Use Test Date</span>
-              <p className="text-xs opacity-60">
+          <label className={settingsToggleRowClass}>
+            <div className={settingsRowBodyClass}>
+              <span className="label-text font-medium leading-snug">
+                Use Test Date
+              </span>
+              <p className="text-xs leading-relaxed opacity-60">
                 Uses the fixed development date/time instead of real-time clock.
               </p>
             </div>
@@ -426,30 +468,32 @@ export const SettingsPage = () => {
               onChange={(e) =>
                 handleFlagChange("USE_TEST_DATE", e.target.checked)
               }
-              className="toggle toggle-warning"
+              className="toggle toggle-warning mt-1 shrink-0"
             />
           </label>
 
           {/* Test Date and Time */}
-          <div className="ml-6 border-l border-base-300 pl-4">
-            <div className="form-control mb-2">
+          <div className={nestedDeveloperSectionClass}>
+            <div className="form-control min-w-0">
               <label className="label py-1">
-                <span className="label-text font-medium">Date & Time</span>
+                <span className="label-text font-medium">Date &amp; Time</span>
               </label>
               <input
                 type="datetime-local"
                 value={toLocalDatetimeString(draftFlags.TEST_DATE)}
                 disabled={!isUseTestDateEnabled}
                 onChange={(e) => handleTestDateChange(new Date(e.target.value))}
-                className="input input-bordered w-full max-w-xs"
+                className={`input input-bordered ${compactFieldClass}`}
               />
             </div>
 
             {/* Freeze Time */}
-            <label className={developerFlagRowClass}>
-              <div>
-                <span className="label-text font-medium">Freeze Time</span>
-                <p className="text-xs opacity-60">
+            <label className={settingsToggleRowClass}>
+              <div className={settingsRowBodyClass}>
+                <span className="label-text font-medium leading-snug">
+                  Freeze Time
+                </span>
+                <p className="text-xs leading-relaxed opacity-60">
                   Stops the app clock from ticking while this flag is enabled.
                 </p>
               </div>
@@ -460,17 +504,17 @@ export const SettingsPage = () => {
                 onChange={(e) =>
                   handleFlagChange("FREEZE_TIME", e.target.checked)
                 }
-                className="toggle toggle-warning"
+                className="toggle toggle-warning mt-1 shrink-0"
               />
             </label>
 
             {/* Use Time Multiplier */}
-            <label className={developerFlagRowClass}>
-              <div>
-                <span className="label-text font-medium">
+            <label className={settingsToggleRowClass}>
+              <div className={settingsRowBodyClass}>
+                <span className="label-text font-medium leading-snug">
                   Use Time Multiplier (seconds)
                 </span>
-                <p className="text-xs opacity-60">
+                <p className="text-xs leading-relaxed opacity-60">
                   Speeds up test time progression. (1 real second ={" "}
                   {draftFlags.TIME_MULTIPLIER} test seconds)
                 </p>
@@ -482,11 +526,11 @@ export const SettingsPage = () => {
                 onChange={(e) =>
                   handleFlagChange("USE_TIME_MULTIPLIER", e.target.checked)
                 }
-                className="toggle toggle-warning"
+                className="toggle toggle-warning mt-1 shrink-0"
               />
             </label>
 
-            <div className="form-control mb-2">
+            <div className="form-control min-w-0">
               <label className="label py-1">
                 <span className="label-text font-medium">Multiplier</span>
               </label>
@@ -500,22 +544,22 @@ export const SettingsPage = () => {
                   !isUseTestDateEnabled || !draftFlags.USE_TIME_MULTIPLIER
                 }
                 onChange={(e) => handleMultiplierChange(Number(e.target.value))}
-                className="input input-bordered w-full max-w-xs"
+                className={`input input-bordered ${compactFieldClass}`}
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-4">
-            <div>
+          <div className={settingsActionRowClass}>
+            <div className={settingsRowBodyClass}>
               <p className="font-medium">Force Reseed Demo Data</p>
-              <p className="text-xs opacity-60">
+              <p className="text-xs leading-relaxed opacity-60">
                 Clears existing demo/business data and inserts fresh demo
                 services, providers, patients, queue entries, and stats.
               </p>
             </div>
             <button
               type="button"
-              className="btn btn-warning btn-sm"
+              className={`btn btn-warning btn-sm ${mobileActionButtonClass}`}
               onClick={handleSeedDemoData}
               disabled={isSeeding}
             >
@@ -523,16 +567,16 @@ export const SettingsPage = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between gap-4">
-            <div>
+          <div className={settingsActionRowClass}>
+            <div className={settingsRowBodyClass}>
               <p className="font-medium">Clear Queue Entries</p>
-              <p className="text-xs opacity-60">
+              <p className="text-xs leading-relaxed opacity-60">
                 Deletes all current queue entries.
               </p>
             </div>
             <button
               type="button"
-              className="btn btn-error btn-sm"
+              className={`btn btn-error btn-sm ${mobileActionButtonClass}`}
               onClick={handleClearQueueEntries}
               disabled={isClearingQueue}
             >
@@ -540,16 +584,16 @@ export const SettingsPage = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between gap-4">
-            <div>
+          <div className={settingsActionRowClass}>
+            <div className={settingsRowBodyClass}>
               <p className="font-medium">Clear Stats</p>
-              <p className="text-xs opacity-60">
+              <p className="text-xs leading-relaxed opacity-60">
                 Deletes all statistics records without touching queue entries.
               </p>
             </div>
             <button
               type="button"
-              className="btn btn-error btn-sm"
+              className={`btn btn-error btn-sm ${mobileActionButtonClass}`}
               onClick={handleClearStats}
               disabled={isClearingStats}
             >
@@ -557,17 +601,17 @@ export const SettingsPage = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between gap-4">
-            <div>
+          <div className={settingsActionRowClass}>
+            <div className={settingsRowBodyClass}>
               <p className="font-medium">Delete All Data</p>
-              <p className="text-xs opacity-60">
+              <p className="text-xs leading-relaxed opacity-60">
                 Deletes services, providers, patients, queue entries,
                 appointments, stats, and counters. Settings and flags are kept.
               </p>
             </div>
             <button
               type="button"
-              className="btn btn-error btn-sm"
+              className={`btn btn-error btn-sm ${mobileActionButtonClass}`}
               onClick={handleClearAllData}
               disabled={isClearingAllData}
             >
@@ -577,10 +621,10 @@ export const SettingsPage = () => {
         </div>
       </div>
 
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <button
           type="button"
-          className="btn btn-outline"
+          className="btn btn-outline w-full sm:w-auto"
           onClick={handleCancel}
           disabled={!hasChanges || isSaving}
         >
@@ -588,7 +632,7 @@ export const SettingsPage = () => {
         </button>
         <button
           type="button"
-          className="btn btn-primary"
+          className="btn btn-primary w-full sm:w-auto"
           onClick={handleSave}
           disabled={!hasChanges || isSaving || isWorkdayRangeInvalid}
         >
@@ -623,3 +667,8 @@ const toLocalDatetimeString = (date: Date) => {
   const offset = date.getTimezoneOffset() * 60000;
   return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 };
+
+const applyDocumentTheme = (theme: string) => {
+  document.documentElement.setAttribute("data-theme", theme);
+};
+
