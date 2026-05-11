@@ -1,24 +1,13 @@
 import React, { useState } from "react";
-import {
-  HomeIcon,
-  UserGroupIcon,
-  PresentationChartLineIcon,
-  CalendarDaysIcon,
-  WrenchScrewdriverIcon,
-  BugAntIcon,
-  NumberedListIcon,
-  Cog6ToothIcon,
-  IdentificationIcon,
-  ChartPieIcon,
-} from "@heroicons/react/24/solid";
 import { Outlet, useLocation } from "react-router-dom";
-import { NavLinkItem } from "/imports/ui/navigation/NavLinkItem";
+import { SidebarItem } from "/imports/ui/navigation/SidebarItem";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { formatDateToLocale } from "/imports/utils/utils";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Flags, SettingsCollection } from "/imports/api/settings";
 import { Loading } from "/imports/ui/components/Loading";
+import { AdminPages, PatientPages } from "/imports/ui/navigation/NavLink";
 
 export const Sidebar = () => {
   const location = useLocation();
@@ -42,6 +31,28 @@ export const Sidebar = () => {
 
   // Home Screen - don't show dashboard
   if (isHome) return <Outlet />;
+
+  // Admin Pages
+  const adminPages = () => {
+    return AdminPages.map((page) => (
+      <SidebarItem
+        key={page.link}
+        navLink={page}
+        isTestFlagEnabled={flags.ENABLE_TEST_FEATURES}
+      />
+    ));
+  };
+
+  // Patient Pages
+  const patientPages = () => {
+    return PatientPages.map((page) => (
+      <SidebarItem
+        key={page.link}
+        navLink={page}
+        isTestFlagEnabled={flags.ENABLE_TEST_FEATURES}
+      />
+    ));
+  };
 
   return (
     <>
@@ -96,102 +107,10 @@ export const Sidebar = () => {
             </div>
 
             {/*Admin Sidebar*/}
-            {isAdmin && (
-              <>
-                {flags.ENABLE_TEST_FEATURES && (
-                  <NavLinkItem link="/" label="Landing Page" icon={HomeIcon} />
-                )}
-
-                {/*Dashboard Button*/}
-                <NavLinkItem
-                  link="/admin/dashboard"
-                  label="Dashboard"
-                  icon={PresentationChartLineIcon}
-                />
-
-                {/*Appointments Button*/}
-                {flags.ENABLE_TEST_FEATURES && (
-                  <NavLinkItem
-                    link="/admin/appointments"
-                    label="Appointments"
-                    icon={CalendarDaysIcon}
-                  />
-                )}
-
-                {/* Queue Button */}
-                <NavLinkItem
-                  link="/admin/queue"
-                  label="Queue"
-                  icon={NumberedListIcon}
-                />
-
-                {/*Patients Button*/}
-                {flags.ENABLE_TEST_FEATURES && (
-                  <NavLinkItem
-                    link="/admin/patients"
-                    label="Patients"
-                    icon={UserGroupIcon}
-                  />
-                )}
-
-                {/*Services Button*/}
-                <NavLinkItem
-                  link="/admin/services"
-                  label="Services"
-                  icon={WrenchScrewdriverIcon}
-                />
-
-                {/*Service Providers Button*/}
-                <NavLinkItem
-                  link="/admin/providers"
-                  label="Service Providers"
-                  icon={IdentificationIcon}
-                />
-
-                {/*Stats Button*/}
-                {flags.ENABLE_TEST_FEATURES && (
-                  <NavLinkItem
-                    link="/admin/statistics"
-                    label="Actual Statistics"
-                    icon={ChartPieIcon}
-                  />
-                )}
-
-                {/* Statistics Demo Button */}
-                <NavLinkItem
-                  link="/admin/statistics-demo"
-                  label="Statistics"
-                  icon={ChartPieIcon}
-                />
-
-                {/* Test Page Button */}
-                {flags.ENABLE_TEST_FEATURES && (
-                  <NavLinkItem
-                    link="/admin/test"
-                    label="Test Page"
-                    icon={BugAntIcon}
-                  />
-                )}
-
-                <NavLinkItem
-                  link="/admin/settings"
-                  label="Settings"
-                  icon={Cog6ToothIcon}
-                />
-              </>
-            )}
+            {isAdmin && adminPages()}
 
             {/*Patient Sidebars*/}
-            {isPatient && (
-              <>
-                {/*Join Queue Button*/}
-                <NavLinkItem
-                  link="/patient/queue"
-                  label="Queue"
-                  icon={NumberedListIcon}
-                />
-              </>
-            )}
+            {isPatient && patientPages()}
           </ul>
         </div>
       </div>
