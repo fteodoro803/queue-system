@@ -10,7 +10,11 @@ export const SidebarItem = ({
   isTestFlagEnabled: boolean;
 }) => {
   const location = useLocation();
-  const highlight = "bg-primary text-primary-content rounded";
+  const activeItemClass = "bg-primary text-primary-content shadow-sm";
+  const idleItemClass =
+    "text-base-content/80 hover:bg-base-200 hover:text-base-content";
+  const linkClass =
+    "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
 
   const isActive: boolean = (() => {
     const activePath = location.pathname;
@@ -22,9 +26,16 @@ export const SidebarItem = ({
 
   return (
     // Highlight if active, otherwise default styling
-    <li className={isActive ? highlight : ""}>
-      <Link to={navLink.link}>
-        <navLink.icon className="h-5 w-5 text-base" />
+    <li>
+      <Link
+        to={navLink.link}
+        className={`${linkClass} ${isActive ? activeItemClass : idleItemClass}`}
+      >
+        <span
+          className={`grid h-8 w-8 place-items-center rounded-lg ${isActive ? "bg-primary-content/20" : "bg-base-200 text-base-content/70 group-hover:bg-base-300"}`}
+        >
+          <navLink.icon className="h-6 w-6" />
+        </span>
         <span>{navLink.label}</span>
       </Link>
     </li>

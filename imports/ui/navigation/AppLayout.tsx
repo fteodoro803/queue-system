@@ -95,10 +95,12 @@ export const AppLayout = () => {
             aria-label="close sidebar"
             className="drawer-overlay"
           ></label>
-          <ul className="menu bg-base-100 min-h-full w-80 p-4">
-            {/* Date and Time */}
-            <div className="flex justify-center">
-              <p className="text-sm">{`${now.toLocaleDateString()} ${formatDateToLocale(now, true)}`}</p>
+          <ul className="menu bg-base-100/95 flex min-h-full w-80 flex-col gap-1 border-r border-base-300/60 p-4 backdrop-blur-sm">
+            {/* Logo slot */}
+            <div className="mb-2 rounded-2xl border border-dashed border-base-300 bg-base-200/70 p-4">
+              <div className="flex h-14 items-center justify-center rounded-xl bg-base-100/80 text-sm font-medium text-base-content/60">
+                Logo Placeholder
+              </div>
             </div>
 
             {/* Admin Sidebar */}
@@ -106,6 +108,11 @@ export const AppLayout = () => {
 
             {/* Patient Sidebar */}
             {isPatient && patientPages()}
+
+            {/* Date and Time */}
+            <div className="mt-auto flex justify-center rounded-xl bg-base-200/70 px-3 py-2">
+              <p className="text-xs font-medium tracking-wide text-base-content/70">{`${now.toLocaleDateString()} ${formatDateToLocale(now, true)}`}</p>
+            </div>
           </ul>
         </div>
       </div>
