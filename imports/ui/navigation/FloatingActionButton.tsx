@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink } from "/imports/ui/navigation/NavLink";
 import { Link, useLocation } from "react-router-dom";
+import { Bars3Icon } from "@heroicons/react/24/outline";
 
 export const FloatingActionButton = ({
   pages,
@@ -28,12 +29,17 @@ export const FloatingActionButton = ({
         role="button"
         className="btn btn-lg btn-circle btn-primary"
       >
-        F
+        <Bars3Icon className="h-6 w-6" />
       </div>
 
       {/* close button should not be focusable so it can close the FAB when clicked. It's just a visual placeholder */}
       <div className="fab-close">
-        Close <span className="btn btn-circle btn-lg btn-error">✕</span>
+        <span
+          className={`rounded-full px-3 py-1 text-sm font-medium shadow-md whitespace-nowrap`}
+        >
+          Close
+        </span>{" "}
+        <span className="btn btn-circle btn-lg btn-error">✕</span>
       </div>
 
       {/* buttons that show up when FAB is open */}
