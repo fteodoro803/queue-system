@@ -56,9 +56,8 @@ export const AppLayout = () => {
 
   return (
     <>
-      {/* Floating button - only shows on small screens */}
-      <div className="fixed bottom-4 left-4 lg:hidden z-50">
-        {/* hamburger icon */}
+      {/* Floating Action Button - only shows on small screens */}
+      <div className="fixed bottom-4 left-4 z-50 max-w-[calc(100vw-2rem)] lg:hidden">
         {isAdmin && (
           <FloatingActionButton
             pages={AdminPages}
@@ -72,7 +71,6 @@ export const AppLayout = () => {
           />
         )}
       </div>
-
       {/* Drawer - sidebar hidden on small, always visible on large */}
       <div className="drawer lg:drawer-open">
         <input
@@ -84,8 +82,8 @@ export const AppLayout = () => {
         />
 
         {/* Main content area */}
-        <div className="drawer-content flex flex-col min-h-screen bg-base-200">
-          <div className="p-6 lg:p-8">
+        <div className="drawer-content flex min-h-screen min-w-0 flex-col overflow-x-hidden bg-base-200">
+          <div className="px-4 py-5 sm:p-6 lg:p-8">
             <Outlet />
           </div>
         </div>
