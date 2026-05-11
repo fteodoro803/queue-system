@@ -107,4 +107,4 @@ export const AdminPages: NavLinkItem[] = [
   AdminSettingsPage,
 ];
 
-export const PatientPages: NavLinkItem[] = [PatientQueuePage];
+export const PatientPages: NavLinkItem[] = [LandingPage, PatientQueuePage];

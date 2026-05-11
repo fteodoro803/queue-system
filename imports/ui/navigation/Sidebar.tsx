@@ -3,11 +3,11 @@ import { Outlet, useLocation } from "react-router-dom";
 import { SidebarItem } from "/imports/ui/navigation/SidebarItem";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
 import { formatDateToLocale } from "/imports/utils/utils";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useFind, useSubscribe } from "meteor/react-meteor-data";
 import { Flags, SettingsCollection } from "/imports/api/settings";
 import { Loading } from "/imports/ui/components/Loading";
 import { AdminPages, PatientPages } from "/imports/ui/navigation/NavLink";
+import { FloatingActionButton } from "/imports/ui/components/FloatingActionButton";
 
 export const Sidebar = () => {
   const location = useLocation();
@@ -58,22 +58,19 @@ export const Sidebar = () => {
     <>
       {/* Floating button - only shows on small screens */}
       <div className="fixed bottom-4 left-4 lg:hidden z-50">
-        <label
-          htmlFor="my-drawer-3"
-          className="btn btn-circle btn-xl swap swap-rotate shadow-lg"
-        >
-          <input
-            type="checkbox"
-            checked={drawerOpen}
-            onChange={() => setDrawerOpen(!drawerOpen)}
+        {/* hamburger icon */}
+        {isAdmin && (
+          <FloatingActionButton
+            pages={AdminPages}
+            isTestFlagEnabled={flags.ENABLE_TEST_FEATURES}
           />
-
-          {/* hamburger icon */}
-          <Bars3Icon className="swap-off fill-current h-6 w-6" />
-
-          {/* close icon */}
-          <XMarkIcon className="swap-on fill-current h-6 w-6" />
-        </label>
+        )}
+        {isPatient && (
+          <FloatingActionButton
+            pages={PatientPages}
+            isTestFlagEnabled={flags.ENABLE_TEST_FEATURES}
+          />
+        )}
       </div>
 
       {/* Drawer - sidebar hidden on small, always visible on large */}
