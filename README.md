@@ -8,6 +8,29 @@ technical infrastructure may be limited.
 - Video walkthrough (March 12, 2026): [YouTube Demo](https://www.youtube.com/watch?v=grjqZ2xFrk8)
 - To try the latest interactive version of the demo, email: `fteodoro803@gmail.com`
 
+## Screenshots
+
+Auto-generated local screenshots:
+
+<table>
+  <tr>
+    <td align="center">
+      <strong>Admin Queue</strong>
+      <br />
+      <a href="docs/screenshots/admin-queue.png">
+        <img src="docs/screenshots/admin-queue.png" alt="Admin Queue" width="560" />
+      </a>
+    </td>
+    <td align="center">
+      <strong>Patient Queue (Mobile)</strong>
+      <br />
+      <a href="docs/screenshots/patient-queue-mobile.png">
+        <img src="docs/screenshots/patient-queue-mobile.png" alt="Patient Queue Mobile" width="220" />
+      </a>
+    </td>
+  </tr>
+</table>
+
 ## Why This Project Exists
 
 Many clinics and service centers still run scheduling and queueing with fragmented tools (paper lists, spreadsheets, or
@@ -68,12 +91,13 @@ server/                 # Server startup and demo seed wiring
 tests/                  # Unit + integration tests
 ```
 
-## Screenshots
+## Automated Screenshot Updates
 
-Auto-generated local screenshots:
+This repository includes `/.github/workflows/update-screenshots.yml`.
 
-![Admin Queue](docs/screenshots/admin-queue.png)
-![Patient Queue Mobile](docs/screenshots/patient-queue-mobile.png)
+- Trigger: push to `release` (or manual `workflow_dispatch`)
+- Flow: install Meteor + dependencies, start app, capture screenshots, commit updated files in `docs/screenshots/`
+- Commit author: `github-actions[bot]`
 
 Notes:
 
@@ -83,18 +107,3 @@ Notes:
 - `npm run screenshots:mobile` captures mobile screenshots.
 - `npm run screenshots` and `npm run screenshots:mobile` expect the app to already be running at
   `http://127.0.0.1:3000` (or `SCREENSHOT_BASE_URL`).
-
-## Automated Screenshot Updates
-
-This repository includes `/.github/workflows/update-screenshots.yml`.
-
-- Trigger: push to `release` (or manual `workflow_dispatch`)
-- Flow: install Meteor + dependencies, start app, capture screenshots, commit updated files in `docs/screenshots/`
-- Commit author: `github-actions[bot]`
-
-## Deployment Notes
-
-- This app supports seeded demo data for quick setup.
-- For shared demos, consider timed reseeding to keep data clean while preserving real-time behavior.
-- For isolated demos, consider per-session data partitioning if required.
-
