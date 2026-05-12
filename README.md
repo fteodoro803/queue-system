@@ -14,14 +14,14 @@ Auto-generated local screenshots:
 
 <table>
   <tr>
-    <td align="center">
+    <td>
       <strong>Admin Queue</strong>
       <br />
       <a href="docs/screenshots/admin-queue.png">
         <img src="docs/screenshots/admin-queue.png" alt="Admin Queue" width="560" />
       </a>
     </td>
-    <td align="center">
+    <td>
       <strong>Patient Queue (Mobile)</strong>
       <br />
       <a href="docs/screenshots/patient-queue-mobile.png">
@@ -46,8 +46,8 @@ This project aims to provide a practical, modern baseline for:
 
 ## Product Philosophy
 
-- **Reactive Data Sync:** Utilizing Meteor to enable instant client-server synchronization.
-- **Mobile-First Design:** Optimized for low-bandwidth environments to ensure accessibility for all users.
+- **Reactive Data Sync:** Utilising Meteor to enable instant client-server synchronisation.
+- **Mobile-First Design:** Optimised for low-bandwidth environments to ensure accessibility for all users.
 - **Real-Time Availability:** Dynamic scheduling updates to prevent double-booking and reduce wait times.
 - **Human-Centered Simplicity:** Clear, role-oriented screens for admins and patients.
 
@@ -66,7 +66,7 @@ This project aims to provide a practical, modern baseline for:
 - React 18 + TypeScript
 - React Router 6
 - Tailwind CSS 4 + DaisyUI
-- Recharts (data visualization)
+- Recharts (data visualisation)
 
 ### Backend / Runtime
 
