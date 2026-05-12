@@ -8,7 +8,11 @@
     "test-app": "meteor test --once --full-app --driver-package meteortesting:mocha --port 3100",
     "test-app:watch": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha --port 3100",
     "visualize": "meteor --production --extra-packages bundle-visualizer",
-    "lint": "eslint imports"
+    "lint": "eslint imports",
+    "screenshots": "node scripts/capture-screenshots.mjs",
+    "screenshots:mobile": "node scripts/capture-screenshots.mjs --mobile",
+    "screenshots:all": "npm run screenshots && npm run screenshots:mobile",
+    "screenshots:local": "bash scripts/run-screenshots-local.sh"
   },
   "dependencies": {
     "@babel/runtime": "^7.23.5",
@@ -39,6 +43,7 @@
     "eslint-plugin-react": "^7.37.5",
     "globals": "^17.3.0",
     "jiti": "^2.6.1",
+    "playwright": "^1.60.0",
     "prettier": "^3.8.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.55.0"

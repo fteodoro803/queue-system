@@ -70,16 +70,27 @@ tests/                  # Unit + integration tests
 
 ## Screenshots
 
-Current demo preview:
+Auto-generated local screenshots:
 
-![Demo Screenshot](https://github.com/user-attachments/assets/ecd54521-7b08-4e65-acb1-903e878e5777)
+![Admin Queue](docs/screenshots/admin-queue.png)
+![Patient Queue Mobile](docs/screenshots/patient-queue-mobile.png)
 
-Suggested additions (drop files in `docs/screenshots/` and update links):
+Notes:
 
-- `docs/screenshots/dashboard.png`
-- `docs/screenshots/queue-mobile.png`
-- `docs/screenshots/settings-mobile.png`
-- `docs/screenshots/provider-availability.png`
+- `npm run screenshots:local` is the one-command flow for local development: start app, wait, capture all configured
+  screenshots, stop app.
+- `npm run screenshots` captures desktop screenshots.
+- `npm run screenshots:mobile` captures mobile screenshots.
+- `npm run screenshots` and `npm run screenshots:mobile` expect the app to already be running at
+  `http://127.0.0.1:3000` (or `SCREENSHOT_BASE_URL`).
+
+## Automated Screenshot Updates
+
+This repository includes `/.github/workflows/update-screenshots.yml`.
+
+- Trigger: push to `release` (or manual `workflow_dispatch`)
+- Flow: install Meteor + dependencies, start app, capture screenshots, commit updated files in `docs/screenshots/`
+- Commit author: `github-actions[bot]`
 
 ## Deployment Notes
 
