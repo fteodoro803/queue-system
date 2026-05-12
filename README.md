@@ -10,8 +10,6 @@ technical infrastructure may be limited.
 
 ## Screenshots
 
-Auto-generated local screenshots:
-
 <table>
   <tr>
     <td>
@@ -91,15 +89,7 @@ server/                 # Server startup and demo seed wiring
 tests/                  # Unit + integration tests
 ```
 
-## Automated Screenshot Updates
-
-This repository includes `/.github/workflows/update-screenshots.yml`.
-
-- Trigger: push to `release` (or manual `workflow_dispatch`)
-- Flow: install Meteor + dependencies, start app, capture screenshots, commit updated files in `docs/screenshots/`
-- Commit author: `github-actions[bot]`
-
-Notes:
+## Screenshot Commands
 
 - `npm run screenshots:local` is the one-command flow for local development: start app, wait, capture all configured
   screenshots, stop app.
