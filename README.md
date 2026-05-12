@@ -1,4 +1,4 @@
-# Queue System
+# Realtime Queue Management System
 
 A web-based scheduling platform designed to improve patient and administrator experiences in environments where
 technical infrastructure may be limited.
