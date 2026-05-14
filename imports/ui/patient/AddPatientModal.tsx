@@ -17,7 +17,7 @@ export const AddPatientModal = ({
   return (
     <div className="modal modal-open" role={"dialog"}>
       <div className="modal-box">
-        <AddPatientForm />
+        <AddPatientForm flat />
 
         <div className=" flex gap-2 justify-end">
           {/* Close Button */}
