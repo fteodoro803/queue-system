@@ -114,7 +114,7 @@ export const AdminDashboard = () => {
 
   return (
     <>
-      <div className="mx-4 sm:mx-8 lg:mx-8">
+      <div>
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
         {/* Dashboard Cards */}

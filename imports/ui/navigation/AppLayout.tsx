@@ -83,7 +83,7 @@ export const AppLayout = () => {
 
         {/* Main content area */}
         <div className="drawer-content flex min-h-screen min-w-0 flex-col overflow-x-hidden bg-base-200">
-          <div className="px-4 py-5 sm:p-6 lg:p-8">
+          <div className="mx-4 my-5 sm:m-6 lg:m-8">
             <Outlet />
           </div>
         </div>

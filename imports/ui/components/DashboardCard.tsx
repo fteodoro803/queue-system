@@ -30,7 +30,7 @@ export const DashboardCard = ({
           <p className="text-xs font-semibold">{header}</p>
 
           <div className={"flex flex-1 items-center justify-center"}>
-            <h3 className="w-full font-bold text-center text-[clamp(1.125rem,7vw,1.875rem)] line-clamp-2 wrap-break-word">
+            <h3 className="w-full font-bold text-center whitespace-nowrap text-[clamp(0.75rem,7vw,1.875rem)] line-clamp-2 wrap-break-word">
               {body}
             </h3>
           </div>
