@@ -3,8 +3,11 @@ import { assert } from "chai";
 import { Meteor } from "meteor/meteor";
 import { QueueEntryCollection } from "/imports/api/queueEntry";
 import { ProviderCollection } from "/imports/api/provider";
+import { PatientsCollection } from "/imports/api/patient";
 import {
   enqueue,
+  checkIn,
+  patientSelfCheckIn,
   startService,
   completeService,
   cancelService,
@@ -50,6 +53,7 @@ if (Meteor.isServer) {
     beforeEach(async () => {
       await QueueEntryCollection.removeAsync({});
       await ProviderCollection.removeAsync({});
+      await PatientsCollection.removeAsync({});
     });
 
     // -------------------------
@@ -271,6 +275,172 @@ if (Meteor.isServer) {
         } catch (e) {
           assert.instanceOf(e, Meteor.Error);
         }
+      });
+    });
+
+    // -------------------------
+    // checkIn
+    // -------------------------
+    describe("checkIn()", function () {
+      it("returns success and marks a waiting entry as ready", async () => {
+        const entryId = await QueueEntryCollection.insertAsync({
+          displayId: "gc-01",
+          patientId: "patient-checkin-1",
+          serviceId: mockService._id,
+          providerId: null,
+          position: 1,
+          status: "waiting",
+          initialEstimatedWaitTime: null,
+          readyAt: null,
+          start: null,
+          end: null,
+          createdAt: now,
+        });
+
+        const result = await checkIn(entryId, now);
+        const updatedEntry = await QueueEntryCollection.findOneAsync(entryId);
+
+        assert.equal(result.result, "success");
+        assert.equal(result.id, entryId);
+        assert.equal(updatedEntry?.status, "ready");
+        assert.deepEqual(updatedEntry?.readyAt, now);
+      });
+
+      it("returns already-checked-in when entry is already ready", async () => {
+        const entryId = await QueueEntryCollection.insertAsync({
+          displayId: "gc-02",
+          patientId: "patient-checkin-2",
+          serviceId: mockService._id,
+          providerId: null,
+          position: 1,
+          status: "ready",
+          initialEstimatedWaitTime: null,
+          readyAt: now,
+          start: null,
+          end: null,
+          createdAt: now,
+        });
+
+        const result = await checkIn(entryId, new Date(now.getTime() + 1000));
+
+        assert.equal(result.result, "already-checked-in");
+      });
+
+      it("returns entry-not-found when entry does not exist", async () => {
+        const result = await checkIn("missing-entry-id", now);
+
+        assert.equal(result.result, "entry-not-found");
+      });
+    });
+
+    // -------------------------
+    // patientSelfCheckIn
+    // -------------------------
+    describe("patientSelfCheckIn()", function () {
+      it("finds by normalized name and display ID then checks in successfully", async () => {
+        const patientId = await PatientsCollection.insertAsync({
+          name: "taylor ong",
+          email: null,
+          number: null,
+          avatar: null,
+          createdAt: now,
+        });
+
+        await QueueEntryCollection.insertAsync({
+          displayId: "gc-03",
+          patientId,
+          serviceId: mockService._id,
+          providerId: null,
+          position: 1,
+          status: "waiting",
+          initialEstimatedWaitTime: null,
+          readyAt: null,
+          start: null,
+          end: null,
+          createdAt: now,
+        });
+
+        const result = await patientSelfCheckIn({
+          displayId: "  GC-03  ",
+          name: "  Taylor Ong  ",
+          time: now,
+        });
+
+        assert.equal(result.result, "success");
+      });
+
+      it("returns already-checked-in when matched entry is already ready", async () => {
+        const patientId = await PatientsCollection.insertAsync({
+          name: "taylor ong",
+          email: null,
+          number: null,
+          avatar: null,
+          createdAt: now,
+        });
+
+        await QueueEntryCollection.insertAsync({
+          displayId: "gc-04",
+          patientId,
+          serviceId: mockService._id,
+          providerId: null,
+          position: 1,
+          status: "ready",
+          initialEstimatedWaitTime: null,
+          readyAt: now,
+          start: null,
+          end: null,
+          createdAt: now,
+        });
+
+        const result = await patientSelfCheckIn({
+          displayId: "GC-04",
+          name: "Taylor Ong",
+          time: now,
+        });
+
+        assert.equal(result.result, "already-checked-in");
+      });
+
+      it("returns entry-not-found when patient is missing", async () => {
+        const result = await patientSelfCheckIn({
+          displayId: "gc-05",
+          name: "Unknown Person",
+          time: now,
+        });
+
+        assert.equal(result.result, "entry-not-found");
+      });
+
+      it("returns entry-not-found when queue entry does not match patient/displayId", async () => {
+        const patientId = await PatientsCollection.insertAsync({
+          name: "taylor ong",
+          email: null,
+          number: null,
+          avatar: null,
+          createdAt: now,
+        });
+
+        await QueueEntryCollection.insertAsync({
+          displayId: "gc-06",
+          patientId,
+          serviceId: mockService._id,
+          providerId: null,
+          position: 1,
+          status: "waiting",
+          initialEstimatedWaitTime: null,
+          readyAt: null,
+          start: null,
+          end: null,
+          createdAt: now,
+        });
+
+        const result = await patientSelfCheckIn({
+          displayId: "gc-07",
+          name: "taylor ong",
+          time: now,
+        });
+
+        assert.equal(result.result, "entry-not-found");
       });
     });
   });
