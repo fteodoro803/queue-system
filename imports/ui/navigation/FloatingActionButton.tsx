@@ -23,6 +23,7 @@ export const FloatingActionButton = ({
   const hoverColor = "group-hover:bg-base-300";
   const baseLabel =
     "bg-base-100 text-base-content group-hover:bg-base-300 transition-all";
+  const border = "border-1 border-base-content/10";
 
   return (
     <div className="fab">
@@ -36,13 +37,13 @@ export const FloatingActionButton = ({
       </div>
 
       {/* close button should not be focusable so it can close the FAB when clicked. It's just a visual placeholder */}
-      <div className="fab-close">
+      <div className="fab-close group">
         <span
-          className={`rounded-full px-3 py-1 text-sm font-medium shadow-md whitespace-nowrap`}
+          className={`rounded-full px-3 py-1 ${baseLabel} text-sm font-medium shadow-md whitespace-nowrap`}
         >
           Close
         </span>
-        <span className="btn btn-circle btn-lg btn-error shadow-md">✕</span>
+        <span className="btn btn-circle btn-lg btn-error shadow-lg">✕</span>
       </div>
 
       {/* buttons that show up when FAB is open */}
@@ -57,7 +58,7 @@ export const FloatingActionButton = ({
           <div key={page.link} className="group">
             {/* Label */}
             <span
-              className={`rounded-full px-3 py-1 text-sm shadow-md whitespace-nowrap ${baseLabel}`}
+              className={`rounded-full px-3 py-1 text-sm ${border} shadow-lg whitespace-nowrap ${baseLabel}`}
             >
               {page.label}
             </span>
@@ -65,11 +66,11 @@ export const FloatingActionButton = ({
             {/* Button */}
             <Link to={page.link}>
               <button
-                className={`btn btn-lg btn-circle shadow-md ${active ? activeColor : baseColor} ${hoverColor} `}
+                className={`btn btn-lg btn-circle ${border} shadow-lg ${active ? activeColor : baseColor} ${hoverColor}`}
               >
                 <page.icon className="h-6 w-6" />
                 {active && (
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-primary border-2 border-base-100" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-primary" />
                 )}
               </button>
             </Link>
