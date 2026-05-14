@@ -153,13 +153,13 @@ async function insertDemoData(date: Date): Promise<void> {
 
   // 5 queue entries with all statuses represented at least once.
   await QueueEntryCollection.insertAsync({
-    _id: "seed-queue-waiting",
+    _id: "seed-queue-ready",
     displayId: "GC-98",
     patientId: "seed-patient-1",
     serviceId: "seed-service-general",
     providerId: null,
     position: 1,
-    status: "waiting",
+    status: "ready",
     initialEstimatedWaitTime: 20,
     readyAt: null,
     start: null,
@@ -168,13 +168,13 @@ async function insertDemoData(date: Date): Promise<void> {
   });
 
   await QueueEntryCollection.insertAsync({
-    _id: "seed-queue-ready",
+    _id: "seed-queue-waiting",
     displayId: "GC-99",
     patientId: "seed-patient-2",
     serviceId: "seed-service-general",
     providerId: null,
     position: 2,
-    status: "ready",
+    status: "waiting",
     initialEstimatedWaitTime: 35,
     readyAt: minutesAgo(10),
     start: null,

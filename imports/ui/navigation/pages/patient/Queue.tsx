@@ -15,10 +15,12 @@ import {
   IdentificationIcon,
   NumberedListIcon,
 } from "@heroicons/react/24/outline";
+import { PatientQueueCheckInModal } from "/imports/ui/queue/PatientQueueCheckInModal";
 
 export const Queue = () => {
   const now = useDateTime();
-  const [isModalOpen, setModalOpen] = useState<boolean>(false);
+  const [isMakeQueueEntryModalOpen, setModalOpen] = useState<boolean>(false);
+  const [isCheckInModalOpen, setCheckInModalOpen] = useState<boolean>(false);
 
   const isQueueEntryLoading = useSubscribe("queue");
   const queueEntries = useFind(() =>
@@ -115,7 +117,14 @@ export const Queue = () => {
         <h1 className="text-3xl font-bold">Queue</h1>
         <div className="flex gap-1">
           <button
-            className="btn btn-primary w-full sm:w-auto"
+            className="btn btn-primary flex-1 sm:flex-none"
+            onClick={() => setCheckInModalOpen(true)}
+          >
+            Check In
+          </button>
+
+          <button
+            className="btn btn-primary flex-1 sm:flex-none"
             onClick={() => setModalOpen(true)}
           >
             + Join Queue
@@ -183,7 +192,12 @@ export const Queue = () => {
       )}
 
       {/* Join Queue Modal */}
-      {isModalOpen && <MakeQueueEntryModal setOpen={setModalOpen} />}
+      {isMakeQueueEntryModalOpen && (
+        <MakeQueueEntryModal setOpen={setModalOpen} />
+      )}
+      {isCheckInModalOpen && (
+        <PatientQueueCheckInModal setOpen={setCheckInModalOpen} />
+      )}
     </>
   );
 };

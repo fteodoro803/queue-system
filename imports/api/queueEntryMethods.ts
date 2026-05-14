@@ -14,6 +14,8 @@ export interface QueueEntryData {
   service: Service;
 }
 
+export type CheckInResult = { id: string; isReady: boolean; time: Date };
+
 // Client-Called methods
 Meteor.methods({
   // Inserts entry to queue, and calculates its position
@@ -65,13 +67,23 @@ Meteor.methods({
   },
 
   // Check in
-  async "queueEntry.markAsReady"(id: string, time: Date) {
-    await QueueEntryCollection.updateAsync(id, {
+  async "queueEntry.markAsReady"(
+    id: string,
+    time: Date,
+  ): Promise<CheckInResult> {
+    const updated = await QueueEntryCollection.updateAsync(id, {
       $set: {
         readyAt: time,
         status: "ready",
       },
     });
+
+    // No update
+    if (updated === 0) {
+      return { id, isReady: false, time };
+    }
+
+    return { id, isReady: true, time };
   },
 
   // Starts a Service
@@ -207,8 +219,8 @@ export async function setInitialEstimatedWaitTime(
 }
 
 // Checks-in a Patient, and marks them as Ready
-export async function checkIn(id: string, time: Date): Promise<void> {
-  await Meteor.callAsync("queueEntry.markAsReady", id, time);
+export async function checkIn(id: string, time: Date): Promise<CheckInResult> {
+  return Meteor.callAsync("queueEntry.markAsReady", id, time);
 }
 
 // Starts a service for a queue entry
@@ -272,4 +284,19 @@ async function generateDisplayId(service: Service): Promise<string> {
   const displayId = `${service.shortcode}-${numStr}`;
 
   return displayId;
+}
+
+// User Check-in
+export async function patientSelfCheckIn({
+  id,
+  time,
+}: {
+  id: string;
+  time: Date;
+}): Promise<CheckInResult> {
+  // 1. Resolve patientId from arguments or context (e.g., from logged-in user)
+  // PLACEHOLDER: just use that actual queueEntryId for now
+
+  // 2. Mark the entry as ready (i.e., check-in), if the patient has an active queue entry
+  return await checkIn(id, time);
 }
