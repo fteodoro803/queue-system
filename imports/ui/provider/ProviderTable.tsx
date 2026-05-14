@@ -5,6 +5,7 @@ import { Loading } from "/imports/ui/components/Loading";
 import { Provider, ProviderCollection } from "/imports/api/provider";
 import { ProviderDetailsModal } from "/imports/ui/provider/ProviderDetailsModal";
 import { styles } from "/imports/utils/styles";
+import { formatNumberDisplay } from "/imports/utils/numberUtils";
 
 export const ProviderTable = () => {
   const isLoading = useSubscribe("providers");
@@ -39,15 +40,15 @@ export const ProviderTable = () => {
     <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
       <div className="overflow-x-auto rounded-xl">
         <table
-          className={`table w-full min-w-160 ${styles.outline} rounded-xl overflow-hidden`}
+          className={`table w-full min-w-136 sm:min-w-160 ${styles.outline} rounded-xl overflow-hidden [&_th]:px-2 [&_td]:px-2 sm:[&_th]:px-4 sm:[&_td]:px-4 [&_th]:py-4 [&_td]:py-4`}
         >
           {/* head */}
           <thead className="bg-base-300 text-xs sm:text-sm">
             <tr>
-              <th></th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Number</th>
+              <th className="text-center"></th>
+              <th className="text-center">Name</th>
+              <th className="text-center">Email</th>
+              <th className="text-center">Number</th>
             </tr>
           </thead>
           <tbody>
@@ -60,22 +61,27 @@ export const ProviderTable = () => {
                   onClick={() => handleSelect(p)}
                 >
                   {/*Avatar*/}
-                  <th className="w-14">
+                  <th className="w-14 text-center align-middle">
                     <Avatar profile={p} />
                   </th>
 
                   {/*Name*/}
-                  <td className="max-w-48 truncate" title={p.name}>
+                  <td className="max-w-48 text-center truncate" title={p.name}>
                     {p.name}
                   </td>
 
                   {/*Email*/}
-                  <td className="max-w-64 truncate" title={p.email ?? "-"}>
+                  <td
+                    className="max-w-64 text-center truncate"
+                    title={p.email ?? "-"}
+                  >
                     {p.email ? p.email : "-"}
                   </td>
 
                   {/*Number*/}
-                  <td className="whitespace-nowrap">{p.number ? p.number : "-"}</td>
+                  <td className="whitespace-nowrap text-center tabular-nums">
+                    {p.number ? formatNumberDisplay(p.number) : "-"}
+                  </td>
                 </tr>
               );
             })}

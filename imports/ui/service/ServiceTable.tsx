@@ -36,20 +36,20 @@ export const ServiceTable = () => {
     <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
       <div className="overflow-x-auto rounded-xl">
         <table
-          className={`table w-full min-w-xl ${styles.outline} rounded-xl overflow-hidden`}
+          className={`table w-full min-w-120 sm:min-w-xl ${styles.outline} rounded-xl overflow-hidden [&_th]:px-2 [&_td]:px-2 sm:[&_th]:px-4 sm:[&_td]:px-4 [&_th]:py-4 [&_td]:py-4`}
         >
           {/* head */}
           <thead className="bg-base-300 text-xs sm:text-sm">
             <tr>
-              <th>Name</th>
-              <th>Duration (mins)</th>
-              <th>Cost (PHP)</th>
+              <th className="text-center">Name</th>
+              <th className="text-center">Shortcode</th>
+              <th className="text-center">Duration (mins)</th>
+              <th className="text-center">Cost (PHP)</th>
             </tr>
           </thead>
           <tbody>
             {services.map((s) => {
               const modalId: string = `my_modal_${s._id}`;
-              const serviceName = `${s.name} (${s.shortcode})`;
               return (
                 <tr
                   key={modalId}
@@ -57,15 +57,27 @@ export const ServiceTable = () => {
                   onClick={() => handleSelect(s)}
                 >
                   {/*Name*/}
-                  <td className="max-w-72 truncate" title={serviceName}>
-                    {serviceName}
+                  <td className="max-w-72 truncate text-center" title={s.name}>
+                    {s.name}
+                  </td>
+
+                  {/*Shortcode*/}
+                  <td
+                    className="max-w-32 truncate text-center"
+                    title={s.shortcode}
+                  >
+                    {s.shortcode}
                   </td>
 
                   {/*Duration*/}
-                  <td className="whitespace-nowrap">{s.duration ? s.duration : "-"}</td>
+                  <td className="whitespace-nowrap text-center tabular-nums">
+                    {s.duration ? s.duration : "-"}
+                  </td>
 
                   {/*Cost*/}
-                  <td className="whitespace-nowrap">{s.cost ? s.cost : "-"}</td>
+                  <td className="whitespace-nowrap text-center tabular-nums">
+                    {s.cost ? s.cost : "-"}
+                  </td>
                 </tr>
               );
             })}
