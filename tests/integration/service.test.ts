@@ -56,7 +56,7 @@ if (Meteor.isServer) {
         assert.equal(service?.duration, 45);
         assert.equal(service?.description, "Extended consult");
         assert.isNull(service?.cost ?? null);
-        assert.equal(service?.shortcode, "GC");
+        assert.equal(service?.shortcode, "gc");
       });
 
       it("throws not-found when service id does not exist", async () => {

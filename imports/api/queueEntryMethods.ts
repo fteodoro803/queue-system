@@ -1,6 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import { QueueEntry, QueueEntryCollection } from "/imports/api/queueEntry";
-import { Patient } from "/imports/api/patient";
+import { Patient, PatientsCollection } from "/imports/api/patient";
 import { Service } from "/imports/api/service";
 import { CountersCollection } from "/imports/api/counters";
 import {
@@ -8,6 +8,7 @@ import {
   setProviderAvailability,
 } from "/imports/api/providerMethods";
 import { updateStats } from "/imports/api/statsMethods";
+import { normaliseString } from "/imports/utils/utils";
 
 export interface QueueEntryData {
   patient: Patient;
@@ -50,7 +51,7 @@ Meteor.methods({
 
     // 4. Insert the entry into queue and return
     return QueueEntryCollection.insertAsync({
-      displayId: displayId,
+      displayId: normaliseString(displayId),
       patientId: data.patient._id,
       serviceId: data.service._id,
       providerId: null,

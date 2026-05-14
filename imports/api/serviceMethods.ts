@@ -4,10 +4,8 @@ import {
   SERVICE_SHORTCODE_MIN_LENGTH,
   ServicesCollection,
 } from "/imports/api/service";
-import {
-  isValidShortcode,
-  normaliseShortcode,
-} from "/imports/utils/serviceUtils";
+import { isValidShortcode } from "/imports/utils/serviceUtils";
+import { normaliseString } from "/imports/utils/utils";
 
 // ---- Interfaces ----
 export interface ServiceData {
@@ -24,7 +22,7 @@ Meteor.methods({
   // Adds service type to the database
   // Returns the ID of the newly created service document
   "services.insert"(data: ServiceData): Promise<string> {
-    const normalisedShortcode = normaliseShortcode(data.shortcode);
+    const normalisedShortcode = normaliseString(data.shortcode);
     if (!isValidShortcode(normalisedShortcode)) {
       throw new Meteor.Error(
         "validation-error",
@@ -53,7 +51,7 @@ Meteor.methods({
 
     if (data.name !== undefined) updates.name = data.name.trim();
     if (data.shortcode !== undefined) {
-      const normalisedShortcode = normaliseShortcode(data.shortcode);
+      const normalisedShortcode = normaliseString(data.shortcode);
       if (!isValidShortcode(normalisedShortcode)) {
         throw new Meteor.Error(
           "validation-error",

@@ -4,10 +4,8 @@ import {
   SERVICE_SHORTCODE_MIN_LENGTH,
 } from "/imports/api/service";
 import { insertService } from "/imports/api/serviceMethods";
-import {
-  isValidShortcode,
-  normaliseShortcode,
-} from "/imports/utils/serviceUtils";
+import { isValidShortcode } from "/imports/utils/serviceUtils";
+import { normaliseString } from "/imports/utils/utils";
 
 interface AddServiceModalProps {
   open: boolean;
@@ -35,7 +33,7 @@ export const AddServiceModal = ({ open, setOpen }: AddServiceModalProps) => {
     if (isNaN(durationNum)) return;
     if (costNum !== null && isNaN(costNum)) return;
 
-    const normalisedShortCode: string = normaliseShortcode(shortcode);
+    const normalisedShortCode: string = normaliseString(shortcode);
     if (!isValidShortcode(normalisedShortCode)) {
       setShortcodeError(
         `Shortcode must be between ${SERVICE_SHORTCODE_MIN_LENGTH} and ${SERVICE_SHORTCODE_MAX_LENGTH} characters.`,

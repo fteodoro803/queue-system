@@ -106,7 +106,7 @@ if (Meteor.isServer) {
         );
         const entry = await QueueEntryCollection.findOneAsync(id);
 
-        assert.match(entry?.displayId ?? "", /^GS-\d{2}$/);
+        assert.match(entry?.displayId ?? "", /^gs-\d{2}$/);
       });
     });
 
