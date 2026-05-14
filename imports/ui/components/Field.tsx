@@ -27,6 +27,7 @@ export interface FieldProps {
   placeholder?: string;
   additionalAttributes?: string;
   type?: string;
+  autocomplete?: string;
   mode: "write" | "read" | "editable";
   icon?: ComponentType<{ className?: string }>;
   validate?: (val: string) => boolean;
@@ -39,6 +40,7 @@ export const Field: FC<FieldProps> = ({
   disabled = false,
   additionalAttributes = "",
   type = "text",
+  autocomplete,
   icon,
   mode,
   validate,
@@ -99,6 +101,7 @@ export const Field: FC<FieldProps> = ({
           <input
             required
             type={type}
+            autoComplete={autocomplete}
             className="grow"
             placeholder={placeholder}
             value={mode === "editable" ? draftValue : value}
@@ -163,6 +166,8 @@ export const EmailField: FC<EmailFieldProps> = (props) => {
         additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
         icon={EnvelopeIcon}
         validate={isValidEmail}
+        autocomplete="email"
+        type={"email"}
       />
     </>
   );
@@ -180,6 +185,8 @@ export const NameField: FC<NameFieldProps> = (props) => {
         {...props}
         additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
         icon={UserIcon}
+        type="name"
+        autocomplete="name"
       />
     </>
   );
@@ -199,6 +206,7 @@ export const NumberField: FC<NumberFieldProps> = (props) => {
         additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
         icon={DevicePhoneMobileIcon}
         type="tel"
+        autocomplete="tel"
         validate={isPhilippineNumber}
       />
     </>
