@@ -38,7 +38,7 @@ async function insertDemoData(date: Date): Promise<void> {
   await ServicesCollection.insertAsync({
     _id: "seed-service-general",
     name: "General Consultation",
-    shortcode: "GC",
+    shortcode: "gc",
     duration: 20,
     cost: 500,
     description: "General checkup and consultation",
@@ -49,7 +49,7 @@ async function insertDemoData(date: Date): Promise<void> {
   await ServicesCollection.insertAsync({
     _id: "seed-service-vaccination",
     name: "Vaccination",
-    shortcode: "VC",
+    shortcode: "vc",
     duration: 15,
     cost: 250,
     description: "Routine vaccination service",
@@ -60,7 +60,7 @@ async function insertDemoData(date: Date): Promise<void> {
   // 3 providers
   await ProviderCollection.insertAsync({
     _id: "seed-provider-alex",
-    name: "Alex Rivera",
+    name: "alex rivera",
     email: "alex.demo@example.com",
     number: "09170000001",
     avatar: null,
@@ -78,7 +78,7 @@ async function insertDemoData(date: Date): Promise<void> {
 
   await ProviderCollection.insertAsync({
     _id: "seed-provider-blair",
-    name: "Blair Santos",
+    name: "blair santos",
     email: "blair.demo@example.com",
     number: "09170000002",
     avatar: null,
@@ -97,7 +97,7 @@ async function insertDemoData(date: Date): Promise<void> {
 
   await ProviderCollection.insertAsync({
     _id: "seed-provider-casey",
-    name: "Casey Lim",
+    name: "casey lim",
     email: "casey.demo@example.com",
     number: "09170000003",
     avatar: null,
@@ -112,7 +112,7 @@ async function insertDemoData(date: Date): Promise<void> {
   // 5 patients (supports 5 queue entries)
   await PatientsCollection.insertAsync({
     _id: "seed-patient-1",
-    name: "Jordan Cruz",
+    name: "jordan cruz",
     email: "jordan.demo@example.com",
     number: "09171111111",
     avatar: null,
@@ -120,7 +120,7 @@ async function insertDemoData(date: Date): Promise<void> {
   });
   await PatientsCollection.insertAsync({
     _id: "seed-patient-2",
-    name: "Taylor Ong",
+    name: "taylor ong",
     email: "taylor.demo@example.com",
     number: "09172222222",
     avatar: null,
@@ -128,7 +128,7 @@ async function insertDemoData(date: Date): Promise<void> {
   });
   await PatientsCollection.insertAsync({
     _id: "seed-patient-3",
-    name: "Morgan Lee",
+    name: "morgan lee",
     email: "morgan.demo@example.com",
     number: "09173333333",
     avatar: null,
@@ -136,7 +136,7 @@ async function insertDemoData(date: Date): Promise<void> {
   });
   await PatientsCollection.insertAsync({
     _id: "seed-patient-4",
-    name: "Riley Tan",
+    name: "riley tan",
     email: "riley.demo@example.com",
     number: "09174444444",
     avatar: null,
@@ -144,7 +144,7 @@ async function insertDemoData(date: Date): Promise<void> {
   });
   await PatientsCollection.insertAsync({
     _id: "seed-patient-5",
-    name: "Avery Dela Cruz",
+    name: "avery dela cruz",
     email: "avery.demo@example.com",
     number: "09175555555",
     avatar: null,
@@ -154,7 +154,7 @@ async function insertDemoData(date: Date): Promise<void> {
   // 5 queue entries with all statuses represented at least once.
   await QueueEntryCollection.insertAsync({
     _id: "seed-queue-ready",
-    displayId: "GC-98",
+    displayId: "gc-98",
     patientId: "seed-patient-1",
     serviceId: "seed-service-general",
     providerId: null,
@@ -169,7 +169,7 @@ async function insertDemoData(date: Date): Promise<void> {
 
   await QueueEntryCollection.insertAsync({
     _id: "seed-queue-waiting",
-    displayId: "GC-99",
+    displayId: "gc-99",
     patientId: "seed-patient-2",
     serviceId: "seed-service-general",
     providerId: null,
@@ -184,7 +184,7 @@ async function insertDemoData(date: Date): Promise<void> {
 
   await QueueEntryCollection.insertAsync({
     _id: "seed-queue-in-progress",
-    displayId: "GC-97",
+    displayId: "gc-97",
     patientId: "seed-patient-3",
     serviceId: "seed-service-general",
     providerId: "seed-provider-alex",
@@ -199,7 +199,7 @@ async function insertDemoData(date: Date): Promise<void> {
 
   await QueueEntryCollection.insertAsync({
     _id: "seed-queue-completed",
-    displayId: "VC-01",
+    displayId: "vc-01",
     patientId: "seed-patient-4",
     serviceId: "seed-service-vaccination",
     providerId: "seed-provider-casey",
@@ -214,7 +214,7 @@ async function insertDemoData(date: Date): Promise<void> {
 
   await QueueEntryCollection.insertAsync({
     _id: "seed-queue-cancelled",
-    displayId: "VC-02",
+    displayId: "vc-02",
     patientId: "seed-patient-5",
     serviceId: "seed-service-vaccination",
     providerId: null,

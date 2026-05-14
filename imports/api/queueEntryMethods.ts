@@ -21,7 +21,6 @@ export type CheckInResult = {
     | "success"
     | "already-checked-in"
     | "entry-not-found"
-    | "invalid-status"
     | "unknown-error";
   time: Date;
 };
@@ -83,19 +82,14 @@ Meteor.methods({
       await QueueEntryCollection.findOneAsync(id);
 
     // 1. Early Returns
-    // Entry doesn't exist
-    if (!entry) {
+    // Entry doesn't exist or is not in a state that can be checked-in
+    if (!entry || (entry.status !== "waiting" && entry.status !== "ready")) {
       return { id, result: "entry-not-found", time };
     }
 
     // Already ready, no update needed
     if (entry.status === "ready") {
       return { id, result: "already-checked-in", time };
-    }
-
-    //  Only "waiting" entries can be marked ready
-    if (entry.status !== "waiting") {
-      return { id, result: "invalid-status", time };
     }
 
     // 2. Mark the entry as ready
@@ -315,15 +309,41 @@ async function generateDisplayId(service: Service): Promise<string> {
 
 // User Check-in
 export async function patientSelfCheckIn({
-  id,
+  displayId,
+  name,
   time,
 }: {
-  id: string;
+  displayId: string;
+  name: string;
   time: Date;
 }): Promise<CheckInResult> {
-  // 1. Resolve patientId from arguments or context (e.g., from logged-in user)
-  // PLACEHOLDER: just use that actual queueEntryId for now
+  // 1. Normalise inputs
+  const normalisedName: string = normaliseString(name);
+  const normalisedDisplayId: string = normaliseString(displayId);
 
-  // 2. Mark the entry as ready (i.e., check-in), if the patient has an active queue entry
-  return await checkIn(id, time);
+  // 2. Resolve patientId from arguments or context (e.g., from logged-in user)
+  const patient = await PatientsCollection.findOneAsync({
+    name: normalisedName,
+  });
+
+  if (!patient) {
+    console.log(`Patient with name '${name}'->'${normalisedName}' not found`);
+    return { id: "", result: "entry-not-found", time };
+  }
+
+  const entry = await QueueEntryCollection.findOneAsync({
+    displayId: normalisedDisplayId,
+    patientId: patient._id,
+    status: { $in: ["waiting", "ready"] },
+  });
+
+  if (!entry) {
+    console.log(
+      `Queue entry with displayId ${displayId}->${normalisedDisplayId} for patient ${name}->${normalisedName} not found`,
+    );
+    return { id: "", result: "entry-not-found", time };
+  }
+
+  // 3. Mark the entry as ready (i.e., check-in), if the patient has an active queue entry
+  return await checkIn(entry._id, time);
 }

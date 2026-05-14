@@ -4,7 +4,12 @@ import {
   patientSelfCheckIn,
 } from "/imports/api/queueEntryMethods";
 import { useDateTime } from "/imports/contexts/DateTimeContext";
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import {
+  CheckCircleIcon,
+  IdentificationIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/outline";
+import { Field, NameField } from "/imports/ui/components/Field";
 
 export const PatientQueueCheckInModal = ({
   setOpen,
@@ -12,12 +17,13 @@ export const PatientQueueCheckInModal = ({
   setOpen: (value: boolean) => void;
 }) => {
   const now = useDateTime();
-  const [id, setId] = useState("");
+  const [name, setName] = useState("");
+  const [displayId, setDisplayId] = useState("");
   const [feedbackType, setFeedbackType] = useState<CheckInResult["result"]>();
 
   const handleCheckIn = async () => {
     try {
-      const result = await patientSelfCheckIn({ id, time: now });
+      const result = await patientSelfCheckIn({ name, displayId, time: now });
 
       setFeedbackType(result.result);
     } catch (error) {
@@ -41,18 +47,32 @@ export const PatientQueueCheckInModal = ({
         {/* Feedback Messages */}
         {feedbackType && <FeedbackAlert feedback={feedbackType} />}
 
-        {/* Patient ID Input */}
+        {/* Patient Name Input */}
         <div className="form-control w-full py-4">
           <label className="label">
-            <span className="label-text font-medium">Enter Your ID</span>
+            <span className="label-text font-medium">Enter Your Name</span>
           </label>
-          {/* TODO: change this to a Field type */}
-          <input
-            type="text"
-            placeholder="Your patient ID"
-            value={id}
-            onChange={(e) => setId(e.target.value)}
-            className="input input-bordered w-full focus:outline-none"
+          <NameField
+            value={name}
+            mode="write"
+            onChange={setName}
+            placeholder="Your name"
+          />
+        </div>
+
+        {/* Display ID Input */}
+        <div className="form-control w-full py-4">
+          <label className="label">
+            <span className="label-text font-medium">
+              Enter Your Display ID
+            </span>
+          </label>
+          <Field
+            value={displayId}
+            mode="write"
+            onChange={setDisplayId}
+            placeholder="Your display ID"
+            icon={IdentificationIcon}
           />
         </div>
 
@@ -61,7 +81,7 @@ export const PatientQueueCheckInModal = ({
           <button
             className="btn btn-primary"
             onClick={handleCheckIn}
-            disabled={!id}
+            disabled={!name && !displayId}
           >
             Check In
           </button>
@@ -101,10 +121,9 @@ const FeedbackAlert = ({ feedback }: { feedback: CheckInResult["result"] }) => {
         <div className={"flex flex-col gap-1"}>
           <span>Unable to check in.</span>
 
+          {/* Reason */}
           <span>
             {feedback === "entry-not-found" && "ID not found."}
-            {feedback === "invalid-status" &&
-              "Your entry is not in a valid status for check-in."}
             {feedback === "unknown-error" && "An unknown error occurred."}
           </span>
 
