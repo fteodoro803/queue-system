@@ -12,3 +12,12 @@ body {
     /* padding: 10px; */
     font-family: sans-serif;
 }
+
+/* Shared utility to remove Daisy/native focus visuals */
+.no-focus-ui,
+.no-focus-ui:focus,
+.no-focus-ui:focus-visible,
+.no-focus-ui:focus-within {
+    outline: none !important;
+    box-shadow: none !important;
+}

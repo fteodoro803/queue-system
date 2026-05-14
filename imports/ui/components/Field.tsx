@@ -90,7 +90,9 @@ export const Field: FC<FieldProps> = ({
     <>
       {/* Field */}
       <div className="flex items-center gap-2 group">
-        <label className={`${baseAttributes} ${additionalAttributes}`}>
+        <label
+          className={`${baseAttributes} ${additionalAttributes} no-focus-ui`}
+        >
           {/*Icon*/}
           {icon &&
             createElement(icon, {
@@ -102,7 +104,7 @@ export const Field: FC<FieldProps> = ({
             required
             type={type}
             autoComplete={autocomplete}
-            className="grow"
+            className="grow no-focus-ui"
             placeholder={placeholder}
             value={mode === "editable" ? draftValue : value}
             onChange={(e) => {
