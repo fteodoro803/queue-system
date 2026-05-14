@@ -296,7 +296,7 @@ const MobileActionButtons = ({
   return (
     <div
       className={fullWidth ? "w-full" : ""}
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()} // Prevent click from propagating to list item which opens details modal
     >
       <div className={`join flex ${fullWidth ? "w-full" : ""}`}>
         {/* Main Button */}
