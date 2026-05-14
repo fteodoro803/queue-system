@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { QueueEntry } from "/imports/api/queueEntry";
 import {
   CalendarDaysIcon,
+  CheckCircleIcon,
   ClipboardDocumentListIcon,
   ClockIcon,
+  EnvelopeIcon,
   HashtagIcon,
   IdentificationIcon,
   InformationCircleIcon,
+  PhoneIcon,
   UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
@@ -22,6 +25,7 @@ import { Patient } from "/imports/api/patient";
 import { Service } from "/imports/api/service";
 import { getPatient } from "/imports/api/patientsMethods";
 import { getService } from "/imports/api/serviceMethods";
+import { formatNumberDisplay } from "/imports/utils/numberUtils";
 
 /**
  * Action modals for queue entry management.
@@ -121,32 +125,45 @@ const AppointmentDetails = ({ entry }: { entry: QueueEntry }) => {
   return (
     <div className="rounded-box border border-base-300 bg-base-200/60 p-4">
       <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+        {/* ---- Personal and Service Details ---- */}
+        {/* Name */}
         <div className="flex items-center gap-2">
           <UserIcon className="size-4 text-base-content/60" />
           <span className="text-base-content/70">Patient</span>
-          <span className="font-medium">{patient?.name ?? "N/A"}</span>
+          <span className="font-medium">{patient?.name ?? "-"}</span>
         </div>
 
+        {/* Display ID */}
         <div className="flex items-center gap-2">
           <IdentificationIcon className="size-4 text-base-content/60" />
           <span className="text-base-content/70">Display ID</span>
           <span className="font-medium">{entry.displayId}</span>
         </div>
 
+        {/* Email */}
         <div className="flex items-center gap-2">
-          <ClipboardDocumentListIcon className="size-4 text-base-content/60" />
-          <span className="text-base-content/70">Service</span>
-          <span className="font-medium">{service?.name ?? "N/A"}</span>
+          <EnvelopeIcon className="size-4 text-base-content/60" />
+          <span className="text-base-content/70">Email</span>
+          <span className="font-medium">{patient?.email ?? "-"}</span>
         </div>
 
+        {/* Number */}
         <div className="flex items-center gap-2">
-          <HashtagIcon className="size-4 text-base-content/60" />
-          <span className="text-base-content/70">Queue position</span>
+          <PhoneIcon className="size-4 text-base-content/60" />
+          <span className="text-base-content/70">Number</span>
           <span className="font-medium">
-            {entry.position != null ? `#${entry.position}` : "N/A"}
+            {patient?.number ? formatNumberDisplay(patient.number) : "-"}
           </span>
         </div>
 
+        {/* Service */}
+        <div className="flex items-center gap-2">
+          <ClipboardDocumentListIcon className="size-4 text-base-content/60" />
+          <span className="text-base-content/70">Service</span>
+          <span className="font-medium">{service?.name ?? "-"}</span>
+        </div>
+
+        {/* Status */}
         <div className="flex items-center gap-2">
           <InformationCircleIcon className="size-4 text-base-content/60" />
           <span className="text-base-content/70">Status</span>
@@ -155,6 +172,16 @@ const AppointmentDetails = ({ entry }: { entry: QueueEntry }) => {
           </span>
         </div>
 
+        {/* Queue position  */}
+        <div className="flex items-center gap-2">
+          <HashtagIcon className="size-4 text-base-content/60" />
+          <span className="text-base-content/70">Queue position</span>
+          <span className="font-medium">
+            {entry.position != null ? `#${entry.position}` : "-"}
+          </span>
+        </div>
+
+        {/* Queued At */}
         <div className="flex items-center gap-2">
           <CalendarDaysIcon className="size-4 text-base-content/60" />
           <span className="text-base-content/70">Queued at</span>
@@ -163,16 +190,78 @@ const AppointmentDetails = ({ entry }: { entry: QueueEntry }) => {
           </span>
         </div>
 
-        {entry.start && (
+        {/* Ready At */}
+        <div className="flex items-center gap-2">
+          <CheckCircleIcon className="size-4 text-base-content/60" />
+          <span className="text-base-content/70">Ready at</span>
+          <span className="font-medium">
+            {entry.readyAt ? formatDateToLocale(entry.readyAt) : "-"}
+          </span>
+        </div>
+
+        {/* Started At */}
+        <div className="flex items-center gap-2">
+          <ClockIcon className="size-4 text-base-content/60" />
+          <span className="text-base-content/70">Started</span>
+          <span className="font-medium">
+            {entry.start ? formatDateToLocale(entry.start) : "-"}
+          </span>
+        </div>
+
+        {/* Ended At */}
+        {entry.end && (
           <div className="flex items-center gap-2">
             <ClockIcon className="size-4 text-base-content/60" />
-            <span className="text-base-content/70">Started</span>
-            <span className="font-medium">
-              {entry.start ? formatDateToLocale(entry.start) : "Not started"}
-            </span>
+            <span className="text-base-content/70">Ended</span>
+            <span className="font-medium">{formatDateToLocale(entry.end)}</span>
           </div>
         )}
       </div>
+    </div>
+  );
+};
+
+/**
+ * Modal for displaying detailed information about a queue entry and its associated patient.
+ *
+ * @param setOpen - Controls modal visibility
+ * @param entry - The queue entry being acted on
+ */
+export const DetailsModal = ({
+  setOpen,
+  entry,
+}: {
+  setOpen: (value: boolean) => void;
+  entry: QueueEntry;
+}) => {
+  return (
+    <div className="modal modal-open" role="dialog" aria-modal="true">
+      <div className="modal-box relative w-11/12 max-w-2xl">
+        <button
+          className="btn btn-circle btn-ghost absolute right-3 top-3"
+          onClick={() => setOpen(false)}
+          aria-label="Close modal"
+        >
+          <XMarkIcon className="size-5" />
+        </button>
+
+        <h3 className="pr-10 text-lg font-semibold">Patient Details</h3>
+        <p className="mt-1 text-sm text-base-content/70">
+          Queue entry and patient information.
+        </p>
+
+        <div className="mt-4">
+          <AppointmentDetails entry={entry} />
+        </div>
+
+        <div className="modal-action mt-5">
+          <button className="btn btn-ghost" onClick={() => setOpen(false)}>
+            Close
+          </button>
+        </div>
+      </div>
+
+      <div className="modal-backdrop" onClick={() => setOpen(false)} />
     </div>
   );
 };

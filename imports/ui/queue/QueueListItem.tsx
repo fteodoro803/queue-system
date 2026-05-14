@@ -16,6 +16,7 @@ import { QueueTimeResult, statusBadgeMap } from "/imports/utils/queueUtils";
 import {
   CancelModal,
   CheckInModal,
+  DetailsModal,
   EndModal,
   StartModal,
 } from "/imports/ui/queue/ConfirmActionModal";
@@ -50,6 +51,7 @@ export const QueueListItem = ({
   const [openStartModal, setOpenStartModal] = useState(false);
   const [openEndModal, setOpenEndModal] = useState(false);
   const [openCheckInModal, setOpenCheckInModal] = useState(false);
+  const [openDetailsModal, setOpenDetailsModal] = useState(false);
 
   const position = entry.position;
   const isHighPriority = (service.priority ?? 0) > 1;
@@ -67,6 +69,7 @@ export const QueueListItem = ({
       <li
         className={`relative px-4 py-3 hover:bg-base-200 ${border}`}
         key={entry._id}
+        onClick={() => setOpenDetailsModal(true)}
       >
         {/* Mobile layout  */}
         <div className="flex min-w-0 flex-col gap-2 md:hidden">
@@ -215,6 +218,9 @@ export const QueueListItem = ({
       {openCheckInModal && (
         <CheckInModal setOpen={setOpenCheckInModal} entry={entry} now={now} />
       )}
+      {openDetailsModal && (
+        <DetailsModal setOpen={setOpenDetailsModal} entry={entry} />
+      )}
     </>
   );
 };
@@ -288,7 +294,10 @@ const MobileActionButtons = ({
   const flexWidth: string = " flex-1 min-w-25";
 
   return (
-    <div className={fullWidth ? "w-full" : ""}>
+    <div
+      className={fullWidth ? "w-full" : ""}
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className={`join flex ${fullWidth ? "w-full" : ""}`}>
         {/* Main Button */}
         {status === "waiting" ? (
@@ -359,7 +368,7 @@ const DesktopActionButtons = ({
   isProviderAvailable: boolean;
 }) => {
   return (
-    <div>
+    <div onClick={(e) => e.stopPropagation()}>
       {/* Check-in Button */}
       {status === "waiting" && (
         <button
