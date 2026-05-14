@@ -23,7 +23,7 @@ if (Meteor.isServer) {
         });
 
         const patient = await PatientsCollection.findOneAsync(patientId);
-        assert.equal(patient?.name, "Patient Updated");
+        assert.equal(patient?.name, "patient updated");
         assert.equal(patient?.email, "new@example.com");
         assert.equal(patient?.number, "09170000000");
       });

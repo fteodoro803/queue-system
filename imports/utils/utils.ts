@@ -1,3 +1,8 @@
+// ----- General Utilities -----
+export function normaliseString(str: string): string {
+  return str.trim().toLowerCase();
+}
+
 // ----- Checks -----
 export function isInteger(str: string): boolean {
   return /^\d+$/.test(str);

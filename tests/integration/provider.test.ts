@@ -28,7 +28,7 @@ if (Meteor.isServer) {
         });
 
         const provider = await ProviderCollection.findOneAsync(providerId);
-        assert.equal(provider?.name, "Provider Updated");
+        assert.equal(provider?.name, "provider updated");
         assert.equal(provider?.number, "09998887777");
         assert.equal(provider?.email, "provider@example.com");
         assert.deepEqual(provider?.services, [

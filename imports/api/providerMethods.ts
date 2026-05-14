@@ -1,5 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import { ProviderCollection, ProviderService } from "/imports/api/provider";
+import { normaliseString } from "/imports/utils/utils";
 
 // ---- Interfaces ----
 export interface ProviderData {
@@ -18,9 +19,9 @@ Meteor.methods({
   // Returns the new provider's ID
   "provider.insert"(data: ProviderData): Promise<string> {
     return ProviderCollection.insertAsync({
-      name: data.name.trim(),
-      email: data.email?.trim() ?? null,
-      number: data.number?.trim() ?? null,
+      name: normaliseString(data.name),
+      email: data.email ? normaliseString(data.email) : null,
+      number: data.number ? normaliseString(data.number) : null,
       avatar: data.avatar?.trim() ?? null,
       services: data.services ?? [],
       available: false, // Default to unavailable
@@ -38,10 +39,11 @@ Meteor.methods({
     const updates: Partial<ProviderData> = {};
 
     // Only update fields that are provided
-    if (data.name !== undefined) updates.name = data.name.trim();
-    if (data.email !== undefined) updates.email = data.email?.trim() ?? null;
-    if (data.number !== undefined) updates.number = data.number?.trim() ?? null;
-    if (data.avatar !== undefined) updates.avatar = data.avatar?.trim() ?? null;
+    if (data.name !== undefined) updates.name = normaliseString(data.name);
+    if (data.email !== undefined) updates.email = normaliseString(data.email);
+    if (data.number !== undefined)
+      updates.number = normaliseString(data.number);
+    if (data.avatar !== undefined) updates.avatar = data.avatar?.trim();
     if (data.available !== undefined) updates.available = data.available;
     if (data.active !== undefined) updates.active = data.active;
     if (data.services !== undefined) updates.services = data.services;
@@ -238,6 +240,6 @@ export async function selectProvider(
     return undefined; // No available providers for the service
   }
 
-  const providerId = docs[0]._id.toString();
-  return providerId;
+  // 3. Return Provider ID
+  return docs[0]._id.toString();
 }
