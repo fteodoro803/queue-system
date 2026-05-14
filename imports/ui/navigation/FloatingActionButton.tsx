@@ -18,8 +18,11 @@ export const FloatingActionButton = ({
     return activePath === page.link;
   };
 
-  const highlightLabel = "bg-base-300";
-  const highlightButton = "btn-base-300";
+  const baseColor = "group-hover:bg-base-100";
+  const activeColor = "bg-base-300 scale-[1.1]";
+  const hoverColor = "group-hover:bg-base-300";
+  const baseLabel =
+    "bg-base-100 text-base-content group-hover:bg-base-300 transition-all";
 
   return (
     <div className="fab">
@@ -38,8 +41,8 @@ export const FloatingActionButton = ({
           className={`rounded-full px-3 py-1 text-sm font-medium shadow-md whitespace-nowrap`}
         >
           Close
-        </span>{" "}
-        <span className="btn btn-circle btn-lg btn-error">✕</span>
+        </span>
+        <span className="btn btn-circle btn-lg btn-error shadow-md">✕</span>
       </div>
 
       {/* buttons that show up when FAB is open */}
@@ -51,10 +54,10 @@ export const FloatingActionButton = ({
         }
 
         return (
-          <div key={page.link}>
+          <div key={page.link} className="group">
             {/* Label */}
             <span
-              className={`rounded-full px-3 py-1 ${active ? highlightLabel : "bg-base-100"} text-sm font-medium shadow-md whitespace-nowrap`}
+              className={`rounded-full px-3 py-1 text-sm shadow-md whitespace-nowrap ${baseLabel}`}
             >
               {page.label}
             </span>
@@ -62,9 +65,12 @@ export const FloatingActionButton = ({
             {/* Button */}
             <Link to={page.link}>
               <button
-                className={`btn btn-lg btn-circle ${active ? highlightButton : "bg-base-100"}`}
+                className={`btn btn-lg btn-circle ${active ? activeColor : baseColor} ${hoverColor} `}
               >
                 <page.icon className="h-6 w-6" />
+                {active && (
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-primary border-2 border-base-100" />
+                )}
               </button>
             </Link>
           </div>
