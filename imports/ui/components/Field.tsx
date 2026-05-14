@@ -30,6 +30,7 @@ export interface FieldProps {
   mode: "write" | "read" | "editable";
   icon?: ComponentType<{ className?: string }>;
   validate?: (val: string) => boolean;
+  autocomplete?: string;
 }
 
 export const Field: FC<FieldProps> = ({
@@ -42,6 +43,7 @@ export const Field: FC<FieldProps> = ({
   icon,
   mode,
   validate,
+  autocomplete,
 }) => {
   const baseAttributes: string = `input ${validate ? "validator" : ""}`;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -99,6 +101,7 @@ export const Field: FC<FieldProps> = ({
           <input
             required
             type={type}
+            autoComplete={autocomplete}
             className="grow"
             placeholder={placeholder}
             value={mode === "editable" ? draftValue : value}
@@ -157,14 +160,14 @@ export const EmailField: FC<EmailFieldProps> = (props) => {
   const baseAttributes: string = "";
 
   return (
-    <>
-      <Field
-        {...props}
-        additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
-        icon={EnvelopeIcon}
-        validate={isValidEmail}
-      />
-    </>
+    <Field
+      {...props}
+      additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
+      icon={EnvelopeIcon}
+      validate={isValidEmail}
+      type="email"
+      autocomplete="email"
+    />
   );
 };
 
@@ -175,13 +178,13 @@ export const NameField: FC<NameFieldProps> = (props) => {
   const baseAttributes: string = "";
 
   return (
-    <>
-      <Field
-        {...props}
-        additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
-        icon={UserIcon}
-      />
-    </>
+    <Field
+      {...props}
+      additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
+      icon={UserIcon}
+      type="name"
+      autocomplete="name"
+    />
   );
 };
 
@@ -192,15 +195,14 @@ export const NumberField: FC<NumberFieldProps> = (props) => {
   const baseAttributes: string = "";
 
   return (
-    <>
-      <Field
-        {...props}
-        onChange={(val) => props.onChange?.(formatNumberDisplay(val))}
-        additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
-        icon={DevicePhoneMobileIcon}
-        type="tel"
-        validate={isPhilippineNumber}
-      />
-    </>
+    <Field
+      {...props}
+      onChange={(val) => props.onChange?.(formatNumberDisplay(val))}
+      additionalAttributes={`${baseAttributes} ${props.additionalAttributes}`}
+      icon={DevicePhoneMobileIcon}
+      type="tel"
+      validate={isPhilippineNumber}
+      autocomplete="tel"
+    />
   );
 };
