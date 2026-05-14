@@ -14,7 +14,16 @@ export interface QueueEntryData {
   service: Service;
 }
 
-export type CheckInResult = { id: string; isReady: boolean; time: Date };
+export type CheckInResult = {
+  id: string;
+  result:
+    | "success"
+    | "already-checked-in"
+    | "entry-not-found"
+    | "invalid-status"
+    | "unknown-error";
+  time: Date;
+};
 
 // Client-Called methods
 Meteor.methods({
@@ -39,8 +48,8 @@ Meteor.methods({
     // 3. Generate display ID
     const displayId = await generateDisplayId(data.service);
 
-    // 4. Insert the entry into queue
-    const queueEntryId = QueueEntryCollection.insertAsync({
+    // 4. Insert the entry into queue and return
+    return QueueEntryCollection.insertAsync({
       displayId: displayId,
       patientId: data.patient._id,
       serviceId: data.service._id,
@@ -53,8 +62,6 @@ Meteor.methods({
       end: null, // End time will be set after the service is completed
       createdAt: time,
     });
-
-    return queueEntryId;
   },
 
   // Set initialEstimatedWaitTime
@@ -71,6 +78,26 @@ Meteor.methods({
     id: string,
     time: Date,
   ): Promise<CheckInResult> {
+    const entry: QueueEntry | undefined =
+      await QueueEntryCollection.findOneAsync(id);
+
+    // 1. Early Returns
+    // Entry doesn't exist
+    if (!entry) {
+      return { id, result: "entry-not-found", time };
+    }
+
+    // Already ready, no update needed
+    if (entry.status === "ready") {
+      return { id, result: "already-checked-in", time };
+    }
+
+    //  Only "waiting" entries can be marked ready
+    if (entry.status !== "waiting") {
+      return { id, result: "invalid-status", time };
+    }
+
+    // 2. Mark the entry as ready
     const updated = await QueueEntryCollection.updateAsync(id, {
       $set: {
         readyAt: time,
@@ -80,10 +107,11 @@ Meteor.methods({
 
     // No update
     if (updated === 0) {
-      return { id, isReady: false, time };
+      return { id, result: "unknown-error", time };
     }
 
-    return { id, isReady: true, time };
+    // Successfully marked as ready
+    return { id, result: "success", time };
   },
 
   // Starts a Service
@@ -281,9 +309,7 @@ async function generateDisplayId(service: Service): Promise<string> {
 
   // 4. Combine initials and count to generate ID (e.g., "AB-12")
   const numStr = `${String(nextNum).padStart(2, "0")}`;
-  const displayId = `${service.shortcode}-${numStr}`;
-
-  return displayId;
+  return `${service.shortcode}-${numStr}`;
 }
 
 // User Check-in
