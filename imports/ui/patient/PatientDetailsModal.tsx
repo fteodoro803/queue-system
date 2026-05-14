@@ -3,7 +3,7 @@ import { Patient } from "/imports/api/patient";
 import { EmailField, NameField, NumberField } from "../components/Field";
 import { Avatar } from "/imports/ui/components/Avatar";
 import { updatePatient } from "/imports/api/patientsMethods";
-import { ModalButtons } from "/imports/ui/components/ModalButtons";
+import { DetailsModalButtons } from "/imports/ui/components/DetailsModalButtons";
 
 export const PatientDetailsModal = ({
   patient,
@@ -76,9 +76,7 @@ export const PatientDetailsModal = ({
           <NameField
             value={name}
             onChange={setName}
-            additionalAttributes={
-              "input input-ghost disabled:opacity-100 bg-base-100"
-            }
+            additionalAttributes={"disabled:opacity-100 bg-base-100"}
             placeholder={"N/A"}
             mode="editable"
           />
@@ -88,9 +86,7 @@ export const PatientDetailsModal = ({
           <EmailField
             value={email}
             onChange={setEmail}
-            additionalAttributes={
-              "input-ghost disabled:opacity-100 bg-base-100"
-            }
+            additionalAttributes={"disabled:opacity-100 bg-base-100"}
             placeholder={"N/A"}
             mode="editable"
           />
@@ -100,9 +96,7 @@ export const PatientDetailsModal = ({
           <NumberField
             value={number}
             onChange={setNumber}
-            additionalAttributes={
-              "input-ghost disabled:opacity-100 bg-base-100"
-            }
+            additionalAttributes={"disabled:opacity-100 bg-base-100"}
             placeholder={"N/A"}
             mode="editable"
           />
@@ -118,7 +112,7 @@ export const PatientDetailsModal = ({
         </fieldset>
 
         {/*Buttons*/}
-        <ModalButtons
+        <DetailsModalButtons
           handleCancel={handleCancel}
           handleSave={handleSave}
           hasChanges={hasChanges}

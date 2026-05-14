@@ -8,7 +8,7 @@ import {
   IdentificationIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
-import { ModalButtons } from "/imports/ui/components/ModalButtons";
+import { DetailsModalButtons } from "/imports/ui/components/DetailsModalButtons";
 import { updateService } from "/imports/api/serviceMethods";
 
 export const ServiceDetailsModal = ({
@@ -120,7 +120,7 @@ export const ServiceDetailsModal = ({
             <Field
               value={name}
               onChange={setName}
-              additionalAttributes="input input-ghost bg-base-100"
+              additionalAttributes="bg-base-100"
               mode="editable"
               type="text"
               placeholder="N/A"
@@ -136,7 +136,7 @@ export const ServiceDetailsModal = ({
             <Field
               value={shortcode}
               onChange={setShortcode}
-              additionalAttributes="input input-ghost bg-base-100"
+              additionalAttributes="bg-base-100"
               mode="editable"
               type="text"
               placeholder="N/A"
@@ -152,7 +152,7 @@ export const ServiceDetailsModal = ({
             <Field
               value={duration}
               onChange={setDuration}
-              additionalAttributes="input input-ghost bg-base-100"
+              additionalAttributes="bg-base-100"
               type="number"
               placeholder="N/A"
               icon={ClockIcon}
@@ -168,7 +168,7 @@ export const ServiceDetailsModal = ({
             <Field
               value={cost}
               onChange={setCost}
-              additionalAttributes="input input-ghost bg-base-100"
+              additionalAttributes="bg-base-100"
               type="number"
               placeholder="N/A"
               icon={BanknotesIcon}
@@ -184,7 +184,7 @@ export const ServiceDetailsModal = ({
             <Field
               value={description}
               onChange={setDescription}
-              additionalAttributes="input input-ghost bg-base-100"
+              additionalAttributes="bg-base-100"
               type="text"
               placeholder="N/A"
               icon={ChatBubbleBottomCenterIcon}
@@ -193,7 +193,7 @@ export const ServiceDetailsModal = ({
           </div>
 
           <div className="pt-1">
-            <ModalButtons
+            <DetailsModalButtons
               setOpen={setOpen}
               hasChanges={hasChanges}
               handleSave={handleSave}

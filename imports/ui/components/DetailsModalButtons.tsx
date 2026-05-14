@@ -1,6 +1,6 @@
 import React from "react";
 
-export const ModalButtons = ({
+export const DetailsModalButtons = ({
   setOpen,
   hasChanges,
   handleSave,
@@ -11,13 +11,21 @@ export const ModalButtons = ({
   handleSave?: () => void;
   handleCancel?: () => void;
 }) => {
+  const ghostButtonClass =
+    "btn btn-sm border border-base-300 bg-base-100 px-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-base-200";
+  const saveButtonClass =
+    "btn btn-sm border border-success bg-success/10 px-5 text-success shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-success/20";
+  const cancelButtonClass =
+    "btn btn-sm border border-error bg-error/10 px-5 text-error shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-error/20";
+
   return (
     <div className="flex gap-2 justify-end">
       {!hasChanges ? (
         <>
           {/* Close Button */}
           <button
-            className="btn"
+            type="button"
+            className={ghostButtonClass}
             onClick={() => {
               setOpen(false);
             }}
@@ -30,7 +38,7 @@ export const ModalButtons = ({
           {/* Save Button */}
           <button
             type="button"
-            className="btn btn-success"
+            className={saveButtonClass}
             onClick={handleSave}
           >
             Save
@@ -39,7 +47,7 @@ export const ModalButtons = ({
           {/* Cancel Button */}
           <button
             type="button"
-            className="btn btn-error"
+            className={cancelButtonClass}
             onClick={handleCancel}
           >
             Cancel

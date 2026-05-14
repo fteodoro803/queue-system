@@ -86,6 +86,9 @@ export const Field: FC<FieldProps> = ({
     setIsEditing(false);
   };
 
+  const actionButtonClass =
+    "btn btn-sm btn-circle border shadow-sm transition-all duration-200 group-hover:opacity-100 hover:-translate-y-0.5";
+
   return (
     <>
       {/* Field */}
@@ -122,29 +125,41 @@ export const Field: FC<FieldProps> = ({
         </label>
 
         {/* Buttons */}
-        {/* Visible when in editable mode and not disabled */}
+        {/* Visible when in editable mode or on mobile, and not disabled */}
         {mode === "editable" && !disabled && (
           <div>
             {!isEditing ? (
               <div>
                 {/* Edit Button */}
                 <button
-                  className="btn opacity-0 group-hover:opacity-100"
+                  type="button"
+                  className={`${actionButtonClass} sm:opacity-0`}
                   onClick={handleStartEditing}
+                  aria-label="Edit field"
                 >
-                  <PencilSquareIcon className="h-5 w-5 text-base-content/50" />
+                  <PencilSquareIcon className="h-4 w-4 text-base-content/70" />
                 </button>
               </div>
             ) : (
-              <div>
+              <div className="flex items-center gap-2">
                 {/* Cancel Button */}
-                <button className="btn btn-error" onClick={handleCancel}>
-                  <XMarkIcon className="h-5 w-5 text-base-content/50" />
+                <button
+                  type="button"
+                  className={`${actionButtonClass} border-error bg-error/10 hover:bg-error/20`}
+                  onClick={handleCancel}
+                  aria-label="Cancel edit"
+                >
+                  <XMarkIcon className="h-4 w-4 text-error" />
                 </button>
 
                 {/* Save Button */}
-                <button className="btn btn-success" onClick={handleSave}>
-                  <CheckIcon className="h-5 w-5 text-base-content/50" />
+                <button
+                  type="button"
+                  className={`${actionButtonClass} border-success bg-success/10 hover:bg-success/20`}
+                  onClick={handleSave}
+                  aria-label="Save field"
+                >
+                  <CheckIcon className="h-4 w-4 text-success" />
                 </button>
               </div>
             )}

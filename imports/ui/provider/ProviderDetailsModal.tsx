@@ -4,7 +4,7 @@ import { Avatar } from "/imports/ui/components/Avatar";
 import { Provider } from "/imports/api/provider";
 import { updateProvider } from "/imports/api/providerMethods";
 import { ProviderServicesTable } from "/imports/ui/provider/ProviderServicesTable";
-import { ModalButtons } from "/imports/ui/components/ModalButtons";
+import { DetailsModalButtons } from "/imports/ui/components/DetailsModalButtons";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 
 export const ProviderDetailsModal = ({
@@ -105,7 +105,7 @@ export const ProviderDetailsModal = ({
             <NameField
               value={name}
               onChange={setName}
-              additionalAttributes="input-ghost bg-base-100"
+              additionalAttributes="bg-base-100"
               placeholder="N/A"
               mode="editable"
             />
@@ -119,7 +119,7 @@ export const ProviderDetailsModal = ({
             <EmailField
               value={email}
               onChange={setEmail}
-              additionalAttributes="input-ghost bg-base-100"
+              additionalAttributes="bg-base-100"
               placeholder="N/A"
               mode="editable"
             />
@@ -133,7 +133,7 @@ export const ProviderDetailsModal = ({
             <NumberField
               value={number}
               onChange={setNumber}
-              additionalAttributes="input-ghost bg-base-100"
+              additionalAttributes="bg-base-100"
               placeholder="N/A"
               mode="editable"
             />
@@ -150,7 +150,7 @@ export const ProviderDetailsModal = ({
           </div>
 
           <div className="pt-1">
-            <ModalButtons
+            <DetailsModalButtons
               setOpen={setOpen}
               hasChanges={hasChanges}
               handleSave={handleSave}
