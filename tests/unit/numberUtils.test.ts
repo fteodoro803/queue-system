@@ -3,6 +3,7 @@ import { expect } from "chai";
 import {
   formatNumberDisplay,
   isPhilippineNumber,
+  normaliseNumber,
 } from "/imports/utils/numberUtils";
 
 describe("[UNIT] NumberUtils", () => {
@@ -129,6 +130,32 @@ describe("[UNIT] NumberUtils", () => {
       expect(isPhilippineNumber("")).to.equal(false);
       expect(isPhilippineNumber("   ")).to.equal(false);
       expect(isPhilippineNumber("abcdefg")).to.equal(false);
+    });
+  });
+
+  describe("normaliseNumber()", () => {
+    it("returns empty string for empty input", () => {
+      expect(normaliseNumber("")).to.equal("");
+      expect(normaliseNumber("   ")).to.equal("");
+    });
+
+    it("normalises +63 prefixed input to local 0-prefixed digits", () => {
+      expect(normaliseNumber("+63 999 123 4567")).to.equal("09991234567");
+      expect(normaliseNumber("+639991234567")).to.equal("09991234567");
+    });
+
+    it("normalises 63 prefixed input to local 0-prefixed digits", () => {
+      expect(normaliseNumber("63 999 123 4567")).to.equal("09991234567");
+      expect(normaliseNumber("639991234567")).to.equal("09991234567");
+    });
+
+    it("keeps already-local numbers and strips separators", () => {
+      expect(normaliseNumber("0917 123 4567")).to.equal("09171234567");
+      expect(normaliseNumber("0917-123-4567")).to.equal("09171234567");
+    });
+
+    it("removes non-digit characters after prefix normalisation", () => {
+      expect(normaliseNumber(" +63-(999)-123-4567 ")).to.equal("09991234567");
     });
   });
 });

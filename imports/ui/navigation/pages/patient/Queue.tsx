@@ -173,6 +173,7 @@ export const Queue = () => {
             patientMap={patientMap}
             states={["in-progress", "waiting", "ready"]}
             adminView={false}
+            searchBar={true}
             stats={stats && stats.length > 0 ? stats[0] : undefined}
           />
         </div>

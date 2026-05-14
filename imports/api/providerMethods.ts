@@ -1,5 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import { ProviderCollection, ProviderService } from "/imports/api/provider";
+import { normaliseNumber } from "/imports/utils/numberUtils";
 
 // ---- Interfaces ----
 export interface ProviderData {
@@ -20,7 +21,7 @@ Meteor.methods({
     return ProviderCollection.insertAsync({
       name: data.name.trim(),
       email: data.email?.trim() ?? null,
-      number: data.number?.trim() ?? null,
+      number: data.number ? normaliseNumber(data.number) : null,
       avatar: data.avatar?.trim() ?? null,
       services: data.services ?? [],
       available: false, // Default to unavailable
@@ -39,9 +40,10 @@ Meteor.methods({
 
     // Only update fields that are provided
     if (data.name !== undefined) updates.name = data.name.trim();
-    if (data.email !== undefined) updates.email = data.email?.trim() ?? null;
-    if (data.number !== undefined) updates.number = data.number?.trim() ?? null;
-    if (data.avatar !== undefined) updates.avatar = data.avatar?.trim() ?? null;
+    if (data.email !== undefined) updates.email = data.email?.trim();
+    if (data.number !== undefined)
+      updates.number = normaliseNumber(data.number);
+    if (data.avatar !== undefined) updates.avatar = data.avatar?.trim();
     if (data.available !== undefined) updates.available = data.available;
     if (data.active !== undefined) updates.active = data.active;
     if (data.services !== undefined) updates.services = data.services;
@@ -238,6 +240,6 @@ export async function selectProvider(
     return undefined; // No available providers for the service
   }
 
-  const providerId = docs[0]._id.toString();
-  return providerId;
+  // Return the ID of the selected provider as a string
+  return docs[0]._id.toString();
 }

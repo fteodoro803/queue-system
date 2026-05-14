@@ -5,6 +5,7 @@ import {
   BanknotesIcon,
   ChatBubbleBottomCenterIcon,
   ClockIcon,
+  IdentificationIcon,
   WrenchIcon,
 } from "@heroicons/react/24/outline";
 import { ModalButtons } from "/imports/ui/components/ModalButtons";
@@ -20,6 +21,7 @@ export const ServiceDetailsModal = ({
   setOpen: (value: boolean) => void;
 }) => {
   const [name, setName] = useState<string>("");
+  const [shortcode, setShortcode] = useState<string>("");
   const [duration, setDuration] = useState<string>("");
   const [cost, setCost] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -30,6 +32,7 @@ export const ServiceDetailsModal = ({
     if (!service) return;
 
     setName(service.name);
+    setShortcode(service.shortcode);
     setDuration(service.duration.toString());
     setCost(service.cost?.toString() ?? "");
     setDescription(service.description);
@@ -40,12 +43,13 @@ export const ServiceDetailsModal = ({
     if (!service) return;
     const hasChanges =
       name !== service.name ||
+      shortcode !== service.shortcode ||
       duration !== service.duration.toString() ||
       cost !== (service.cost?.toString() ?? "") ||
       description !== service.description;
 
     setHasChanges(hasChanges);
-  }, [name, duration, cost, description, service]);
+  }, [name, shortcode, duration, cost, description, service]);
 
   // Save edits functionality
   const handleSave = async () => {
@@ -54,6 +58,7 @@ export const ServiceDetailsModal = ({
 
     await updateService(service._id, {
       name,
+      shortcode,
       duration: Number.isFinite(parsedDuration)
         ? parsedDuration
         : service.duration,
@@ -67,6 +72,7 @@ export const ServiceDetailsModal = ({
   // Cancel edits functionality
   const handleCancel = () => {
     setName(service.name);
+    setShortcode(service.shortcode);
     setDuration(service.duration.toString());
     setCost(service.cost?.toString() ?? "");
     setDescription(service.description);
@@ -122,6 +128,23 @@ export const ServiceDetailsModal = ({
             />
           </div>
 
+          {/* Shortcode */}
+          <div>
+            <label className="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-1 block">
+              Shortcode
+            </label>
+            <Field
+              value={shortcode}
+              onChange={setShortcode}
+              additionalAttributes="input input-ghost bg-base-100"
+              mode="editable"
+              type="text"
+              placeholder="N/A"
+              icon={IdentificationIcon}
+            />
+          </div>
+
+          {/* Duration */}
           <div>
             <label className="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-1 block">
               Duration (mins)

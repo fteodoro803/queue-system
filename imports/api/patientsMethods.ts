@@ -1,5 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import { PatientsCollection } from "/imports/api/patient";
+import { normaliseNumber } from "/imports/utils/numberUtils";
 
 // Interfaces for method parameters
 export interface PatientData {
@@ -17,7 +18,7 @@ Meteor.methods({
     return PatientsCollection.insertAsync({
       name: data.name.trim(),
       email: data.email?.trim() ?? null,
-      number: data.number?.trim() ?? null,
+      number: data.number ? normaliseNumber(data.number) : null,
       avatar: data.avatar?.trim() ?? null,
       createdAt: new Date(),
     });
@@ -33,9 +34,10 @@ Meteor.methods({
 
     // Only update fields that are provided
     if (data.name !== undefined) updates.name = data.name.trim();
-    if (data.email !== undefined) updates.email = data.email?.trim() ?? null;
-    if (data.number !== undefined) updates.number = data.number?.trim() ?? null;
-    if (data.avatar !== undefined) updates.avatar = data.avatar?.trim() ?? null;
+    if (data.email !== undefined) updates.email = data.email.trim();
+    if (data.number !== undefined)
+      updates.number = normaliseNumber(data.number);
+    if (data.avatar !== undefined) updates.avatar = data.avatar.trim();
 
     const result = await PatientsCollection.updateAsync(id, {
       $set: updates,

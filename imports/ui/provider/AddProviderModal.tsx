@@ -25,7 +25,7 @@ export const AddProviderModal = ({
           ✕
         </button>
 
-        <AddProviderForm />
+        <AddProviderForm flat />
 
         <div className="flex gap-2 justify-end">
           {/*Close Button*/}

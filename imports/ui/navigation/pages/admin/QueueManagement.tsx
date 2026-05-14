@@ -251,6 +251,7 @@ export const QueueManagement = () => {
                     states={["in-progress"]}
                     patientMap={patientMap}
                     adminView={true}
+                    searchBar={true}
                   />
                 </div>
               </div>
@@ -266,6 +267,7 @@ export const QueueManagement = () => {
                     providers={activeProviders}
                     patientMap={patientMap}
                     adminView={true}
+                    searchBar={true}
                     stats={stats && stats.length > 0 ? stats[0] : undefined}
                   />
                 </div>
