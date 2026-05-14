@@ -65,7 +65,7 @@ export const FloatingActionButton = ({
             {/* Button */}
             <Link to={page.link}>
               <button
-                className={`btn btn-lg btn-circle ${active ? activeColor : baseColor} ${hoverColor} `}
+                className={`btn btn-lg btn-circle shadow-md ${active ? activeColor : baseColor} ${hoverColor} `}
               >
                 <page.icon className="h-6 w-6" />
                 {active && (
