@@ -58,3 +58,25 @@ export function formatNumberDisplay(value: string): string {
   if (local.length <= 7) return `${local.slice(0, 4)} ${local.slice(4)}`;
   return `${local.slice(0, 4)} ${local.slice(4, 7)} ${local.slice(7, 11)}`;
 }
+
+/**
+ * Formats a formatted Philippine phone number string into a normalised format, starting with 0 and without spaces.
+ * @param value The input string containing digits.
+ * @returns The formatted phone number string.
+ *
+ * Example:
+ * normaliseNumber("0917 123 4567") => "09171234567"
+ * normaliseNumber("63 999 123 4567") => "09991234567"
+ * normaliseNumber("+63 999 123 4567") => "09991234567"
+ */
+export function normaliseNumber(value: string): string {
+  if (!value || value.trim() === "") return "";
+
+  // 1. Replace a leading +63 or 63 with 0
+  let normalised = value.trim().replace(/^\+?63/, "0");
+
+  // 2. Remove all non-digit characters
+  normalised = normalised.replace(/\D/g, "");
+
+  return normalised;
+}
