@@ -24,6 +24,7 @@ import { ServiceSelector } from "/imports/ui/components/ServiceSelector";
 import { Service, ServicesCollection } from "/imports/api/service";
 import { Patient, PatientsCollection } from "/imports/api/patient";
 import { getStatsQuery } from "/imports/api/statsMethods";
+import { ProviderAvailabilityModal } from "/imports/ui/provider/ProviderAvailabilityModal";
 
 export const AdminDashboard = () => {
   const now = useDateTime();
@@ -43,6 +44,8 @@ export const AdminDashboard = () => {
   const startOfDay: string = settings?.start_of_day;
   const endOfDay: string = settings?.end_of_day;
   const [isWorkdayModalOpen, setWorkdayModalOpen] = useState(false);
+  const [providerAvailabilityModalOpen, setProviderAvailabilityModalOpen] =
+    useState(false);
 
   // Patients
   const patients = useFind(() => PatientsCollection.find({}));
@@ -164,13 +167,16 @@ export const AdminDashboard = () => {
                 />
               </div>
 
-              {/* Available Doctors Card */}
-              <div>
+              {/* Available Providers Card */}
+              <div className={"cursor-pointer"}>
                 <DashboardCard
                   header="Available Providers"
                   body={availableProviders.length}
                   footer={`Unavailable: ${activeProviders.length - availableProviders.length}`}
                   icon={IdentificationIcon}
+                  onClick={() => {
+                    setProviderAvailabilityModalOpen(true);
+                  }}
                 />
               </div>
             </>
@@ -208,6 +214,12 @@ export const AdminDashboard = () => {
 
       {/* Workday Modal */}
       {isWorkdayModalOpen && <WorkdayModal setOpen={setWorkdayModalOpen} />}
+
+      {/* Provider Availability Modal */}
+      <ProviderAvailabilityModal
+        open={providerAvailabilityModalOpen}
+        setOpen={setProviderAvailabilityModalOpen}
+      />
     </>
   );
 };
