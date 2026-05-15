@@ -64,7 +64,7 @@ async function insertDemoData(date: Date): Promise<void> {
     email: "alex.demo@example.com",
     number: "09170000001",
     avatar: null,
-    available: true,
+    available: false,
     active: true,
     services: [
       {

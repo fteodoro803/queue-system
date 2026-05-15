@@ -58,20 +58,16 @@ export const AdminDashboard = () => {
 
   // Providers
   const providers = useFind(() => ProviderCollection.find({}));
-  const activeProviders = providers.filter(
-    (p) =>
-      p.active &&
-      p.services.some((s) => s.id === selectedService?._id && s.enabled),
-  );
-  const availableProviders = activeProviders.filter((p) => p.available).length;
+  const activeProviders = providers.filter((p) => p.active);
+  const availableProviders = providers.filter((p) => p.active && p.available);
 
   // Queues
   const queue = useFind(() =>
-    // Get queue entries made today that are still waiting or in-progress
+    // Get queue entries in-progress
     QueueEntryCollection.find(
       {
         createdAt: { $gte: getStartOfDay(now), $lte: getEndOfDay(now) },
-        status: { $in: ["waiting", "in-progress", "ready"] },
+        status: "in-progress",
       },
       { sort: { serviceId: 1, position: 1 } },
     ),
@@ -118,7 +114,6 @@ export const AdminDashboard = () => {
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
         {/* Dashboard Cards */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-6"> */}
         <div className="flex flex-wrap gap-4 justify-start my-8">
           {/* Calendar Dashboard Card */}
           <div>
@@ -157,9 +152,9 @@ export const AdminDashboard = () => {
             />
           </div>
 
-          {/* Queue Dashboard Card */}
           {dayStarted && (
             <>
+              {/* Queue Dashboard Card */}
               <div>
                 <DashboardCard
                   header="In Queue"
@@ -173,11 +168,8 @@ export const AdminDashboard = () => {
               <div>
                 <DashboardCard
                   header="Available Providers"
-                  body={
-                    providers.filter((p) => p.services.some((s) => s.enabled))
-                      .length
-                  }
-                  footer={`Unavailable: ${providers.filter((p) => !p.services.some((s) => s.enabled)).length}`}
+                  body={availableProviders.length}
+                  footer={`Unavailable: ${activeProviders.length - availableProviders.length}`}
                   icon={IdentificationIcon}
                 />
               </div>
@@ -191,28 +183,13 @@ export const AdminDashboard = () => {
           setService={setSelectedService}
         />
 
-        {/* Queues */}
+        {/* Ongoing Queue */}
         {selectedService && stats ? (
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 mt-2">
             <div>
-              <h2 className="text-xl font-bold mb-3">Waiting</h2>
-              <QueueList
-                queue={queue}
-                service={selectedService}
-                states={["ready", "waiting"]}
-                providers={activeProviders}
-                patientMap={patientMap}
-                availableProviders={availableProviders}
-                adminView={true}
-                searchBar={true}
-                stats={stats && stats.length > 0 ? stats[0] : undefined}
-              />
-            </div>
-
-            <div>
               <h2 className="text-xl font-bold mb-3">Ongoing</h2>
               <QueueList
-                queue={queue}
+                queue={queue.slice(0, 3)}
                 service={selectedService}
                 states={["in-progress"]}
                 providers={activeProviders}

@@ -104,13 +104,10 @@ export const QueueManagement = () => {
     );
   }, [selectedService]);
 
-  const activeProviders = providers.filter(
-    (p) =>
-      p.active &&
-      p.services.some((s) => s.id === selectedService?._id && s.enabled),
-  );
-  const availableProviders = providers.filter((p) => p.available).length;
-  const unavailableProviders = activeProviders.length - availableProviders;
+  const activeProviders = providers.filter((p) => p.active);
+  const availableProviders = providers.filter((p) => p.available);
+  const unavailableProviders =
+    activeProviders.length - availableProviders.length;
 
   const maxQueueLength: QueueTimeResult | undefined =
     selectedService && stats
@@ -191,7 +188,7 @@ export const QueueManagement = () => {
             >
               <DashboardCard
                 header="Available Providers"
-                body={availableProviders}
+                body={availableProviders.length}
                 footer={`Unavailable: ${unavailableProviders}`}
                 icon={IdentificationIcon}
               />
@@ -262,7 +259,7 @@ export const QueueManagement = () => {
                   <QueueList
                     queue={presentQueueEntries}
                     service={selectedService}
-                    availableProviders={availableProviders}
+                    availableProviders={availableProviders.length}
                     states={["waiting", "ready"]}
                     providers={activeProviders}
                     patientMap={patientMap}
@@ -294,7 +291,7 @@ export const QueueManagement = () => {
                 <div key={selectedService._id} className="mb-6">
                   <h2 className="text-2xl font-bold">Finished</h2>
                   <QueueList
-                    availableProviders={availableProviders}
+                    availableProviders={availableProviders.length}
                     queue={pastQueueEntries}
                     service={selectedService}
                     states={["completed"]}
@@ -326,7 +323,7 @@ export const QueueManagement = () => {
                 <div key={selectedService._id} className="mb-6">
                   <h2 className="text-2xl font-bold">Cancelled</h2>
                   <QueueList
-                    availableProviders={availableProviders}
+                    availableProviders={availableProviders.length}
                     queue={pastQueueEntries}
                     service={selectedService}
                     states={["cancelled"]}
